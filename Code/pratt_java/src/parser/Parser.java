@@ -13,19 +13,16 @@ public class Parser {
         mTokens = tokens;
     }
 
-    public void register(TokenType token, PrefixParselet parselet) {
-        mPrefixParselets.put(token, parselet);
-    }
-
-    public void register(TokenType token, InfixParselet parselet) {
-        mInfixParselets.put(token, parselet);
-    }
-
+    /**
+     * Parses expressions
+     * @param precedence precedence value
+     * @return ABST
+     */
     public Expression parseExpression(int precedence) {
         Token token = consume();
         PrefixParselet prefix = mPrefixParselets.get(token.getType());
 
-        if (prefix == null) throw new ParseException("Could not parse \"" +
+        if (prefix == null) throw new ParseException("Could not parse " +
                 token.toString() + "\".");
 
         Expression left = prefix.parse(this, token);

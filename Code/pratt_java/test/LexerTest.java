@@ -1,6 +1,9 @@
 import lexer.*;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 public class LexerTest {
@@ -387,5 +390,29 @@ public class LexerTest {
         assertEquals(TokenType.TOK_BOOL, l.nextToken().getType());
         assertEquals(TokenType.TOK_OR, l.nextToken().getType());
         assertEquals(TokenType.TOK_BOOL, l.nextToken().getType());
+    }
+
+    ////////////////////////////
+    // TESTING OF WHOLE LEXER
+    ////////////////////////////
+    @Test
+    public void testSimple() {
+        Lexer l = new Lexer("a + True + 1 + b.hd");
+        List<Token> lexedTokenized = l.tokenize();
+
+        List<Token> trueTokenized = new ArrayList<>();
+        trueTokenized.add(new TokenIdentifier("a"));
+        trueTokenized.add(new TokenOther(TokenType.TOK_PLUS));
+        trueTokenized.add(new TokenBool(true));
+        trueTokenized.add(new TokenOther(TokenType.TOK_PLUS));
+        trueTokenized.add(new TokenInteger(1));
+        trueTokenized.add(new TokenOther(TokenType.TOK_PLUS));
+        trueTokenized.add(new TokenIdentifier("b"));
+        trueTokenized.add(new TokenOther(TokenType.TOK_DOT));
+        trueTokenized.add(new TokenField("hd"));
+        for(int i = 0; i < trueTokenized.size(); i++){
+            assertEquals(lexedTokenized.get(i), trueTokenized.get(i));
+        }
+        System.out.println(lexedTokenized);
     }
 }

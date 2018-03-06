@@ -1,11 +1,24 @@
 package lexer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Lexer {
     String input = null;
     int currentPosition = 0;
 
     public Lexer(String inp) {
         input = inp;
+    }
+
+    public List<Token> tokenize(){
+        List<Token> tokenizedInput = new ArrayList<>();
+        Token tok;
+        do{
+            tok = nextToken();
+            tokenizedInput.add(tok);
+        } while(tok.getType() != TokenType.TOK_EOF);
+        return tokenizedInput;
     }
 
     void skipWhitespace() {

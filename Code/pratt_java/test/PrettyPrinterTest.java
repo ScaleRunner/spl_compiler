@@ -3,7 +3,6 @@
 //import org.junit.Before;
 //import org.junit.Test;
 //
-//import parser.AstNode;
 //import parser.Parser;
 //import util.PrettyPrinter;
 //
@@ -15,6 +14,7 @@
 //
 //	@Test
 //	public void testInteger() {
+//
 //		Parser p = new Parser("42");
 //		AstNode ast = p.pExpr();
 //		PrettyPrinter pp = new PrettyPrinter();

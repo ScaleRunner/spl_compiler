@@ -45,7 +45,7 @@ public enum TokenType {
     TOK_DOT,
     TOK_FIELD;
 
-    public String toString() {
+    public String getValue() {
         switch (this) {
             case TOK_PLUS:
                 return "+";
