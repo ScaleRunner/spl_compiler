@@ -13,6 +13,13 @@ public class Parser {
         mTokens = tokens;
     }
 
+    private final Iterator<Token> mTokens;
+    private final List<Token> mRead = new ArrayList<Token>();
+    private final Map<TokenType, PrefixParselet> mPrefixParselets =
+            new HashMap<TokenType, PrefixParselet>();
+    private final Map<TokenType, InfixParselet> mInfixParselets =
+            new HashMap<TokenType, InfixParselet>();
+
     /**
      * Parses expressions
      * @param precedence precedence value
@@ -22,8 +29,8 @@ public class Parser {
         Token token = consume();
         PrefixParselet prefix = mPrefixParselets.get(token.getType());
 
-        if (prefix == null) throw new ParseException("Could not parse " +
-                token.toString() + "\".");
+        if (prefix == null) throw new ParseException(
+                String.format("There was an error parsing '%s'.", token.toString()));
 
         Expression left = prefix.parse(this, token);
 
@@ -33,7 +40,6 @@ public class Parser {
             InfixParselet infix = mInfixParselets.get(token.getType());
             left = infix.parse(this, left, token);
         }
-
         return left;
     }
 
@@ -54,8 +60,10 @@ public class Parser {
     public Token consume(TokenType expected) {
         Token token = lookAhead(0);
         if (token.getType() != expected) {
-            throw new RuntimeException("Expected token " + expected +
-                    " and found " + token.getType());
+            throw new RuntimeException(
+                    String.format("Expected token: \t %s \n Found token: \t %s",
+                            expected, token.getType())
+            );
         }
 
         return consume();
@@ -84,11 +92,4 @@ public class Parser {
 
         return 0;
     }
-
-    private final Iterator<Token> mTokens;
-    private final List<Token> mRead = new ArrayList<Token>();
-    private final Map<TokenType, PrefixParselet> mPrefixParselets =
-            new HashMap<TokenType, PrefixParselet>();
-    private final Map<TokenType, InfixParselet> mInfixParselets =
-            new HashMap<TokenType, InfixParselet>();
 }
