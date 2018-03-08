@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lexer {
-    String input = null;
-    int currentPosition = 0;
+    private String input;
+    private int currentPosition = 0;
 
     public Lexer(String inp) {
         input = inp;
@@ -21,7 +21,7 @@ public class Lexer {
         return tokenizedInput;
     }
 
-    void skipWhitespace() {
+    private void skipWhitespace() {
         while (currentPosition < input.length()
                 && Character.isWhitespace(input.charAt(currentPosition))) {
             currentPosition++;
@@ -52,12 +52,7 @@ public class Lexer {
 
         if (match('-')) {
             currentPosition++;
-            if (currentPosition >= input.length() || Character.isWhitespace(input.charAt(currentPosition))) {
-                return new TokenOther(TokenType.TOK_MINUS);
-            } else {
-                currentPosition--;
-                return lexInteger();
-            }
+            return new TokenOther(TokenType.TOK_MINUS);
         }
 
         if (match('*')) {
@@ -224,11 +219,10 @@ public class Lexer {
             return lexIdentifier();
         }
 
-        return new TokenError("Unknown character in input: '"
-                + input.charAt(currentPosition) + "'");
+        return new TokenError(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
     }
 
-    Token lexInteger() {
+    private Token lexInteger() {
         boolean negative = false;
         int currentValue = 0;
         if (match('-')) {
@@ -251,7 +245,7 @@ public class Lexer {
         return new TokenInteger(currentValue);
     }
 
-    Token lexIdentifier() {
+    private Token lexIdentifier() {
         StringBuilder resultBuilder = new StringBuilder();
         while (currentPosition < input.length()
                 && (Character.isAlphabetic(input.charAt(currentPosition)) || Character

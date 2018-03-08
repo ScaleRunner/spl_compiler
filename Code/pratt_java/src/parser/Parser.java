@@ -3,22 +3,57 @@ package parser;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
-import parselets.InfixParselet;
-import parselets.PrefixParselet;
+import parselets.*;
 
 import java.util.*;
 
 public class Parser {
-    public Parser(Iterator<Token> tokens) {
-        mTokens = tokens;
-    }
 
     private final Iterator<Token> mTokens;
-    private final List<Token> mRead = new ArrayList<Token>();
-    private final Map<TokenType, PrefixParselet> mPrefixParselets =
-            new HashMap<TokenType, PrefixParselet>();
-    private final Map<TokenType, InfixParselet> mInfixParselets =
-            new HashMap<TokenType, InfixParselet>();
+    private final List<Token> mRead = new ArrayList<>();
+    private final Map<TokenType, PrefixParselet> mPrefixParselets = new HashMap<>();
+    private final Map<TokenType, InfixParselet> mInfixParselets = new HashMap<>();
+
+    public Parser(List<Token> tokens) {
+        this.mTokens = tokens.iterator();
+        setup_parser();
+    }
+
+    private void registerPrefix(TokenType token, PrefixParselet parselet){
+        mPrefixParselets.put(token, parselet);
+    }
+
+    private void registerInfix(TokenType type, InfixParselet parselet){
+        mInfixParselets.put(type, parselet);
+    }
+
+    private void setup_parser(){
+        // Register Prefixes
+        int prefix_precedence = Precedence.PREFIX;
+        registerPrefix(TokenType.TOK_PLUS, new PrefixOperatorParselet(prefix_precedence));
+        registerPrefix(TokenType.TOK_MINUS, new PrefixOperatorParselet(prefix_precedence));
+        registerPrefix(TokenType.TOK_NOT, new PrefixOperatorParselet(prefix_precedence));
+
+
+        // Register Infixes
+        registerInfix(TokenType.TOK_PLUS, new BinaryOperatorParselet(Precedence.SUM, false));
+        registerInfix(TokenType.TOK_MINUS, new BinaryOperatorParselet(Precedence.SUM, false));
+        registerInfix(TokenType.TOK_MULT, new BinaryOperatorParselet(Precedence.PRODUCT, false));
+        registerInfix(TokenType.TOK_DIV, new BinaryOperatorParselet(Precedence.PRODUCT, false));
+
+        // Register Other Rules
+        registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
+        registerInfix(TokenType.TOK_ASSIGN, new AssignParselet());
+        registerPrefix(TokenType.TOK_OPEN_PARENTESIS, new GroupParselet());
+        registerInfix(TokenType.TOK_OPEN_PARENTESIS, new CallParselet());
+    }
+
+//    public ArrayList<Expression> parse(){
+//        ArrayList<Expression> expressions = new ArrayList<>();
+//        do{
+//            expressions.add(parseExpression());
+//        }while();
+//    }
 
     /**
      * Parses expressions
@@ -69,7 +104,7 @@ public class Parser {
         return consume();
     }
 
-    public Token consume() {
+    private Token consume() {
         // Make sure we've read the token.
         lookAhead(0);
 
@@ -88,7 +123,9 @@ public class Parser {
 
     private int getPrecedence() {
         InfixParselet parser = mInfixParselets.get(lookAhead(0).getType());
-        if (parser != null) return parser.getPrecedence();
+        if (parser != null){
+            return parser.getPrecedence();
+        }
 
         return 0;
     }

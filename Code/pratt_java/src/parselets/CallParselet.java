@@ -16,7 +16,7 @@ import java.util.List;
 public class CallParselet implements InfixParselet {
     public Expression parse(Parser parser, Expression left, Token token) {
         // Parse the comma-separated arguments until we hit, ")".
-        List<Expression> args = new ArrayList<Expression>();
+        List<Expression> args = new ArrayList<>();
 
         // There may be no arguments at all.
         if (!parser.match(TokenType.TOK_CLOSE_PARENTESIS)) {

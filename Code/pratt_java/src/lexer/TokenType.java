@@ -49,6 +49,14 @@ public enum TokenType {
         switch (this) {
             case TOK_PLUS:
                 return "+";
+            case TOK_EQ:
+                return "==";
+            case TOK_DIV:
+                return "/";
+            case TOK_MINUS:
+                return "-";
+            case TOK_ASSIGN:
+                return "=";
             default:
                 return null;
         }

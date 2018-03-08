@@ -2,7 +2,7 @@ package parselets;
 
 import expressions.AssignExpression;
 import expressions.Expression;
-import expressions.NameExpression;
+import expressions.IdentifierExpression;
 import lexer.Token;
 import parser.ParseException;
 import parser.Parser;
@@ -18,10 +18,10 @@ public class AssignParselet implements InfixParselet {
     public Expression parse(Parser parser, Expression left, Token token) {
         Expression right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
-        if (!(left instanceof NameExpression))
+        if (!(left instanceof IdentifierExpression))
             throw new ParseException("The left-hand side of an assignment must be a name.");
 
-        String name = ((NameExpression) left).getName();
+        String name = ((IdentifierExpression) left).getName();
         return new AssignExpression(name, right);
     }
 
