@@ -122,8 +122,8 @@ public class LexerTest {
     }
 
     @Test
-    public void testMixedPlussesAndMinusesExpression() {
-        Lexer l = new Lexer("1 - 12 + 300 - 4");
+    public void testMixedPlusesAndMinusesExpression() {
+        Lexer l = new Lexer("1 - True + yes - if");
         Token t1 = l.nextToken();
         Token t2 = l.nextToken();
         Token t3 = l.nextToken();
@@ -135,11 +135,11 @@ public class LexerTest {
         Token t9 = l.nextToken();
         assertEquals(TokenType.TOK_INT, t1.getType());
         assertEquals(TokenType.TOK_MINUS, t2.getType());
-        assertEquals(TokenType.TOK_INT, t3.getType());
+        assertEquals(TokenType.TOK_BOOL, t3.getType());
         assertEquals(TokenType.TOK_PLUS, t4.getType());
-        assertEquals(TokenType.TOK_INT, t5.getType());
+        assertEquals(TokenType.TOK_IDENTIFIER, t5.getType());
         assertEquals(TokenType.TOK_MINUS, t6.getType());
-        assertEquals(TokenType.TOK_INT, t7.getType());
+        assertEquals(TokenType.TOK_KW_IF, t7.getType());
         assertEquals(TokenType.TOK_EOF, t9.getType());
     }
 
@@ -413,6 +413,6 @@ public class LexerTest {
         for(int i = 0; i < trueTokenized.size(); i++){
             assertEquals(lexedTokenized.get(i), trueTokenized.get(i));
         }
-        System.out.println(lexedTokenized);
+//        System.out.println(lexedTokenized);
     }
 }
