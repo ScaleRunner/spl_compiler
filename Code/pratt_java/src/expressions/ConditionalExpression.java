@@ -17,13 +17,24 @@ public class ConditionalExpression implements Expression {
         this.else_expression = else_expression;
     }
 
+    /**
+     * Prints a conditional expression as:
+     *         (if (CONDITIONAL) {EXPRESSION} else {EXPRESSION})
+     * @param builder visitor
+     */
     public void print(StringBuilder builder) {
-        builder.append("(if ");
+        builder.append("(if").append(" (");
         condition.print(builder);
-        builder.append(" then ");
+        builder.append(") ");
+        builder.append("{");
         then_expression.print(builder);
-        builder.append(" else ");
-        else_expression.print(builder);
+        builder.append("}");
+        if (else_expression != null){
+            builder.append(" else ").append("{");
+            else_expression.print(builder);
+            builder.append("}");
+        }
+
         builder.append(")");
     }
 

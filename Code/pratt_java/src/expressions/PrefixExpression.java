@@ -18,7 +18,7 @@ public class PrefixExpression implements Expression {
     }
 
     public void print(StringBuilder builder) {
-        builder.append("(").append(operator.toString());
+        builder.append("(").append(operator.getValue());
         right.print(builder);
         builder.append(")");
     }
