@@ -244,6 +244,35 @@ public class ParserTest {
 
         assertEquals(result, actual);
     }
+
+    @Test
+    public void testGrouping() {
+        Lexer l = new Lexer("1 + 5 * !(4 + 3)");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IntegerExpression(1),
+                TokenType.TOK_PLUS,
+                new OperatorExpression(
+                        new IntegerExpression(5),
+                        TokenType.TOK_MULT,
+                        new PrefixExpression(
+                                TokenType.TOK_NOT,
+                                new OperatorExpression(
+                                        new IntegerExpression(4),
+                                        TokenType.TOK_PLUS,
+                                        new IntegerExpression(3)
+                                )
+                        )
+                )
+        );
+
+        assertEquals(result, actual);
+    }
+
+
 //
 //	@Test
 //	public void testIdentifierField() {
