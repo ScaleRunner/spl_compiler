@@ -8,6 +8,5 @@ public class Precedence {
     public static final int PRODUCT = 4;
     public static final int EXPONENT = 5;
     public static final int PREFIX = 6;
-    public static final int POSTFIX = 7;
     public static final int CALL = 8;
 }
