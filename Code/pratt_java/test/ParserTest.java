@@ -158,6 +158,21 @@ public class ParserTest {
         assertEquals(result, actual);
     }
 
+    @Test
+    public void testModulo() {
+        Lexer l = new Lexer("2 % 4");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression left = new IntegerExpression(2);
+        Expression right = new IntegerExpression(4);
+        Expression actual = new OperatorExpression(left, TokenType.TOK_MOD, right);
+        assertEquals(result, actual);
+    }
+
+
+
 //	@Test
 //	public void testMixedAdditionMultiplicationModulo() {
 //		SPLParser p = new SPLParser("1+2*3%5");

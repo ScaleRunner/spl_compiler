@@ -29,17 +29,18 @@ public class Parser {
 
     private void setup_parser(){
         // Register Prefixes
-        int prefix_precedence = Precedence.PREFIX;
+        int prefix_precedence = Precedence.UNARY;
 //        registerPrefix(TokenType.TOK_PLUS, new PrefixOperatorParselet(prefix_precedence));
         registerPrefix(TokenType.TOK_MINUS, new PrefixOperatorParselet(prefix_precedence));
         registerPrefix(TokenType.TOK_NOT, new PrefixOperatorParselet(prefix_precedence));
 
 
         // Register Infixes
-        registerInfix(TokenType.TOK_PLUS, new BinaryOperatorParselet(Precedence.SUM, false));
-        registerInfix(TokenType.TOK_MINUS, new BinaryOperatorParselet(Precedence.SUM, false));
-        registerInfix(TokenType.TOK_MULT, new BinaryOperatorParselet(Precedence.PRODUCT, false));
-        registerInfix(TokenType.TOK_DIV, new BinaryOperatorParselet(Precedence.PRODUCT, false));
+        registerInfix(TokenType.TOK_PLUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
+        registerInfix(TokenType.TOK_MINUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
+        registerInfix(TokenType.TOK_MULT, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
+        registerInfix(TokenType.TOK_DIV, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
+        registerInfix(TokenType.TOK_MOD, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
 
         // Register Other Rules
         registerPrefix(TokenType.TOK_INT, new IntegerParselet());

@@ -4,9 +4,12 @@ public class Precedence {
     // Ordered in increasing precedence.
     public static final int ASSIGNMENT = 1;
     public static final int CONDITIONAL = 2;
-    public static final int SUM = 3;
-    public static final int PRODUCT = 4;
-    public static final int EXPONENT = 5;
-    public static final int PREFIX = 6;
-    public static final int CALL = 8;
+    public static final int OR = 3;
+    public static final int AND = 4;
+    public static final int EQUALITY = 5;
+    public static final int COMPARISON = 6;
+    public static final int ADDITIVE = 7;
+    public static final int MULTIPLICATIVE = 8;
+    public static final int UNARY = 9;
+    public static final int CALL = 10;
 }

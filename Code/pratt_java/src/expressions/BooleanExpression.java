@@ -3,7 +3,7 @@ package expressions;
 import java.util.Objects;
 
 /**
- * Identifier Expression: abc
+ * Boolean Expression: True, False
  */
 public class BooleanExpression implements Expression {
 
