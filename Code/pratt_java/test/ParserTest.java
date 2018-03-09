@@ -85,6 +85,9 @@ public class ParserTest {
                         )
                 )
         );
+        StringBuilder builder = new StringBuilder();
+        result.print(builder);
+        System.out.println(builder.toString());
         assertEquals(result, expected);
     }
 
@@ -136,11 +139,24 @@ public class ParserTest {
         Parser p = new Parser(tokens);
         Expression result = p.parseExpression();
 
-        String left = "a";
-        Expression right = new IdentifierExpression("b");
+        String left = "value";
+        Expression right = new BooleanExpression(true);
         Expression actual = new AssignExpression(left, right);
         assertEquals(result, actual);
 	}
+
+    @Test
+    public void testInteger() {
+        Lexer l = new Lexer("value = 1");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        String left = "value";
+        Expression right = new IntegerExpression(1);
+        Expression actual = new AssignExpression(left, right);
+        assertEquals(result, actual);
+    }
 
 //	@Test
 //	public void testMixedAdditionMultiplicationModulo() {

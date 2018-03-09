@@ -30,7 +30,7 @@ public class Parser {
     private void setup_parser(){
         // Register Prefixes
         int prefix_precedence = Precedence.PREFIX;
-        registerPrefix(TokenType.TOK_PLUS, new PrefixOperatorParselet(prefix_precedence));
+//        registerPrefix(TokenType.TOK_PLUS, new PrefixOperatorParselet(prefix_precedence));
         registerPrefix(TokenType.TOK_MINUS, new PrefixOperatorParselet(prefix_precedence));
         registerPrefix(TokenType.TOK_NOT, new PrefixOperatorParselet(prefix_precedence));
 
@@ -42,7 +42,9 @@ public class Parser {
         registerInfix(TokenType.TOK_DIV, new BinaryOperatorParselet(Precedence.PRODUCT, false));
 
         // Register Other Rules
+        registerPrefix(TokenType.TOK_INT, new IntegerParselet());
         registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
+        registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
         registerInfix(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefix(TokenType.TOK_OPEN_PARENTESIS, new GroupParselet());
         registerInfix(TokenType.TOK_OPEN_PARENTESIS, new CallParselet());
