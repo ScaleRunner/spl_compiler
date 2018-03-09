@@ -26,6 +26,20 @@ public class ParserTest {
     }
 
     @Test
+    public void single_field() {
+        Lexer l = new Lexer("a.hd");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression left = new IdentifierExpression("a");
+
+        Expression expected = new PostfixExpression(left, TokenType.TOK_HD);
+        assertEquals(result, expected);
+    }
+
+
+    @Test
     public void nested_addition() {
         // Expected: (a + b) + c
         Lexer l = new Lexer("a + b + c");

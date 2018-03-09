@@ -49,6 +49,12 @@ public class Parser {
         registerInfix(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefix(TokenType.TOK_OPEN_PARENTESIS, new GroupParselet());
         registerInfix(TokenType.TOK_OPEN_PARENTESIS, new CallParselet());
+
+        // Register Fields
+        registerInfix(TokenType.TOK_HD, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerInfix(TokenType.TOK_TL, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerInfix(TokenType.TOK_FST, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerInfix(TokenType.TOK_SND, new PostfixOperatorParselet(Precedence.POSTFIX));
     }
 
 //    public ArrayList<Expression> parse(){

@@ -1,3 +1,4 @@
+import parser.ParseException;
 import lexer.*;
 import org.junit.Test;
 
@@ -34,8 +35,13 @@ public class LexerTest {
     public void testMultiDigitSignedInteger() {
         Lexer l = new Lexer("-4545372");
         Token t = l.nextToken();
+
+
+        assertEquals(TokenType.TOK_MINUS, t.getType());
+        t = l.nextToken();
         assertEquals(TokenType.TOK_INT, t.getType());
-        assertEquals(-4545372, t.getValue());
+
+
     }
 
     @Test
@@ -408,11 +414,46 @@ public class LexerTest {
         trueTokenized.add(new TokenInteger(1));
         trueTokenized.add(new TokenOther(TokenType.TOK_PLUS));
         trueTokenized.add(new TokenIdentifier("b"));
-        trueTokenized.add(new TokenOther(TokenType.TOK_DOT));
-        trueTokenized.add(new TokenField("hd"));
+        trueTokenized.add(new TokenOther(TokenType.TOK_HD));
+
+
         for(int i = 0; i < trueTokenized.size(); i++){
             assertEquals(lexedTokenized.get(i), trueTokenized.get(i));
         }
 //        System.out.println(lexedTokenized);
     }
+
+    @Test(expected = ParseException.class)
+    public void testWrongField() {
+        Lexer l = new Lexer("a + True + 1 + b.hdd");
+        List<Token> lexedTokenized = l.tokenize();
+
+
+    }
+
+    @Test
+    public void testDoubleFieldExp() {
+        Lexer l = new Lexer("a + True + 1 + b.hd.fst");
+        List<Token> lexedTokenized = l.tokenize();
+
+        List<Token> trueTokenized = new ArrayList<>();
+        trueTokenized.add(new TokenIdentifier("a"));
+        trueTokenized.add(new TokenOther(TokenType.TOK_PLUS));
+        trueTokenized.add(new TokenBool(true));
+        trueTokenized.add(new TokenOther(TokenType.TOK_PLUS));
+        trueTokenized.add(new TokenInteger(1));
+        trueTokenized.add(new TokenOther(TokenType.TOK_PLUS));
+        trueTokenized.add(new TokenIdentifier("b"));
+
+        trueTokenized.add(new TokenOther(TokenType.TOK_HD));
+        trueTokenized.add(new TokenOther(TokenType.TOK_FST));
+
+
+        for(int i = 0; i < trueTokenized.size(); i++){
+            assertEquals(lexedTokenized.get(i), trueTokenized.get(i));
+        }
+//        System.out.println(lexedTokenized);
+    }
+
+
 }

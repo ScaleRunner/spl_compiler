@@ -42,8 +42,10 @@ public enum TokenType {
     TOK_COMMA,
     TOK_KW_VOID,
     TOK_KW_ARROW,
-    TOK_DOT,
-    TOK_FIELD;
+    TOK_HD,
+    TOK_TL,
+    TOK_FST,
+    TOK_SND;
 
     public String getValue() {
         switch (this) {

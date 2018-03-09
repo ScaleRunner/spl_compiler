@@ -1,5 +1,7 @@
 package lexer;
 
+import parser.ParseException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -209,17 +211,11 @@ public class Lexer {
             return new TokenOther(TokenType.TOK_SEMI_COLON);
         }
 
-        if (match('.')) {
-            currentPosition++;
-
-            return new TokenOther(TokenType.TOK_DOT);
-        }
-
-        if (Character.isAlphabetic(input.charAt(currentPosition))) {
+        if (Character.isAlphabetic(input.charAt(currentPosition)) || match('.')) {
             return lexIdentifier();
         }
-
-        return new TokenError(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
+        throw new ParseException(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
+//        return new TokenError(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
     }
 
     private Token lexInteger() {
@@ -247,6 +243,10 @@ public class Lexer {
 
     private Token lexIdentifier() {
         StringBuilder resultBuilder = new StringBuilder();
+        if(match('.')){
+            resultBuilder.append('.');
+            currentPosition++;
+        }
         while (currentPosition < input.length()
                 && (Character.isAlphabetic(input.charAt(currentPosition)) || Character
                 .isDigit(input.charAt(currentPosition)) || match('_'))) {
@@ -289,20 +289,23 @@ public class Lexer {
             return new TokenOther(TokenType.TOK_KW_RETURN);
         }
 
-        if (result.equals("hd")) {
-            return new TokenField("hd");
+        if (result.equals(".hd")) {
+            return new TokenOther(TokenType.TOK_HD);
         }
 
-        if (result.equals("tl")) {
-            return new TokenField("tl");
+        if (result.equals(".tl")) {
+            return new TokenOther(TokenType.TOK_TL);
+
         }
 
-        if (result.equals("fst")) {
-            return new TokenField("fst");
+        if (result.equals(".fst")) {
+            return new TokenOther(TokenType.TOK_FST);
+
         }
 
-        if (result.equals("snd")) {
-            return new TokenField("snd");
+        if (result.equals(".snd")) {
+            return new TokenOther(TokenType.TOK_SND);
+
         }
 
 
@@ -322,7 +325,9 @@ public class Lexer {
             return new TokenOther(TokenType.TOK_KW_ARROW);
         }
 
-
+        if (result.contains(".")){
+            throw new ParseException("Invalid field keyword in '" + result+"'");
+        }
         // Identifier is not a keyword, so we treat it as identifier
         return new TokenIdentifier(result);
     }

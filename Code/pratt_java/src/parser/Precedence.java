@@ -11,5 +11,6 @@ public class Precedence {
     public static final int ADDITIVE = 7;
     public static final int MULTIPLICATIVE = 8;
     public static final int UNARY = 9;
-    public static final int CALL = 10;
+    public static final int POSTFIX = 10;
+    public static final int CALL = 11;
 }
