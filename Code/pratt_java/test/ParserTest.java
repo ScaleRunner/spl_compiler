@@ -8,6 +8,7 @@ import lexer.TokenType;
 import org.junit.Test;
 import parser.Parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ParserTest {
@@ -185,46 +186,64 @@ public class ParserTest {
         assertEquals(result, actual);
     }
 
+    @Test
+    public void MomentOfTruth() {
+        Lexer l = new Lexer("2 * True - - 3 +3");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
 
+        Expression actual = new OperatorExpression(
+                new OperatorExpression(
+                        new OperatorExpression(
+                                new IntegerExpression(2),
+                                TokenType.TOK_MULT,
+                                new BooleanExpression(true)
+                        ),
+                        TokenType.TOK_MINUS,
+                        new PrefixExpression(TokenType.TOK_MINUS, new IntegerExpression(3))
+                ),
+                TokenType.TOK_PLUS,
+                new IntegerExpression(3)
+        );
+        assertEquals(result, actual);
+    }
 
-//	@Test
-//	public void testMixedAdditionMultiplicationModulo() {
-//		SPLParser p = new SPLParser("1+2*3%5");
-//		AstExpr ast = p.pExpr();
-//		assertEquals(
-//				new AstExprBinOp(
-//						new AstExprInteger(1),
-//						TokenType.TOK_PLUS,
-//						new AstExprBinOp(
-//								new AstExprBinOp(
-//										new AstExprInteger(2),
-//										TokenType.TOK_MULT,
-//										new AstExprInteger(3)),
-//
-//										TokenType.TOK_MOD,
-//										new AstExprInteger(5)
-//
-//
-//								)
-//
-//
-//						)
-//
-//				, ast);
-//		System.out.println(ast.toString());
-//	}
-//
-//	@Test
-//	public void testFunCall() {
-//		SPLParser p = new SPLParser("void()");
-//		AstExpr ast = p.pExpr();
-//		assertEquals(
-//				new AstExprFunCall(
-//						new AstExprIdentifier("void"))
-//
-//				, ast);
-//		System.out.println(ast.toString());
-//	}
+	@Test
+	public void testFunCall() {
+        Lexer l = new Lexer("a()");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new CallExpression(
+                new IdentifierExpression("a"),
+                new ArrayList<>()
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testFunCallArguments() {
+        Lexer l = new Lexer("a(foo, bar, 2, True)");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        ArrayList<Expression> args = new ArrayList<>();
+        args.add(new IdentifierExpression("foo"));
+        args.add(new IdentifierExpression("bar"));
+        args.add(new IntegerExpression(2));
+        args.add(new BooleanExpression(true));
+
+        Expression actual = new CallExpression(
+                new IdentifierExpression("a"),
+                args
+        );
+
+        assertEquals(result, actual);
+    }
 //
 //	@Test
 //	public void testIdentifierField() {
