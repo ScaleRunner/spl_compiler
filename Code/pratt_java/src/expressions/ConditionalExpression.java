@@ -17,6 +17,13 @@ public class ConditionalExpression implements Expression {
         this.else_expression = else_expression;
     }
 
+    public ConditionalExpression(
+            Expression condition, Expression then_expression) {
+        this.condition = condition;
+        this.then_expression = then_expression;
+        this.else_expression = null;
+    }
+
     /**
      * Prints a conditional expression as:
      *         (if (CONDITIONAL) {EXPRESSION} else {EXPRESSION})

@@ -72,6 +72,7 @@ public class Parser {
         registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
         registerInfix(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefix(TokenType.TOK_OPEN_PARENTESIS, new GroupParselet());
+        registerPrefix(TokenType.TOK_OPEN_CURLY, new BlockParselet());
         registerInfix(TokenType.TOK_OPEN_PARENTESIS, new CallParselet());
 
         // Register Fields
@@ -84,7 +85,7 @@ public class Parser {
     }
 
     public ArrayList<Expression> parse(){
-        ArrayList<Expression> expressions = new ArrayList<Expression>();
+        ArrayList<Expression> expressions = new ArrayList<>();
         while(!lookAhead(0).getType().equals(TokenType.TOK_EOF)){
             Expression expr = parseStatement();
             expressions.add(expr);
@@ -120,9 +121,9 @@ public class Parser {
 
     public Expression parseStatement() {
 
-        if (match(TokenType.TOK_KW_IF)) return (new IfParselet().parse(this, consume()));
+        if (match(TokenType.TOK_KW_IF)) return (new IfParselet().parse(this, lookAhead(0)));
 
-        return parseExpression();
+        return parseExpression(0);
     }
 
 
@@ -152,14 +153,14 @@ public class Parser {
         return consume();
     }
 
-    public Token consume() {
+    private Token consume() {
         // Make sure we've read the token.
         lookAhead(0);
 
         return mRead.remove(0);
     }
 
-    private Token lookAhead(int distance) {
+    public Token lookAhead(int distance) {
         // Read in as many as needed.
         while (distance >= mRead.size()) {
             mRead.add(mTokens.next());

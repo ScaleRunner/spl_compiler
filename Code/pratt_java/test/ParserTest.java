@@ -463,10 +463,10 @@ public class ParserTest {
 
     @Test
     public void testStatementIf() {
-        Lexer l = new Lexer("if (a>0) {a = 0} else {a = -1}");
+        Lexer l = new Lexer("if (a>0 && a * 2 < 4){ b = 5 *6 if ( a == 0) { b = 2 } } else { a = 3 } ");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
-        Expression result = p.parseExpression();
+        List<Expression> result = p.parse();
 
         Expression actual = new CallExpression(
                 new IdentifierExpression("a"),
