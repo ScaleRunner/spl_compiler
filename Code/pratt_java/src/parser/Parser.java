@@ -4,7 +4,10 @@ import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
 import parselets.*;
+import statements.IfParselet;
+import statements.StatementParselet;
 
+import java.sql.Statement;
 import java.util.*;
 
 public class Parser {
@@ -13,6 +16,7 @@ public class Parser {
     private final List<Token> mRead = new ArrayList<>();
     private final Map<TokenType, PrefixParselet> mPrefixParselets = new HashMap<>();
     private final Map<TokenType, InfixParselet> mInfixParselets = new HashMap<>();
+    //private final Map<TokenType, StatementParselet> mStatementParselets = new HashMap<>();
 
     public Parser(List<Token> tokens) {
         this.mTokens = tokens.iterator();
@@ -26,6 +30,10 @@ public class Parser {
     private void registerInfix(TokenType type, InfixParselet parselet){
         mInfixParselets.put(type, parselet);
     }
+
+//    private void registerStatement(TokenType type, StatementParselet parselet){
+//        mStatementParselets.put(type, parselet);
+//    }
 
     private void setup_parser(){
         // Register Prefixes
@@ -55,14 +63,21 @@ public class Parser {
         registerInfix(TokenType.TOK_TL, new PostfixOperatorParselet(Precedence.POSTFIX));
         registerInfix(TokenType.TOK_FST, new PostfixOperatorParselet(Precedence.POSTFIX));
         registerInfix(TokenType.TOK_SND, new PostfixOperatorParselet(Precedence.POSTFIX));
+
+        //registerStatement(TokenType.TOK_KW_IF, new IfParselet());
     }
 
-//    public ArrayList<Expression> parse(){
-//        ArrayList<Expression> expressions = new ArrayList<>();
-//        do{
-//            expressions.add(parseExpression());
-//        }while();
-//    }
+    public ArrayList<Expression> parse(){
+        ArrayList<Expression> expressions = new ArrayList<Expression>();
+        while(!lookAhead(0).getType().equals(TokenType.TOK_EOF)){
+            Expression expr = parseStatement();
+            expressions.add(expr);
+            if ((!lookAhead(0).getType().equals(TokenType.TOK_EOF)))
+                consume();
+        }
+
+        return expressions;
+    }
 
     /**
      * Parses expressions
@@ -86,6 +101,14 @@ public class Parser {
         }
         return left;
     }
+
+    public Expression parseStatement() {
+
+        if (match(TokenType.TOK_KW_IF)) return (new IfParselet().parse(this, consume()));
+
+        return parseExpression();
+    }
+
 
     public Expression parseExpression() {
         return parseExpression(0);
@@ -113,7 +136,7 @@ public class Parser {
         return consume();
     }
 
-    private Token consume() {
+    public Token consume() {
         // Make sure we've read the token.
         lookAhead(0);
 
