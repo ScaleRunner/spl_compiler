@@ -6,6 +6,7 @@ import lexer.TokenType;
 import parselets.*;
 import statements.IfParselet;
 import statements.StatementParselet;
+import statements.WhileParselet;
 
 import java.util.*;
 
@@ -66,7 +67,7 @@ public class Parser {
         registerInfix(TokenType.TOK_OR, new BinaryOperatorParselet(Precedence.OR, false));
 
         // Register Other Rules
-        registerInfix(TokenType.TOK_KW_IF, new ConditionalParselet());
+        //registerInfix(TokenType.TOK_KW_IF, new ConditionalParselet());
         registerPrefix(TokenType.TOK_INT, new IntegerParselet());
         registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
@@ -122,6 +123,7 @@ public class Parser {
     public Expression parseStatement() {
 
         if (match(TokenType.TOK_KW_IF)) return (new IfParselet().parse(this, lookAhead(0)));
+        if (match(TokenType.TOK_KW_WHILE)) return (new WhileParselet().parse(this, lookAhead(0)));
 
         return parseExpression(0);
     }

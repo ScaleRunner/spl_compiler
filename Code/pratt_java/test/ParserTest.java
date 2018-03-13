@@ -463,15 +463,69 @@ public class ParserTest {
 
     @Test
     public void testStatementIf() {
-        Lexer l = new Lexer("if (a>0 && a * 2 < 4){ b = 5 *6 if ( a == 0) { b = 2 } } else { a = 3 } ");
+        Lexer l = new Lexer("if (a>0 && a * 2 < 4){ b = 5 *6 } else { a = 3 } ");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         List<Expression> result = p.parse();
 
-        Expression actual = new CallExpression(
-                new IdentifierExpression("a"),
-                new ArrayList<>()
+        List<Expression> actual = new ArrayList<>();
+        actual.add(new ConditionalExpression(
+                        new OperatorExpression(
+                                new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_GT ,new IntegerExpression(0)),
+                                TokenType.TOK_AND,
+                                new OperatorExpression(
+                                        new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_MULT,new IntegerExpression(2)),
+                                        TokenType.TOK_LT,
+                                        new IntegerExpression(4))),
+                        new AssignExpression(
+                                "b",
+                                new OperatorExpression(
+                                        new IntegerExpression(
+                                                5),
+                                        TokenType.TOK_MULT,
+                                        new IntegerExpression(6)
+                                )
+                        ),
+                        new AssignExpression(
+                                "a",
+                                new IntegerExpression(3)
+
+                        )
+                )
         );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testStatementWhile() {
+        Lexer l = new Lexer("while (a>0 && a * 2 < 4){ b = b + 1 } ");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Expression> result = p.parse();
+
+
+        List<Expression> actual = new ArrayList<>();
+        actual.add(new LoopExpression(
+                    new OperatorExpression(
+                            new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_GT ,new IntegerExpression(0)),
+                            TokenType.TOK_AND,
+                            new OperatorExpression(
+                                    new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_MULT,new IntegerExpression(2)),
+                                    TokenType.TOK_LT,
+                                    new IntegerExpression(4))),
+                    new AssignExpression(
+                            "b",
+                            new OperatorExpression(
+                                new IdentifierExpression(
+                                        "b"),
+                                        TokenType.TOK_PLUS,
+                                        new IntegerExpression(1)
+                            )
+                    )
+        )
+        );
+
 
         assertEquals(result, actual);
     }
