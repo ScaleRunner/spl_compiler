@@ -12,12 +12,12 @@ import parser.Precedence;
  * Parselet for the condition or "ternary" operator, like "a ? b : c".
  */
 public class ConditionalParselet implements InfixParselet {
-    public Expression parse(Parser parser, Expression left, Token token) {
+    public Expression parse(Parser parser, Expression ifExpression, Token token) {
         Expression thenArm = parser.parseExpression();
-        parser.consume(TokenType.TOK_CONS);
+        parser.consume(TokenType.TOK_KW_ELSE);
         Expression elseArm = parser.parseExpression(Precedence.CONDITIONAL - 1);
 
-        return new ConditionalExpression(left, thenArm, elseArm);
+        return new ConditionalExpression(ifExpression, thenArm, elseArm);
     }
 
     public int getPrecedence() {
