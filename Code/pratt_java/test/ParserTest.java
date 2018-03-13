@@ -272,6 +272,210 @@ public class ParserTest {
         assertEquals(result, actual);
     }
 
+    @Test
+    public void testEquals() {
+        Lexer l = new Lexer("a == b + 1");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_EQ,
+                new OperatorExpression(
+                        new IdentifierExpression("b"),
+                        TokenType.TOK_PLUS,
+                        new IntegerExpression(1)
+                )
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testNotEquals() {
+        Lexer l = new Lexer("a != b + 1");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_NEQ,
+                new OperatorExpression(
+                        new IdentifierExpression("b"),
+                        TokenType.TOK_PLUS,
+                        new IntegerExpression(1)
+                )
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testGreaterEquals() {
+        Lexer l = new Lexer("a >= b + 1");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_GEQ,
+                new OperatorExpression(
+                        new IdentifierExpression("b"),
+                        TokenType.TOK_PLUS,
+                        new IntegerExpression(1)
+                )
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testLessEquals() {
+        Lexer l = new Lexer("a <= b + 1");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_LEQ,
+                new OperatorExpression(
+                        new IdentifierExpression("b"),
+                        TokenType.TOK_PLUS,
+                        new IntegerExpression(1)
+                )
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testGreaterThan() {
+        Lexer l = new Lexer("a > b + 1");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_GT,
+                new OperatorExpression(
+                        new IdentifierExpression("b"),
+                        TokenType.TOK_PLUS,
+                        new IntegerExpression(1)
+                )
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testLessThan() {
+        Lexer l = new Lexer("a < b + 1");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_LT,
+                new OperatorExpression(
+                        new IdentifierExpression("b"),
+                        TokenType.TOK_PLUS,
+                        new IntegerExpression(1)
+                )
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testAND() {
+        Lexer l = new Lexer("a && b");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_AND,
+                new IdentifierExpression("b")
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testOR() {
+        Lexer l = new Lexer("a || b");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_OR,
+                new IdentifierExpression("b")
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testComparisonPrecedence() {
+        // Expected: ((True == (a > ((4 * b) + 5))) && (this == fun))
+        Lexer l = new Lexer("True == a > 4 * b + 5 && this == fun");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new OperatorExpression(
+                new OperatorExpression(
+                        new BooleanExpression(true),
+                        TokenType.TOK_EQ,
+                        new OperatorExpression(
+                                new IdentifierExpression("a"),
+                                TokenType.TOK_GT,
+                                new OperatorExpression(
+                                        new OperatorExpression(
+                                                new IntegerExpression(4),
+                                                TokenType.TOK_MULT,
+                                                new IdentifierExpression("b")
+                                        ),
+                                        TokenType.TOK_PLUS,
+                                        new IntegerExpression(5)
+                                )
+                        )
+                ),
+                TokenType.TOK_AND,
+                new OperatorExpression(
+                        new IdentifierExpression("this"),
+                        TokenType.TOK_EQ,
+                        new IdentifierExpression("fun")
+                )
+        );
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testStatementIf() {
+        Lexer l = new Lexer("if (a>0) {a = 0} else {a = -1}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new CallExpression(
+                new IdentifierExpression("a"),
+                new ArrayList<>()
+        );
+
+        assertEquals(result, actual);
+    }
+
 
 //
 //	@Test

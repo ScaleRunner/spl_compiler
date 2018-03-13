@@ -27,22 +27,39 @@ public class Parser {
         mInfixParselets.put(type, parselet);
     }
 
+    /**
+     * This function registers all the rules in the grammer.
+     * The precedences are taken from the official Java Documentation.
+     * @see <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html">Java Operators</a>
+     */
     private void setup_parser(){
         // Register Prefixes
-        int prefix_precedence = Precedence.UNARY;
 //        registerPrefix(TokenType.TOK_PLUS, new PrefixOperatorParselet(prefix_precedence));
-        registerPrefix(TokenType.TOK_MINUS, new PrefixOperatorParselet(prefix_precedence));
-        registerPrefix(TokenType.TOK_NOT, new PrefixOperatorParselet(prefix_precedence));
+        registerPrefix(TokenType.TOK_MINUS, new PrefixOperatorParselet(Precedence.UNARY));
+        registerPrefix(TokenType.TOK_NOT, new PrefixOperatorParselet(Precedence.UNARY));
 
-
-        // Register Infixes
+        // Register Operations
         registerInfix(TokenType.TOK_PLUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
         registerInfix(TokenType.TOK_MINUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
         registerInfix(TokenType.TOK_MULT, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
         registerInfix(TokenType.TOK_DIV, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
         registerInfix(TokenType.TOK_MOD, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
 
+        // Register Comparisons
+        registerInfix(TokenType.TOK_EQ, new BinaryOperatorParselet(Precedence.EQUALITY, false));
+        registerInfix(TokenType.TOK_NEQ, new BinaryOperatorParselet(Precedence.EQUALITY, false));
+
+        registerInfix(TokenType.TOK_GEQ, new BinaryOperatorParselet(Precedence.COMPARISON, false));
+        registerInfix(TokenType.TOK_LEQ, new BinaryOperatorParselet(Precedence.COMPARISON, false));
+        registerInfix(TokenType.TOK_GT, new BinaryOperatorParselet(Precedence.COMPARISON, false));
+        registerInfix(TokenType.TOK_LT, new BinaryOperatorParselet(Precedence.COMPARISON, false));
+
+        // Register Logical AND and OR
+        registerInfix(TokenType.TOK_AND, new BinaryOperatorParselet(Precedence.AND, false));
+        registerInfix(TokenType.TOK_OR, new BinaryOperatorParselet(Precedence.OR, false));
+
         // Register Other Rules
+        registerInfix(TokenType.TOK_KW_IF, new ConditionalParselet());
         registerPrefix(TokenType.TOK_INT, new IntegerParselet());
         registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
