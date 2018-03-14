@@ -8,6 +8,8 @@ import lexer.TokenType;
 import parser.Parser;
 import parser.Precedence;
 
+import java.util.ArrayList;
+
 /**
  * Parselet for the condition or "ternary" operator, like "a ? b : c".
  */
@@ -17,7 +19,7 @@ public class ConditionalParselet implements InfixParselet {
         parser.consume(TokenType.TOK_KW_ELSE);
         Expression elseArm = parser.parseExpression(Precedence.CONDITIONAL - 1);
 
-        return new ConditionalExpression(ifExpression, thenArm, elseArm);
+        return new ConditionalExpression(ifExpression, new ArrayList<>(), new ArrayList<>());
     }
 
     public int getPrecedence() {
