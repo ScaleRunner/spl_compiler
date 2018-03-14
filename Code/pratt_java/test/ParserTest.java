@@ -468,7 +468,7 @@ public class ParserTest {
         Parser p = new Parser(tokens);
         List<Expression> result = p.parseBlock();
         List<Expression> aux = new ArrayList<>();
-        aux.add(new AssignExpression("a", new IntegerExpression(3)));
+        aux.add(new AssignExpression("c", new IntegerExpression(3)));
         List<Expression> then = new ArrayList<>();
         List<Expression> elsee = new ArrayList<>();
         elsee.add(new AssignExpression("a", new IntegerExpression(3)));
