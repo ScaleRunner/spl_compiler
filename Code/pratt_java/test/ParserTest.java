@@ -480,7 +480,8 @@ public class ParserTest {
     @Test
     public void testParanthesesBomb() {
         // Expected: ((True == (a > ((4 * b) + 5))) && (this == fun))
-        int n_parantheses = 5000000; // 10mb file on disk
+//        int n_parantheses = 5000000; // 10mb file on disk
+        int n_parantheses = 500;
         StringBuilder sbInput = new StringBuilder();
         for(int i = 0; i < n_parantheses; i++){
             sbInput.append('(');
