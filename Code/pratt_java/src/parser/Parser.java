@@ -73,7 +73,7 @@ public class Parser {
         registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
         registerInfix(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefix(TokenType.TOK_OPEN_PARENTESIS, new GroupParselet());
-        registerPrefix(TokenType.TOK_OPEN_CURLY, new BlockParselet());
+        //registerPrefix(TokenType.TOK_OPEN_CURLY, new BlockParselet());
         registerInfix(TokenType.TOK_OPEN_PARENTESIS, new CallParselet());
 
         // Register Fields
@@ -85,7 +85,7 @@ public class Parser {
         //registerStatement(TokenType.TOK_KW_IF, new IfParselet());
     }
 
-    public ArrayList<Expression> parse(){
+    public ArrayList<Expression> parseBlock(){
         ArrayList<Expression> expressions = new ArrayList<>();
         while(!lookAhead(0).getType().equals(TokenType.TOK_EOF)){
             Expression expr = parseStatement();
