@@ -5,9 +5,12 @@ import expressions.ConditionalExpression;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
+import parselets.BlockParselet;
 import parselets.InfixParselet;
 import parser.Parser;
 import parser.Precedence;
+
+import java.util.List;
 
 /**
  * Parselet for the condition or "ternary" operator, like "a ? b : c".
@@ -16,17 +19,18 @@ public class IfParselet implements StatementParselet{
 
     public Expression parse(Parser parser, Token token) {
         Expression condition = parser.parseExpression();
-        Expression thenArm = null;
+        List<Expression> thenArm = null;
         if(parser.match(TokenType.TOK_OPEN_CURLY)){
-            thenArm = parser.parseStatement();
-            parser.match(TokenType.TOK_CLOSE_CURLY);
+            thenArm = new BlockParselet().parse(parser, parser.lookAhead(0));
         }
 
-        Expression elseArm = null;
+        List<Expression> elseArm = null;
 
         if(parser.lookAhead(0).getType() == TokenType.TOK_KW_ELSE){
             parser.consume(TokenType.TOK_KW_ELSE);
-            elseArm = parser.parseStatement();
+            if(parser.match(TokenType.TOK_OPEN_CURLY)){
+                elseArm = new BlockParselet().parse(parser, parser.lookAhead(0));
+            }
         }
 
         if(elseArm != null)
