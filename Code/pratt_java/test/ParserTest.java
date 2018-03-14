@@ -463,36 +463,78 @@ public class ParserTest {
 
     @Test
     public void testStatementIf() {
-        Lexer l = new Lexer("if (a>0 && a * 2 < 4){ b = 5 *6 } else { a = 3 } ");
+        Lexer l = new Lexer("if (a>0 && a * 2 < 4){ b = 5 *6 if (a == 2){ c = 3 } } else { a = 3 } ");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
-        List<Expression> result = p.parse();
+        List<Expression> result = p.parseBlock();
+        List<Expression> aux = new ArrayList<>();
+        aux.add(new AssignExpression("a", new IntegerExpression(3)));
+        List<Expression> then = new ArrayList<>();
+        List<Expression> elsee = new ArrayList<>();
+        elsee.add(new AssignExpression("a", new IntegerExpression(3)));
+
+        then.add(new AssignExpression(
+                "b",
+                new OperatorExpression(
+                        new IntegerExpression(5),
+                        TokenType.TOK_MULT,
+                        new IntegerExpression(6)
+                )));
+        then.add(new ConditionalExpression(
+                new OperatorExpression(
+                        new IdentifierExpression("a"),
+                        TokenType.TOK_EQ,
+                        new IntegerExpression(2)),
+                aux,
+                null
+              )
+        );
 
         List<Expression> actual = new ArrayList<>();
         actual.add(new ConditionalExpression(
                         new OperatorExpression(
-                                new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_GT ,new IntegerExpression(0)),
+                                new OperatorExpression(
+                                        new IdentifierExpression("a"),
+                                        TokenType.TOK_GT,
+                                        new IntegerExpression(0)
+                                ),
                                 TokenType.TOK_AND,
                                 new OperatorExpression(
-                                        new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_MULT,new IntegerExpression(2)),
+                                        new OperatorExpression(
+                                                new IdentifierExpression("a"),
+                                                TokenType.TOK_MULT,
+                                                new IntegerExpression(2)),
                                         TokenType.TOK_LT,
-                                        new IntegerExpression(4))),
-                        new AssignExpression(
-                                "b",
-                                new OperatorExpression(
-                                        new IntegerExpression(
-                                                5),
-                                        TokenType.TOK_MULT,
-                                        new IntegerExpression(6)
+                                        new IntegerExpression(4)
                                 )
                         ),
-                        new AssignExpression(
-                                "a",
-                                new IntegerExpression(3)
-
-                        )
-                )
+                        then,
+                        elsee
+                    )
         );
+//                        new OperatorExpression(
+//                                new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_GT ,new IntegerExpression(0)),
+//                                TokenType.TOK_AND,
+//                                new OperatorExpression(
+//                                        new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_MULT,new IntegerExpression(2)),
+//                                        TokenType.TOK_LT,
+//                                        new IntegerExpression(4))),
+//                        new AssignExpression(
+//                                "b",
+//                                new OperatorExpression(
+//                                        new IntegerExpression(
+//                                                5),
+//                                        TokenType.TOK_MULT,
+//                                        new IntegerExpression(6)
+//                                )
+//                        ),
+//                        new AssignExpression(
+//                                "a",
+//                                new IntegerExpression(3)
+//
+//                        )
+//                )
+//        );
 
         assertEquals(result, actual);
     }
@@ -502,7 +544,7 @@ public class ParserTest {
         Lexer l = new Lexer("while (a>0 && a * 2 < 4){ b = b + 1 } ");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
-        List<Expression> result = p.parse();
+        List<Expression> result = p.parseBlock();
 
 
         List<Expression> actual = new ArrayList<>();
