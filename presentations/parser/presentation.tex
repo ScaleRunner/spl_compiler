@@ -63,16 +63,14 @@
 \begin{frame}
     \frametitle{Left Recursion}
     
-    \begin{minipage}[t]{0.48\textwidth}
-        \begin{block}{Old Grammar}
-            Here goes the old grammar
+        \begin{block}{Left Recursion}
+        \begin{align*}
+            \text{Field} &= [ \text{Field} (`.` `hd` | `.` `tl` | `.` `fst` | `.` `snd`)]
+        \end{align*}
         \end{block}
-    \end{minipage}%
-    \begin{minipage}[t]{0.48\textwidth}
-        \begin{block}{New Grammar}
+        \begin{block}{Fixed}
             New Grammar
         \end{block}
-    \end{minipage}
 \end{frame}
 
 
