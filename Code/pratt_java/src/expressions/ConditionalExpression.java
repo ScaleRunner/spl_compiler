@@ -1,5 +1,7 @@
 package expressions;
 
+import util.Visitor;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -7,9 +9,9 @@ import java.util.Objects;
  * Conditional Expression: if a then b else c
  */
 public class ConditionalExpression implements Expression {
-    private final Expression condition;
-    private final List<Expression> then_expression;
-    private final List<Expression> else_expression;
+    public final Expression condition;
+    public final List<Expression> then_expression;
+    public final List<Expression> else_expression;
 
     public ConditionalExpression(
             Expression condition, List<Expression> then_expression, List<Expression> else_expression) {
@@ -28,22 +30,11 @@ public class ConditionalExpression implements Expression {
     /**
      * Prints a conditional expression as:
      *         (if (CONDITIONAL) {EXPRESSION} else {EXPRESSION})
-     * @param builder visitor
+     * @param v visitor
      */
-    public void print(StringBuilder builder) {
-        builder.append("(if").append(" (");
-        condition.print(builder);
-        builder.append(") ");
-        builder.append("{");
-        //then_expression.print(builder);
-        builder.append("}");
-        if (else_expression != null){
-            builder.append(" else ").append("{");
-            //else_expression.print(builder);
-            builder.append("}");
-        }
-
-        builder.append(")");
+    @Override
+    public void accept(Visitor v) {
+        v.visit(this);
     }
 
     @Override

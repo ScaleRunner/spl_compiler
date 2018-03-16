@@ -11,6 +11,11 @@ public abstract class Token<T> {
         this.value = value;
     }
 
+    public Token(TokenType tokenType){
+        this.tokenType = tokenType;
+        this.value = null;
+    }
+
     public TokenType getType() {
         return tokenType;
     }

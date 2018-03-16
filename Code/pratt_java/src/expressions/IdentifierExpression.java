@@ -1,5 +1,7 @@
 package expressions;
 
+import util.Visitor;
+
 import java.util.Objects;
 
 /**
@@ -7,18 +9,10 @@ import java.util.Objects;
  */
 public class IdentifierExpression implements Expression {
 
-    private final String name;
+    public final String name;
 
     public IdentifierExpression(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void print(StringBuilder builder) {
-        builder.append(name);
     }
 
     @Override
@@ -33,5 +27,10 @@ public class IdentifierExpression implements Expression {
     public int hashCode() {
 
         return Objects.hash(name);
+    }
+
+    @Override
+    public void accept(Visitor v) {
+        v.visit(this);
     }
 }

@@ -1,6 +1,7 @@
 package expressions;
 
 import lexer.TokenType;
+import util.Visitor;
 
 import java.util.Objects;
 
@@ -11,22 +12,14 @@ import java.util.Objects;
  *                                etc.
  */
 public class OperatorExpression implements Expression {
-    private final Expression left;
-    private final TokenType operator;
-    private final Expression right;
+    public final Expression left;
+    public final TokenType operator;
+    public final Expression right;
 
     public OperatorExpression(Expression left, TokenType operator, Expression right) {
         this.left = left;
         this.operator = operator;
         this.right = right;
-    }
-
-    public void print(StringBuilder builder) {
-        builder.append("(");
-        left.print(builder);
-        builder.append(" ").append(operator.toString()).append(" ");
-        right.print(builder);
-        builder.append(")");
     }
 
     @Override
@@ -43,5 +36,10 @@ public class OperatorExpression implements Expression {
     public int hashCode() {
 
         return Objects.hash(left, operator, right);
+    }
+
+    @Override
+    public void accept(Visitor v) {
+        v.visit(this);
     }
 }

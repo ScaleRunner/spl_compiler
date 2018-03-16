@@ -6,6 +6,8 @@ import lexer.Token;
 import lexer.TokenType;
 
 import org.junit.Test;
+import parser.CallException;
+import parser.ParseException;
 import parser.Parser;
 
 import java.util.ArrayList;
@@ -116,9 +118,6 @@ public class ParserTest {
                         )
                 )
         );
-        StringBuilder builder = new StringBuilder();
-        result.print(builder);
-        System.out.println(builder.toString());
         assertEquals(result, expected);
     }
 
@@ -238,6 +237,14 @@ public class ParserTest {
         );
 
         assertEquals(result, actual);
+    }
+
+    @Test(expected = CallException.class)
+    public void testFunCallError() {
+        Lexer l = new Lexer("1()");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
     }
 
     @Test

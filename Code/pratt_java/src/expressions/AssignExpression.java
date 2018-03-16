@@ -1,23 +1,19 @@
 package expressions;
 
+import util.Visitor;
+
 import java.util.Objects;
 
 /**
  * Assignment: a = b
  */
 public class AssignExpression implements Expression {
-    private final String name;
-    private final Expression right;
+    public final String name;
+    public final Expression right;
 
     public AssignExpression(String name, Expression right) {
         this.name = name;
         this.right = right;
-    }
-
-    public void print(StringBuilder builder) {
-        builder.append("(").append(name).append(" = ");
-        right.print(builder);
-        builder.append(")");
     }
 
     @Override
@@ -33,5 +29,10 @@ public class AssignExpression implements Expression {
     public int hashCode() {
 
         return Objects.hash(name, right);
+    }
+
+    @Override
+    public void accept(Visitor v) {
+        v.visit(this);
     }
 }

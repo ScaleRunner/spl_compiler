@@ -21,7 +21,7 @@ public class AssignParselet implements InfixParselet {
         if (!(left instanceof IdentifierExpression))
             throw new ParseException("The left-hand side of an assignment must be a name.");
 
-        String name = ((IdentifierExpression) left).getName();
+        String name = ((IdentifierExpression) left).name;
         return new AssignExpression(name, right);
     }
 

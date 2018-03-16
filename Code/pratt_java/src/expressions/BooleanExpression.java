@@ -1,5 +1,7 @@
 package expressions;
 
+import util.Visitor;
+
 import java.util.Objects;
 
 /**
@@ -7,18 +9,10 @@ import java.util.Objects;
  */
 public class BooleanExpression implements Expression {
 
-    private final boolean name;
+    public final boolean name;
 
     public BooleanExpression(boolean name) {
         this.name = name;
-    }
-
-    public boolean getName() {
-        return name;
-    }
-
-    public void print(StringBuilder builder) {
-        builder.append(name);
     }
 
     @Override
@@ -31,7 +25,11 @@ public class BooleanExpression implements Expression {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(name);
+    }
+
+    @Override
+    public void accept(Visitor v) {
+        v.visit(this);
     }
 }
