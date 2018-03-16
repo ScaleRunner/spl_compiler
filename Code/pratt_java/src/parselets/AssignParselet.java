@@ -4,6 +4,7 @@ import expressions.AssignExpression;
 import expressions.Expression;
 import expressions.IdentifierExpression;
 import lexer.Token;
+import lexer.TokenType;
 import parser.ParseException;
 import parser.Parser;
 import parser.Precedence;
@@ -17,6 +18,9 @@ import parser.Precedence;
 public class AssignParselet implements InfixParselet {
     public Expression parse(Parser parser, Expression left, Token token) {
         Expression right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
+
+        if (!parser.match(TokenType.TOK_SEMI_COLON))
+            throw new ParseException("There mush be a ';' in the end of an assignemnt");
 
         if (!(left instanceof IdentifierExpression))
             throw new ParseException("The left-hand side of an assignment must be a name.");
