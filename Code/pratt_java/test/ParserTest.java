@@ -71,7 +71,6 @@ public class ParserTest {
         assertEquals(result, expected);
     }
 
-
     @Test
     public void nested_addition() {
         // Expected: (a + b) + c

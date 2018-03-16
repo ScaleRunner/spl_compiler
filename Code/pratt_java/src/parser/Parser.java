@@ -72,7 +72,6 @@ public class Parser {
         registerInfix(TokenType.TOK_OR, new BinaryOperatorParselet(Precedence.OR, false));
 
         // Register Other Rules
-        //registerInfix(TokenType.TOK_KW_IF, new ConditionalParselet());
         registerPrefix(TokenType.TOK_INT, new IntegerParselet());
         registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
@@ -88,7 +87,7 @@ public class Parser {
 
         // Register Statements
         registerInfixStatement(TokenType.TOK_ASSIGN, new AssignParselet());
-        //TODO: IF parselet
+//        registerPrefixStatement(TokenType.TOK_KW_IF, new ConditionalParselet());
         //TODO: WHILE
     }
 
