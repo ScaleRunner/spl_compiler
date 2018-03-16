@@ -149,8 +149,8 @@ public class Parser {
         if (match(TokenType.TOK_KW_IF)) return (new IfParselet().parse(this, lookAhead(0)));
         if (match(TokenType.TOK_KW_WHILE)) return (new WhileParselet().parse(this, lookAhead(0)));
         if (lookAhead(lookahead).getType() == TokenType.TOK_IDENTIFIER) {
-            lookahead++;
-            Expression left = new IdentifierParselet().parse(this, lookAhead(0));
+            Token id = consume();
+            Expression left = new IdentifierParselet().parse(this, id);
             //consume();
 
             if (lookAhead(lookahead).getType().compareTo(TokenType.TOK_OPEN_PARENTESIS) == 0){
@@ -166,12 +166,13 @@ public class Parser {
                     return funcall;
             }
             else{
-                while ((lookAhead(lookahead).getType().compareTo(TokenType.TOK_HD) == 0) ||
-                       (lookAhead(lookahead).getType().compareTo(TokenType.TOK_TL) == 0) ||
-                       (lookAhead(lookahead).getType().compareTo(TokenType.TOK_FST) == 0) ||
-                       (lookAhead(lookahead).getType().compareTo(TokenType.TOK_SND) == 0)  ){
+                while ((lookAhead(0).getType().compareTo(TokenType.TOK_HD) == 0) ||
+                       (lookAhead(0).getType().compareTo(TokenType.TOK_TL) == 0) ||
+                       (lookAhead(0).getType().compareTo(TokenType.TOK_FST) == 0) ||
+                       (lookAhead(0).getType().compareTo(TokenType.TOK_SND) == 0)  ){
                         //Expression right =  (parseExpression());
-                    left = new PostfixOperatorParselet(Precedence.POSTFIX).parse(this, left, lookAhead(lookahead++));
+                    Token field = consume();
+                    left = new PostfixOperatorParselet(Precedence.POSTFIX).parse(this, left, field);
 
                     }
                     //else throw new ParseException(String.format("There was an error parsing '%s'.", lookAhead(0).toString()));
