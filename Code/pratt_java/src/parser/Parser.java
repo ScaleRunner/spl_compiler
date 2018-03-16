@@ -1,6 +1,9 @@
 package parser;
 
+import expressions.AssignExpression;
+import expressions.CallExpression;
 import expressions.Expression;
+import expressions.PostfixExpression;
 import lexer.Token;
 import lexer.TokenType;
 import parselets.*;
@@ -16,19 +19,31 @@ public class Parser {
     private final List<Token> mRead = new ArrayList<>();
     private final Map<TokenType, PrefixParselet> mPrefixParselets = new HashMap<>();
     private final Map<TokenType, InfixParselet> mInfixParselets = new HashMap<>();
+
+    private final Map<TokenType, PrefixParselet> mIdParselets = new HashMap<>();
+    private final Map<TokenType, InfixParselet> mFieldAssignParselets = new HashMap<>();
     //private final Map<TokenType, StatementParselet> mStatementParselets = new HashMap<>();
 
     public Parser(List<Token> tokens) {
         this.mTokens = tokens.iterator();
         setup_parser();
     }
-
     private void registerPrefix(TokenType token, PrefixParselet parselet){
         mPrefixParselets.put(token, parselet);
     }
 
     private void registerInfix(TokenType type, InfixParselet parselet){
         mInfixParselets.put(type, parselet);
+    }
+
+    private void registerId(TokenType type, PrefixParselet parselet){
+
+        mIdParselets.put(type, parselet);
+    }
+
+    private void registerFieldAssign(TokenType type, InfixParselet parselet){
+
+        mFieldAssignParselets.put(type, parselet);
     }
 
 //    private void registerStatement(TokenType type, StatementParselet parselet){
@@ -71,7 +86,7 @@ public class Parser {
         registerPrefix(TokenType.TOK_INT, new IntegerParselet());
         registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
-        registerInfix(TokenType.TOK_ASSIGN, new AssignParselet());
+        //registerInfix(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefix(TokenType.TOK_OPEN_PARENTESIS, new GroupParselet());
         //registerPrefix(TokenType.TOK_OPEN_CURLY, new BlockParselet());
         registerInfix(TokenType.TOK_OPEN_PARENTESIS, new CallParselet());
@@ -83,18 +98,27 @@ public class Parser {
         registerInfix(TokenType.TOK_SND, new PostfixOperatorParselet(Precedence.POSTFIX));
 
         //registerStatement(TokenType.TOK_KW_IF, new IfParselet());
+
+        registerId(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
+        // Register Fields
+        registerFieldAssign(TokenType.TOK_HD, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerFieldAssign(TokenType.TOK_TL, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerFieldAssign(TokenType.TOK_FST, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerFieldAssign(TokenType.TOK_SND, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerFieldAssign(TokenType.TOK_ASSIGN, new AssignParselet());
     }
 
     public ArrayList<Expression> parseBlock(){
-        ArrayList<Expression> expressions = new ArrayList<>();
+        ArrayList<Expression> statements = new ArrayList<>();
         while(!lookAhead(0).getType().equals(TokenType.TOK_EOF)){
             Expression expr = parseStatement();
-            expressions.add(expr);
-            if ((!lookAhead(0).getType().equals(TokenType.TOK_EOF)))
-                consume();
+            statements.add(expr);
+            if ((lookAhead(0).getType().equals(TokenType.TOK_EOF)))
+                //consume();
+                break;
         }
 
-        return expressions;
+        return statements;
     }
 
     /**
@@ -121,11 +145,57 @@ public class Parser {
     }
 
     public Expression parseStatement() {
-
+        int lookahead = 0;
         if (match(TokenType.TOK_KW_IF)) return (new IfParselet().parse(this, lookAhead(0)));
         if (match(TokenType.TOK_KW_WHILE)) return (new WhileParselet().parse(this, lookAhead(0)));
+        if (lookAhead(lookahead).getType() == TokenType.TOK_IDENTIFIER) {
+            lookahead++;
+            Expression left = new IdentifierParselet().parse(this, lookAhead(0));
+            //consume();
 
-        return parseExpression(0);
+            if (lookAhead(lookahead).getType().compareTo(TokenType.TOK_OPEN_PARENTESIS) == 0){
+
+
+                Expression funcall = new CallParselet().parse(this, left,lookAhead(lookahead++));
+                while (lookahead>0){
+                    consume();
+                    lookahead--;
+
+                }
+                if (match(TokenType.TOK_SEMI_COLON))
+                    return funcall;
+            }
+            else{
+                while ((lookAhead(lookahead).getType().compareTo(TokenType.TOK_HD) == 0) ||
+                       (lookAhead(lookahead).getType().compareTo(TokenType.TOK_TL) == 0) ||
+                       (lookAhead(lookahead).getType().compareTo(TokenType.TOK_FST) == 0) ||
+                       (lookAhead(lookahead).getType().compareTo(TokenType.TOK_SND) == 0)  ){
+                        //Expression right =  (parseExpression());
+                    left = new PostfixOperatorParselet(Precedence.POSTFIX).parse(this, left, lookAhead(lookahead++));
+
+                    }
+                    //else throw new ParseException(String.format("There was an error parsing '%s'.", lookAhead(0).toString()));
+                }
+
+                if (lookAhead(lookahead).getType().compareTo(TokenType.TOK_ASSIGN)== 0) {
+                    lookahead++;
+                    while (lookahead>0){
+                        consume();
+                        lookahead--;
+
+                    }
+                    Expression right =  (parseExpression());
+                    if (!match(TokenType.TOK_SEMI_COLON))
+                        throw new ParseException(String.format("Expected ';' and found '%s'.", lookAhead(0).toString()));
+                    return new AssignExpression(left, right);
+                }
+
+
+
+            }
+
+        throw new ParseException("No statement could be parsed " + lookAhead(0) );
+        //return parseExpression(0);
     }
 
 

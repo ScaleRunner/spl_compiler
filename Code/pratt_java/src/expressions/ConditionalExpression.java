@@ -1,5 +1,6 @@
 package expressions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,7 +23,7 @@ public class ConditionalExpression implements Expression {
             Expression condition, List<Expression> then_expression) {
         this.condition = condition;
         this.then_expression = then_expression;
-        this.else_expression = null;
+        this.else_expression = new ArrayList<>();
     }
 
     /**
