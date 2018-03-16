@@ -1,6 +1,7 @@
 package expressions;
 
 import lexer.TokenType;
+import util.Visitor;
 
 import java.util.Objects;
 
@@ -9,18 +10,12 @@ import java.util.Objects;
  *                                 -b
  */
 public class PrefixExpression implements Expression {
-    private final TokenType operator;
-    private final Expression right;
+    public final TokenType operator;
+    public final Expression right;
 
     public PrefixExpression(TokenType operator, Expression right) {
         this.operator = operator;
         this.right = right;
-    }
-
-    public void print(StringBuilder builder) {
-        builder.append("(").append(operator.getValue());
-        right.print(builder);
-        builder.append(")");
     }
 
     @Override
@@ -36,5 +31,10 @@ public class PrefixExpression implements Expression {
     public int hashCode() {
 
         return Objects.hash(operator, right);
+    }
+
+    @Override
+    public void accept(Visitor v) {
+        v.visit(this);
     }
 }

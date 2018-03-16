@@ -1,5 +1,8 @@
 package expressions;
 
+import parser.CallException;
+import util.Visitor;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -7,22 +10,18 @@ import java.util.Objects;
  * Function Call: foo(bar)
  */
 public class CallExpression implements Expression {
-    private final Expression function_name;
-    private final List<Expression> args;
+    public final IdentifierExpression function_name;
+    public final List<Expression> args;
 
     public CallExpression(Expression function, List<Expression> args) {
-        function_name = function;
-        this.args = args;
-    }
-
-    public void print(StringBuilder builder) {
-        function_name.print(builder);
-        builder.append("(");
-        for (int i = 0; i < args.size(); i++) {
-            args.get(i).print(builder);
-            if (i < args.size() - 1) builder.append(", ");
+        try {
+            function_name = (IdentifierExpression) function;
+        } catch (ClassCastException e){
+            throw new CallException(
+                    String.format("Could not call %s as a function. Perhaps there is an operator missing?", function)
+            );
         }
-        builder.append(")");
+        this.args = args;
     }
 
     @Override
@@ -38,5 +37,10 @@ public class CallExpression implements Expression {
     public int hashCode() {
 
         return Objects.hash(function_name, args);
+    }
+
+    @Override
+    public void accept(Visitor v) {
+        v.visit(this);
     }
 }

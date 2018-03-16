@@ -45,22 +45,5 @@ public enum TokenType {
     TOK_HD,
     TOK_TL,
     TOK_FST,
-    TOK_SND;
-
-    public String getValue() {
-        switch (this) {
-            case TOK_PLUS:
-                return "+";
-            case TOK_EQ:
-                return "==";
-            case TOK_DIV:
-                return "/";
-            case TOK_MINUS:
-                return "-";
-            case TOK_ASSIGN:
-                return "=";
-            default:
-                return null;
-        }
-    }
+    TOK_SND
 }
