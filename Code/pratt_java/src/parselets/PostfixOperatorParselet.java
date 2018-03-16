@@ -8,7 +8,7 @@ import parser.Parser;
 /**
  * Generic postfix parselet for an unary operator like: a.hd
  */
-public class PostfixOperatorParselet implements InfixParselet {
+public class PostfixOperatorParselet implements InfixParseletExpression {
     public PostfixOperatorParselet(int precedence) {
         mPrecedence = precedence;
     }

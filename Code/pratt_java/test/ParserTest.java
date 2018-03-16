@@ -8,6 +8,9 @@ import lexer.TokenType;
 import org.junit.Test;
 import parser.CallException;
 import parser.Parser;
+import statements.AssignStatement;
+import statements.ConditionalStatement;
+import statements.Statement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +55,7 @@ public class ParserTest {
         ArrayList<Expression> expected = new ArrayList<>();
         Expression left = new IdentifierExpression("a");
         Expression right = new IdentifierExpression("b");
-        expected.add(new AssignExpression(left, right));
+        expected.add(new AssignStatement(left, right));
         assertEquals(result, expected);
     }
 
@@ -94,20 +97,20 @@ public class ParserTest {
 	    Lexer l = new Lexer("a = b; c = a;if(a == c) { a = 2;}");
         List<Token> tokens = l.tokenize();
 		Parser p = new Parser(tokens);
-		ArrayList<Expression> result = p.parseBlock();
+		ArrayList<Statement> result = p.parseBlock();
 
         Expression left = new IdentifierExpression("a");
         Expression right = new IdentifierExpression("b");
-        Expression assign = new AssignExpression(left, right);
+        Statement assign = new AssignStatement(left, right);
 
-        ArrayList<Expression> actual = new ArrayList<>();
+        ArrayList<Statement> actual = new ArrayList<>();
 
-        ArrayList<Expression> then = new ArrayList<>();
-        then.add(new AssignExpression(new IdentifierExpression("a"),new IntegerExpression(2)));
+        ArrayList<Statement> then = new ArrayList<>();
+        then.add(new AssignStatement(new IdentifierExpression("a"),new IntegerExpression(2)));
 
         actual.add(assign);
-        actual.add(new AssignExpression(new IdentifierExpression("c"), new IdentifierExpression("a")));
-        actual.add(new ConditionalExpression(
+        actual.add(new AssignStatement(new IdentifierExpression("c"), new IdentifierExpression("a")));
+        actual.add(new ConditionalStatement(
                         new OperatorExpression(new IdentifierExpression("a"),
                         TokenType.TOK_EQ,
                         new IdentifierExpression("c")),
@@ -117,19 +120,19 @@ public class ParserTest {
 
     @Test
     public void testEmptyStatement() {
-        Lexer l = new Lexer("if(a = c) {}");
+        Lexer l = new Lexer("if(a == c) {}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         ArrayList<Expression> result = p.parseBlock();
 
         Expression left = new IdentifierExpression("a");
         Expression right = new IdentifierExpression("c");
-        Expression condition = new AssignExpression(left, right);
+        Expression condition = new OperatorExpression(left, TokenType.TOK_EQ, right);
 
         ArrayList<Expression> actual = new ArrayList<>();
-        Expression cond = new ConditionalExpression(condition, new ArrayList<>());
+        Expression cond = new ConditionalStatement(condition, new ArrayList<>());
         actual.add(cond);
-        //actual.add(new AssignExpression(new IdentifierExpression("c"), new IdentifierExpression("a")));
+        //actual.add(new AssignStatement(new IdentifierExpression("c"), new IdentifierExpression("a")));
 
         assertEquals(result, actual);
     }
@@ -215,7 +218,7 @@ public class ParserTest {
         ArrayList<Expression> actual = new ArrayList<>();
         Expression left = new IdentifierExpression("value");
         Expression right = new BooleanExpression(true);
-        actual.add(new AssignExpression(left, right));
+        actual.add(new AssignStatement(left, right));
         assertEquals(result, actual);
 	}
 
@@ -245,7 +248,7 @@ public class ParserTest {
         Expression left = new IdentifierExpression("value");
         left = new PostfixExpression(left, TokenType.TOK_TL);
         left = new PostfixExpression(left, TokenType.TOK_HD);
-        actual.add(new AssignExpression(left, new IdentifierExpression("a")));
+        actual.add(new AssignStatement(left, new IdentifierExpression("a")));
 
 
         assertEquals(result, actual);
@@ -260,7 +263,7 @@ public class ParserTest {
         ArrayList<Expression> actual = new ArrayList<>();
         Expression left = new IdentifierExpression("value") ;
         Expression right = new IntegerExpression(1);
-        actual.add(new AssignExpression(left, right));
+        actual.add(new AssignStatement(left, right));
         assertEquals(result, actual);
     }
 
@@ -567,19 +570,19 @@ public class ParserTest {
 //        Parser p = new Parser(tokens);
 //        List<Expression> result = p.parseBlock();
 //        List<Expression> aux = new ArrayList<>();
-//        aux.add(new AssignExpression("c", new IntegerExpression(3)));
+//        aux.add(new AssignStatement("c", new IntegerExpression(3)));
 //        List<Expression> then = new ArrayList<>();
 //        List<Expression> elsee = new ArrayList<>();
-//        elsee.add(new AssignExpression("a", new IntegerExpression(3)));
+//        elsee.add(new AssignStatement("a", new IntegerExpression(3)));
 //
-//        then.add(new AssignExpression(
+//        then.add(new AssignStatement(
 //                "b",
 //                new OperatorExpression(
 //                        new IntegerExpression(5),
 //                        TokenType.TOK_MULT,
 //                        new IntegerExpression(6)
 //                )));
-//        then.add(new ConditionalExpression(
+//        then.add(new ConditionalStatement(
 //                new OperatorExpression(
 //                        new IdentifierExpression("a"),
 //                        TokenType.TOK_EQ,
@@ -590,7 +593,7 @@ public class ParserTest {
 //        );
 //
 //        List<Expression> actual = new ArrayList<>();
-//        actual.add(new ConditionalExpression(
+//        actual.add(new ConditionalStatement(
 //                        new OperatorExpression(
 //                                new OperatorExpression(
 //                                        new IdentifierExpression("a"),
@@ -640,19 +643,19 @@ public class ParserTest {
 //        Parser p = new Parser(tokens);
 //        List<Expression> result = p.parseBlock();
 //        List<Expression> aux = new ArrayList<>();
-//        aux.add(new AssignExpression("a", new IntegerExpression(3)));
+//        aux.add(new AssignStatement("a", new IntegerExpression(3)));
 //        List<Expression> then = new ArrayList<>();
 //        List<Expression> elsee = new ArrayList<>();
-//        elsee.add(new AssignExpression("a", new IntegerExpression(3)));
+//        elsee.add(new AssignStatement("a", new IntegerExpression(3)));
 //
-//        then.add(new AssignExpression(
+//        then.add(new AssignStatement(
 //                "b",
 //                new OperatorExpression(
 //                        new IntegerExpression(5),
 //                        TokenType.TOK_MULT,
 //                        new IntegerExpression(6)
 //                )));
-//        then.add(new ConditionalExpression(
+//        then.add(new ConditionalStatement(
 //                        new OperatorExpression(
 //                                new IdentifierExpression("a"),
 //                                TokenType.TOK_EQ,
@@ -663,7 +666,7 @@ public class ParserTest {
 //        );
 //
 //        List<Expression> actual = new ArrayList<>();
-//        actual.add(new ConditionalExpression(
+//        actual.add(new ConditionalStatement(
 //                        new OperatorExpression(
 //                                new OperatorExpression(
 //                                        new IdentifierExpression("a"),
@@ -691,7 +694,7 @@ public class ParserTest {
 //                                        new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_MULT,new IntegerExpression(2)),
 //                                        TokenType.TOK_LT,
 //                                        new IntegerExpression(4))),
-//                        new AssignExpression(
+//                        new AssignStatement(
 //                                "b",
 //                                new OperatorExpression(
 //                                        new IntegerExpression(
@@ -700,7 +703,7 @@ public class ParserTest {
 //                                        new IntegerExpression(6)
 //                                )
 //                        ),
-//                        new AssignExpression(
+//                        new AssignStatement(
 //                                "a",
 //                                new IntegerExpression(3)
 //
@@ -728,7 +731,7 @@ public class ParserTest {
 //                                    new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_MULT,new IntegerExpression(2)),
 //                                    TokenType.TOK_LT,
 //                                    new IntegerExpression(4))),
-//                    new AssignExpression(
+//                    new AssignStatement(
 //                            "b",
 //                            new OperatorExpression(
 //                                new IdentifierExpression(

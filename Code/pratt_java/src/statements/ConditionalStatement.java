@@ -1,5 +1,6 @@
-package expressions;
+package statements;
 
+import expressions.Expression;
 import util.Visitor;
 
 import java.util.ArrayList;
@@ -9,24 +10,22 @@ import java.util.Objects;
 /**
  * Conditional Expression: if a then b else c
  */
-public class ConditionalExpression implements Expression {
+public class ConditionalStatement implements Statement {
     public final Expression condition;
-    public final List<Expression> then_expression;
-    public final List<Expression> else_expression;
+    public final List<Statement> then_expression;
+    public final List<Statement> else_expression;
 
-    public ConditionalExpression(
-            Expression condition, List<Expression> then_expression, List<Expression> else_expression) {
+    public ConditionalStatement(
+            Expression condition, List<Statement> then_expression, List<Statement> else_expression) {
         this.condition = condition;
         this.then_expression = then_expression;
         this.else_expression = else_expression;
     }
 
-    public ConditionalExpression(
-            Expression condition, List<Expression> then_expression) {
-        this.condition = condition;
-        this.then_expression = then_expression;
-        this.else_expression = new ArrayList<>();
-    }
+//    public ConditionalStatement(
+//            Expression condition, List<Statement> then_expression) {
+//        super(condition, then_expression, new ArrayList<Statement>());
+//    }
 
     /**
      * Prints a conditional expression as:
@@ -42,7 +41,7 @@ public class ConditionalExpression implements Expression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ConditionalExpression that = (ConditionalExpression) o;
+        ConditionalStatement that = (ConditionalStatement) o;
         return Objects.equals(condition, that.condition) &&
                 Objects.equals(then_expression, that.then_expression) &&
                 Objects.equals(else_expression, that.else_expression);

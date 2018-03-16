@@ -1,14 +1,14 @@
 package statements.parselets;
 
-import expressions.AssignExpression;
+import statements.AssignStatement;
 import expressions.Expression;
 import expressions.IdentifierExpression;
 import lexer.Token;
 import lexer.TokenType;
-import parselets.InfixParselet;
 import parser.ParseException;
 import parser.Parser;
 import parser.Precedence;
+import statements.Statement;
 
 
 /**
@@ -16,9 +16,9 @@ import parser.Precedence;
  * expression must be a simple name like "a", and expressions are
  * right-associative. (In other words, "a = b = c" is parsed as "a = (b = c)").
  */
-public class AssignParselet implements InfixParselet {
+public class AssignParselet implements InfixParseletStatement {
 
-    public Expression parse(Parser parser, Expression left, Token token) {
+    public Statement parse(Parser parser, Expression left, Token token) {
         Expression right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
         if (!parser.match(TokenType.TOK_SEMI_COLON))
@@ -28,10 +28,6 @@ public class AssignParselet implements InfixParselet {
             throw new ParseException("The left-hand side of an assignment must be a name.");
 
 
-        return new AssignExpression(left, right);
-    }
-
-    public int getPrecedence() {
-        return Precedence.ASSIGNMENT;
+        return new AssignStatement(left, right);
     }
 }

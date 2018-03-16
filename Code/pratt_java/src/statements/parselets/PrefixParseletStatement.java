@@ -1,11 +1,12 @@
-package parselets;
+package statements.parselets;
 
 import expressions.Expression;
 import lexer.Token;
 import parser.Parser;
+import statements.Statement;
 
 /**
- * One of the two interfaces used by the Pratt parser. A PrefixParselet is
+ * One of the two interfaces used by the Pratt parser. A PrefixParseletExpression is
  * associated with a token that appears at the beginning of an expression. Its
  * parse() method will be called with the consumed leading token, and the
  * parselet is responsible for parsing anything that comes after that token.
@@ -14,6 +15,6 @@ import parser.Parser;
  *
  * @author rnystrom
  */
-public interface PrefixParselet {
-    Expression parse(Parser parser, Token token);
+public interface PrefixParseletStatement {
+    Statement parse(Parser parser, Token token);
 }

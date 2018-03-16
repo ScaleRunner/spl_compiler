@@ -1,13 +1,12 @@
 package parser;
 
-import expressions.AssignExpression;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
 import parselets.*;
-import statements.parselets.AssignParselet;
-import statements.parselets.IfParselet;
-import statements.parselets.WhileParselet;
+import statements.Statement;
+import statements.parselets.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -15,28 +14,32 @@ public class Parser {
 
     private final Iterator<Token> mTokens;
     private final List<Token> mRead = new ArrayList<>();
-    private final Map<TokenType, PrefixParselet> mPrefixParselets = new HashMap<>();
-    private final Map<TokenType, InfixParselet> mInfixParselets = new HashMap<>();
+    private final Map<TokenType, PrefixParseletExpression> mPrefixParselets = new HashMap<>();
+    private final Map<TokenType, InfixParseletExpression> mInfixParselets = new HashMap<>();
 
-    //private final Map<TokenType, StatementParselet> mStatementParselets = new HashMap<>();
+    private final Map<TokenType, InfixParseletStatement> mInfixParseletsStatement = new HashMap<>();
+    private final Map<TokenType, PrefixParseletStatement> mPrefixParseletsStatement = new HashMap<>();
+
 
     public Parser(List<Token> tokens) {
         this.mTokens = tokens.iterator();
         setup_parser();
     }
-    private void registerPrefix(TokenType token, PrefixParselet parselet){
+    private void registerPrefix(TokenType token, PrefixParseletExpression parselet){
         mPrefixParselets.put(token, parselet);
     }
 
-    private void registerInfix(TokenType type, InfixParselet parselet){
+    private void registerInfix(TokenType type, InfixParseletExpression parselet){
         mInfixParselets.put(type, parselet);
     }
 
+    private void registerInfixStatement(TokenType type, InfixParseletStatement parselet){
+        mInfixParseletsStatement.put(type, parselet);
+    }
 
-
-//    private void registerStatement(TokenType type, StatementParselet parselet){
-//        mStatementParselets.put(type, parselet);
-//    }
+    private void registerPrefixStatement(TokenType type, PrefixParseletStatement parselet){
+        mPrefixParseletsStatement.put(type, parselet);
+    }
 
     /**
      * This function registers all the rules in the grammer.
@@ -74,7 +77,6 @@ public class Parser {
         registerPrefix(TokenType.TOK_INT, new IntegerParselet());
         registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
-        registerInfix(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefix(TokenType.TOK_OPEN_PARENTESIS, new GroupParselet());
         //registerPrefix(TokenType.TOK_OPEN_CURLY, new BlockParselet());
         registerInfix(TokenType.TOK_OPEN_PARENTESIS, new CallParselet());
@@ -85,13 +87,16 @@ public class Parser {
         registerInfix(TokenType.TOK_FST, new PostfixOperatorParselet(Precedence.POSTFIX));
         registerInfix(TokenType.TOK_SND, new PostfixOperatorParselet(Precedence.POSTFIX));
 
-
+        // Register Statements
+        registerInfixStatement(TokenType.TOK_ASSIGN, new AssignParselet());
+        //TODO: IF parselet
+        //TODO: WHILE
     }
 
-    public ArrayList<Expression> parseBlock(){
-        ArrayList<Expression> statements = new ArrayList<>();
+    public ArrayList<Statement> parseBlock(){
+        ArrayList<Statement> statements = new ArrayList<>();
         while(!lookAhead(0).getType().equals(TokenType.TOK_EOF)){
-            Expression expr = parseStatement();
+            Statement expr = parseStatement();
             statements.add(expr);
             if ((lookAhead(0).getType().equals(TokenType.TOK_EOF)))
                 //consume();
@@ -108,7 +113,7 @@ public class Parser {
      */
     public Expression parseExpression(int precedence) {
         Token token = consume();
-        PrefixParselet prefix = mPrefixParselets.get(token.getType());
+        PrefixParseletExpression prefix = mPrefixParselets.get(token.getType());
 
         if (prefix == null) throw new ParseException(
                 String.format("There was an error parsing '%s'.", token.toString()));
@@ -118,15 +123,15 @@ public class Parser {
         while (precedence < getPrecedence()) {
             token = consume();
 
-            InfixParselet infix = mInfixParselets.get(token.getType());
+            InfixParseletExpression infix = mInfixParselets.get(token.getType());
             left = infix.parse(this, left, token);
         }
         return left;
     }
 
-    public Expression parseStatement() {
+    public Statement parseStatement() {
         int lookahead = 0;
-        if (match(TokenType.TOK_KW_IF)) return (new IfParselet().parse(this, lookAhead(0)));
+        if (match(TokenType.TOK_KW_IF)) return (new ConditionalParselet().parse(this, lookAhead(0)));
         if (match(TokenType.TOK_KW_WHILE)) return (new WhileParselet().parse(this, lookAhead(0)));
         if (lookAhead(lookahead).getType() == TokenType.TOK_IDENTIFIER) {
             Token id = consume();
@@ -136,11 +141,12 @@ public class Parser {
             if (lookAhead(lookahead).getType() == TokenType.TOK_OPEN_PARENTESIS){
 
                 consume();
-                Expression funcall = new CallParselet().parse(this, left,lookAhead(0));
-
-                if (match(TokenType.TOK_SEMI_COLON))
-                    return funcall;
-                else throw new ParseException(String.format("Expected ';' and found '%s'.", lookAhead(0).toString()));
+                throw new NotImplementedException();
+//                Statement funcall = new CallParselet().parse(this, left,lookAhead(0));
+//
+//                if (match(TokenType.TOK_SEMI_COLON))
+//                    return funcall;
+//                else throw new ParseException(String.format("Expected ';' and found '%s'.", lookAhead(0).toString()));
 
             }
             else{
@@ -156,11 +162,10 @@ public class Parser {
                     //else throw new ParseException(String.format("There was an error parsing '%s'.", lookAhead(0).toString()));
                 }
 
-                if (lookAhead(lookahead).getType().compareTo(TokenType.TOK_ASSIGN)== 0) {
+                if (lookAhead(lookahead).getType() == TokenType.TOK_ASSIGN) {
                     Token tok = consume();
-                    InfixParselet parselet =  mInfixParselets.get(tok.getType());
-                    Expression assignExpression = parselet.parse(this, left, tok);
-                    return assignExpression;
+                    InfixParseletStatement parselet =  mInfixParseletsStatement.get(tok.getType());
+                    return parselet.parse(this, left, tok);
                 }
 
 
@@ -216,7 +221,7 @@ public class Parser {
     }
 
     private int getPrecedence() {
-        InfixParselet parser = mInfixParselets.get(lookAhead(0).getType());
+        InfixParseletExpression parser = mInfixParselets.get(lookAhead(0).getType());
         if (parser != null){
             return parser.getPrecedence();
         }

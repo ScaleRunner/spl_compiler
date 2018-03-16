@@ -1,29 +1,29 @@
 package statements.parselets;
 
 
-import expressions.ConditionalExpression;
+import statements.ConditionalStatement;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
-import parselets.BlockParselet;
-import parselets.PrefixParselet;
 import parser.Parser;
+import statements.Statement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Parselet for the condition or "ternary" operator, like "a ? b : c".
  */
-public class IfParselet implements PrefixParselet {
+public class ConditionalParselet implements PrefixParseletStatement {
 
-    public Expression parse(Parser parser, Token token) {
+    public Statement parse(Parser parser, Token token) {
         Expression condition = parser.parseExpression();
-        List<Expression> thenArm = null;
+        List<Statement> thenArm = new ArrayList<>();
         if(parser.match(TokenType.TOK_OPEN_CURLY)){
             thenArm = new BlockParselet().parse(parser, parser.lookAhead(0));
         }
 
-        List<Expression> elseArm = null;
+        List<Statement> elseArm = new ArrayList<>();
 
         if(parser.lookAhead(0).getType() == TokenType.TOK_KW_ELSE){
             parser.consume(TokenType.TOK_KW_ELSE);
@@ -32,10 +32,7 @@ public class IfParselet implements PrefixParselet {
             }
         }
 
-        if(elseArm != null)
-            return new ConditionalExpression(condition, thenArm, elseArm);
-        else
-            return new ConditionalExpression(condition, thenArm);
+        return new ConditionalStatement(condition, thenArm, elseArm);
     }
 
 

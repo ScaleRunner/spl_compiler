@@ -2,7 +2,11 @@ package util;
 
 import expressions.*;
 import lexer.TokenType;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import statements.AssignStatement;
+import statements.ConditionalStatement;
+import statements.LoopExpression;
+import statements.LoopStatement;
+import statements.Statement;
 
 import java.util.List;
 
@@ -70,8 +74,8 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(Expression e){
-        if(e.getClass() == AssignExpression.class){
-            this.visit((AssignExpression) e);
+        if(e.getClass() == AssignStatement.class){
+            this.visit((AssignStatement) e);
         }
 
         else if(e.getClass() == BooleanExpression.class){
@@ -82,8 +86,8 @@ public class PrettyPrinter implements Visitor {
             this.visit((CallExpression) e);
         }
 
-        else if(e.getClass() == ConditionalExpression.class){
-            this.visit((ConditionalExpression) e);
+        else if(e.getClass() == ConditionalStatement.class){
+            this.visit((ConditionalStatement) e);
         }
 
         else if(e.getClass() == IdentifierExpression.class){
@@ -94,8 +98,8 @@ public class PrettyPrinter implements Visitor {
             this.visit((IntegerExpression) e);
         }
 
-        else if(e.getClass() == LoopExpression.class){
-            this.visit((LoopExpression) e);
+        else if(e.getClass() == LoopStatement.class){
+            this.visit((LoopStatement) e);
         }
 
         else if(e.getClass() == OperatorExpression.class){
@@ -112,14 +116,14 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void visit(List<Expression> es){
-        for(Expression e : es){
+    public void visit(List<Statement> es){
+        for(Statement e : es){
             this.visit(e);
         }
     }
 
     @Override
-    public void visit(AssignExpression e){
+    public void visit(AssignStatement e){
         builder.append(e.name).append(" = ");
         this.visit(e.right);
         builder.append(";");
@@ -148,7 +152,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void visit(ConditionalExpression e) {
+    public void visit(ConditionalStatement e) {
         builder.append("(if").append(" (");
         this.visit(e.condition);
         builder.append(") ");

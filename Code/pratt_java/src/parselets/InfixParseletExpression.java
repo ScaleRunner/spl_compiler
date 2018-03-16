@@ -5,9 +5,9 @@ import lexer.Token;
 import parser.Parser;
 
 /**
- * The InfixParselet handles expressions which are in between arguments
+ * The InfixParseletExpression handles expressions which are in between arguments
  */
-public interface InfixParselet {
+public interface InfixParseletExpression {
     Expression parse(Parser parser, Expression left, Token token);
 
     int getPrecedence();

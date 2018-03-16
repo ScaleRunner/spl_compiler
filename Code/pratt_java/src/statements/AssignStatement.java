@@ -1,5 +1,7 @@
-package expressions;
+package statements;
 
+import com.sun.corba.se.spi.orbutil.fsm.State;
+import expressions.Expression;
 import util.Visitor;
 
 import java.util.Objects;
@@ -7,11 +9,11 @@ import java.util.Objects;
 /**
  * Assignment: a = b
  */
-public class AssignExpression implements Expression {
+public class AssignStatement implements Statement {
     public final Expression name;
     public final Expression right;
 
-    public AssignExpression(Expression name, Expression right) {
+    public AssignStatement(Expression name, Expression right) {
         this.name = name;
         this.right = right;
     }
@@ -20,7 +22,7 @@ public class AssignExpression implements Expression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AssignExpression that = (AssignExpression) o;
+        AssignStatement that = (AssignStatement) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(right, that.right);
     }

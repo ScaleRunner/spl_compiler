@@ -10,7 +10,7 @@ import parser.Parser;
  * difference when parsing, "+", "-", "*", "/", and "^" is precedence and
  * associativity, so we can use a single parselet class for all of those.
  */
-public class BinaryOperatorParselet implements InfixParselet {
+public class BinaryOperatorParselet implements InfixParseletExpression {
     public BinaryOperatorParselet(int precedence, boolean isRight) {
         mPrecedence = precedence;
         mIsRight = isRight;

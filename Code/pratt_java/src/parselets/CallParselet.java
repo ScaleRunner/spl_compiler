@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Parselet to parse a function call like "a(b, c, d)".
  */
-public class CallParselet implements InfixParselet {
+public class CallParselet implements InfixParseletExpression {
     public Expression parse(Parser parser, Expression left, Token token) {
         // Parse the comma-separated arguments until we hit, ")".
         List<Expression> args = new ArrayList<>();

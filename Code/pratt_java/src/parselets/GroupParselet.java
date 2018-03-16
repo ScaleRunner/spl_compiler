@@ -8,7 +8,7 @@ import parser.Parser;
 /**
  * Parses parentheses used to group an expression, like "a * (b + c)".
  */
-public class GroupParselet implements PrefixParselet {
+public class GroupParselet implements PrefixParseletExpression {
     public Expression parse(Parser parser, Token token) {
         Expression expression = parser.parseExpression();
         parser.consume(TokenType.TOK_CLOSE_PARENTESIS);

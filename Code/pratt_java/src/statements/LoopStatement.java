@@ -1,18 +1,21 @@
-package expressions;
+package statements;
 
+import expressions.Expression;
 import util.Visitor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Conditional Expression: if a then b else c
  */
-public class LoopExpression implements Expression {
+public class LoopStatement implements Statement {
     public final Expression condition;
-    public final Expression body;
+    public final List<Statement> body;
 
-    public LoopExpression(
-            Expression condition, Expression body) {
+    public LoopStatement(
+            Expression condition, List<Statement> body) {
         this.condition = condition;
         this.body = body;
     }
@@ -21,7 +24,7 @@ public class LoopExpression implements Expression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LoopExpression that = (LoopExpression) o;
+        LoopStatement that = (LoopStatement) o;
         return Objects.equals(condition, that.condition) &&
                 Objects.equals(body, that.body);
     }

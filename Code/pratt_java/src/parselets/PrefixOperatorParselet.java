@@ -9,7 +9,7 @@ import parser.Parser;
  * Generic prefix parselet for an unary arithmetic operator. Parses prefix
  * unary "-", "+", "~", and "!" expressions.
  */
-public class PrefixOperatorParselet implements PrefixParselet {
+public class PrefixOperatorParselet implements PrefixParseletExpression {
     public PrefixOperatorParselet(int precedence) {
         mPrecedence = precedence;
     }
