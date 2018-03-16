@@ -1,13 +1,12 @@
 package statements.parselets;
 
-import statements.AssignStatement;
 import expressions.Expression;
-import expressions.IdentifierExpression;
 import lexer.Token;
 import lexer.TokenType;
 import parser.ParseException;
 import parser.Parser;
 import parser.Precedence;
+import statements.AssignStatement;
 import statements.Statement;
 
 
@@ -22,11 +21,7 @@ public class AssignParselet implements InfixParseletStatement {
         Expression right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
         if (!parser.match(TokenType.TOK_SEMI_COLON))
-            throw new ParseException("There mush be a ';' in the end of an assignemnt");
-
-        if (!(left instanceof IdentifierExpression))
-            throw new ParseException("The left-hand side of an assignment must be a name.");
-
+            throw new ParseException("There mush be a ';' at the end of an assignment.");
 
         return new AssignStatement(left, right);
     }

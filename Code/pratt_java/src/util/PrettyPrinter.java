@@ -4,7 +4,6 @@ import expressions.*;
 import lexer.TokenType;
 import statements.AssignStatement;
 import statements.ConditionalStatement;
-import statements.LoopExpression;
 import statements.LoopStatement;
 import statements.Statement;
 
@@ -73,12 +72,19 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
-    public void visit(Expression e){
-        if(e.getClass() == AssignStatement.class){
-            this.visit((AssignStatement) e);
+    public void visit(Statement s) {
+        if (s.getClass() == LoopStatement.class) {
+            this.visit((LoopStatement) s);
+        } else if (s.getClass() == ConditionalStatement.class) {
+            this.visit((ConditionalStatement) s);
+        } else if (s.getClass() == AssignStatement.class) {
+            this.visit((AssignStatement) s);
         }
+    }
 
-        else if(e.getClass() == BooleanExpression.class){
+    @Override
+    public void visit(Expression e){
+        if (e.getClass() == BooleanExpression.class) {
             this.visit((BooleanExpression) e);
         }
 
@@ -86,9 +92,6 @@ public class PrettyPrinter implements Visitor {
             this.visit((CallExpression) e);
         }
 
-        else if(e.getClass() == ConditionalStatement.class){
-            this.visit((ConditionalStatement) e);
-        }
 
         else if(e.getClass() == IdentifierExpression.class){
             this.visit((IdentifierExpression) e);
@@ -98,9 +101,6 @@ public class PrettyPrinter implements Visitor {
             this.visit((IntegerExpression) e);
         }
 
-        else if(e.getClass() == LoopStatement.class){
-            this.visit((LoopStatement) e);
-        }
 
         else if(e.getClass() == OperatorExpression.class){
             this.visit((OperatorExpression) e);
@@ -183,7 +183,7 @@ public class PrettyPrinter implements Visitor {
      * @param e expression
      */
     @Override
-    public void visit(LoopExpression e) {
+    public void visit(LoopStatement e) {
         builder.append("while").append(" (");
         this.visit(e.condition);
         builder.append(") \n");

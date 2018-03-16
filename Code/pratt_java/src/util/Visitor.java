@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface Visitor {
 
+    void visit(Statement s);
+
     void visit(Expression e);
 
     void visit(List<Statement> es);

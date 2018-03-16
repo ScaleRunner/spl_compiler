@@ -6,7 +6,6 @@ import lexer.TokenType;
 import parselets.*;
 import statements.Statement;
 import statements.parselets.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -141,7 +140,7 @@ public class Parser {
             if (lookAhead(lookahead).getType() == TokenType.TOK_OPEN_PARENTESIS){
 
                 consume();
-                throw new NotImplementedException();
+                throw new UnsupportedOperationException("Function call not working right now...");
 //                Statement funcall = new CallParselet().parse(this, left,lookAhead(0));
 //
 //                if (match(TokenType.TOK_SEMI_COLON))
