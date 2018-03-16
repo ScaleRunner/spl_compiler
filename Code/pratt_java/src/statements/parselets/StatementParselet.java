@@ -1,4 +1,4 @@
-package statements;
+package statements.parselets;
 
 import expressions.Expression;
 import lexer.Token;
@@ -16,4 +16,5 @@ import parser.Parser;
  */
 public interface StatementParselet {
     Expression parse(Parser parser, Token token);
+    Expression parse(Parser parser, Expression left, Token token);
 }

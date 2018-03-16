@@ -1,10 +1,11 @@
-package parselets;
+package statements.parselets;
 
 import expressions.AssignExpression;
 import expressions.Expression;
 import expressions.IdentifierExpression;
 import lexer.Token;
 import lexer.TokenType;
+import parselets.InfixParselet;
 import parser.ParseException;
 import parser.Parser;
 import parser.Precedence;
@@ -16,6 +17,7 @@ import parser.Precedence;
  * right-associative. (In other words, "a = b = c" is parsed as "a = (b = c)").
  */
 public class AssignParselet implements InfixParselet {
+
     public Expression parse(Parser parser, Expression left, Token token) {
         Expression right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
@@ -25,8 +27,8 @@ public class AssignParselet implements InfixParselet {
         if (!(left instanceof IdentifierExpression))
             throw new ParseException("The left-hand side of an assignment must be a name.");
 
-        String name = ((IdentifierExpression) left).name;
-        return new AssignExpression(name, right);
+
+        return new AssignExpression(left, right);
     }
 
     public int getPrecedence() {

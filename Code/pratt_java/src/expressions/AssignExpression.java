@@ -8,10 +8,10 @@ import java.util.Objects;
  * Assignment: a = b
  */
 public class AssignExpression implements Expression {
-    public final String name;
+    public final Expression name;
     public final Expression right;
 
-    public AssignExpression(String name, Expression right) {
+    public AssignExpression(Expression name, Expression right) {
         this.name = name;
         this.right = right;
     }

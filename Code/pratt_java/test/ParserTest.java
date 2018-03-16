@@ -7,7 +7,6 @@ import lexer.TokenType;
 
 import org.junit.Test;
 import parser.CallException;
-import parser.ParseException;
 import parser.Parser;
 
 import java.util.ArrayList;
@@ -118,14 +117,14 @@ public class ParserTest {
 
     @Test
     public void testEmptyStatement() {
-        Lexer l = new Lexer("if(a == c) {}");
+        Lexer l = new Lexer("if(a = c) {}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         ArrayList<Expression> result = p.parseBlock();
 
         Expression left = new IdentifierExpression("a");
         Expression right = new IdentifierExpression("c");
-        Expression condition = new OperatorExpression(left,TokenType.TOK_EQ, right);
+        Expression condition = new AssignExpression(left, right);
 
         ArrayList<Expression> actual = new ArrayList<>();
         Expression cond = new ConditionalExpression(condition, new ArrayList<>());
@@ -321,7 +320,7 @@ public class ParserTest {
         Lexer l = new Lexer("1()");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
-        Expression result = p.parseExpression();
+        p.parseExpression();
     }
 
     @Test
@@ -629,7 +628,7 @@ public class ParserTest {
         Lexer l = new Lexer(sbInput.toString());
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
-        Expression result = p.parseExpression();
+        p.parseExpression();
 
         assertEquals(true, true);
     }

@@ -1,4 +1,4 @@
-package statements;
+package statements.parselets;
 
 
 import expressions.ConditionalExpression;
@@ -6,16 +6,15 @@ import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
 import parselets.BlockParselet;
-import parselets.InfixParselet;
+import parselets.PrefixParselet;
 import parser.Parser;
-import parser.Precedence;
 
 import java.util.List;
 
 /**
  * Parselet for the condition or "ternary" operator, like "a ? b : c".
  */
-public class IfParselet implements StatementParselet{
+public class IfParselet implements PrefixParselet {
 
     public Expression parse(Parser parser, Token token) {
         Expression condition = parser.parseExpression();
@@ -38,5 +37,7 @@ public class IfParselet implements StatementParselet{
         else
             return new ConditionalExpression(condition, thenArm);
     }
+
+
 
 }
