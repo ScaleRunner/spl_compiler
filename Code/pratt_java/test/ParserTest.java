@@ -14,6 +14,22 @@ import java.util.List;
 public class ParserTest {
 
     @Test
+    public void slides_example() {
+        Lexer l = new Lexer("-5 + b");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression left = new PrefixExpression(
+                TokenType.TOK_MINUS,
+                new IntegerExpression(5)
+        );
+        Expression right = new IdentifierExpression("b");
+        Expression expected = new OperatorExpression(left, TokenType.TOK_PLUS, right);
+        assertEquals(result, expected);
+    }
+
+    @Test
     public void single_addition() {
         Lexer l = new Lexer("a + b");
         List<Token> tokens = l.tokenize();
@@ -236,7 +252,6 @@ public class ParserTest {
 
         assertEquals(result, actual);
     }
-
 
     @Test
     public void testInteger() {
@@ -590,6 +605,79 @@ public class ParserTest {
 //                        elsee
 //                    )
 //        );
+    @Test
+    public void testParanthesesBomb() {
+        // Expected: ((True == (a > ((4 * b) + 5))) && (this == fun))
+//        int n_parantheses = 5000000; // 10mb file on disk
+        int n_parantheses = 500;
+        StringBuilder sbInput = new StringBuilder();
+        for(int i = 0; i < n_parantheses; i++){
+            sbInput.append('(');
+        }
+        sbInput.append("cosy");
+        for(int i = 0; i < n_parantheses; i++){
+            sbInput.append(')');
+        }
+
+        Lexer l = new Lexer(sbInput.toString());
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        assertEquals(true, true);
+    }
+
+    @Test
+    public void testStatementIf() {
+        Lexer l = new Lexer("if (a>0 && a * 2 < 4){ b = 5 *6 if (a == 2){ c = 3 } } else { a = 3 } ");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Expression> result = p.parseBlock();
+        List<Expression> aux = new ArrayList<>();
+        aux.add(new AssignExpression("a", new IntegerExpression(3)));
+        List<Expression> then = new ArrayList<>();
+        List<Expression> elsee = new ArrayList<>();
+        elsee.add(new AssignExpression("a", new IntegerExpression(3)));
+
+        then.add(new AssignExpression(
+                "b",
+                new OperatorExpression(
+                        new IntegerExpression(5),
+                        TokenType.TOK_MULT,
+                        new IntegerExpression(6)
+                )));
+        then.add(new ConditionalExpression(
+                        new OperatorExpression(
+                                new IdentifierExpression("a"),
+                                TokenType.TOK_EQ,
+                                new IntegerExpression(2)),
+                        aux,
+                        null
+                )
+        );
+
+        List<Expression> actual = new ArrayList<>();
+        actual.add(new ConditionalExpression(
+                        new OperatorExpression(
+                                new OperatorExpression(
+                                        new IdentifierExpression("a"),
+                                        TokenType.TOK_GT,
+                                        new IntegerExpression(0)
+                                ),
+                                TokenType.TOK_AND,
+                                new OperatorExpression(
+                                        new OperatorExpression(
+                                                new IdentifierExpression("a"),
+                                                TokenType.TOK_MULT,
+                                                new IntegerExpression(2)),
+                                        TokenType.TOK_LT,
+                                        new IntegerExpression(4)
+                                )
+                        ),
+                        then,
+                        elsee
+                )
+        );
 //                        new OperatorExpression(
 //                                new OperatorExpression(new IdentifierExpression("a"),TokenType.TOK_GT ,new IntegerExpression(0)),
 //                                TokenType.TOK_AND,
