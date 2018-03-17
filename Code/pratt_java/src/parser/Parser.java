@@ -87,7 +87,7 @@ public class Parser {
 
         // Register Statements
         registerInfixStatement(TokenType.TOK_ASSIGN, new AssignParselet());
-//        registerPrefixStatement(TokenType.TOK_KW_IF, new ConditionalParselet());
+        registerPrefixStatement(TokenType.TOK_KW_IF, new ConditionalParselet());
         //TODO: WHILE
     }
 
@@ -129,7 +129,13 @@ public class Parser {
 
     public Statement parseStatement() {
         int lookahead = 0;
-        if (match(TokenType.TOK_KW_IF)) return (new ConditionalParselet().parse(this, lookAhead(0)));
+        if (lookAhead(0).getType() == TokenType.TOK_KW_IF) {
+            Token token = consume();
+            PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
+            return prefix.parse(this, token);
+
+//            return (new ConditionalParselet().parse(this, lookAhead(0)));
+        }
         if (match(TokenType.TOK_KW_WHILE)) return (new WhileParselet().parse(this, lookAhead(0)));
         if (lookAhead(lookahead).getType() == TokenType.TOK_IDENTIFIER) {
             Token id = consume();
