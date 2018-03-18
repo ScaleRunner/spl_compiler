@@ -4,6 +4,7 @@ package statements.parselets;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
+import parser.ParseException;
 import parser.Parser;
 import statements.LoopStatement;
 import statements.Statement;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parselet for the condition or "ternary" operator, like "a ? b : c".
+ * Parselet for the While Parselt: while(a==b) {a = b;}
  */
 public class WhileParselet implements PrefixParseletStatement {
 
@@ -22,6 +23,8 @@ public class WhileParselet implements PrefixParseletStatement {
         if(parser.match(TokenType.TOK_OPEN_CURLY)){
             body = parser.parseBlock();
             parser.match(TokenType.TOK_CLOSE_CURLY);
+        } else {
+            throw new ParseException("While statements should have a condition, like while(a==b){}");
         }
 
         return new LoopStatement(condition, body);

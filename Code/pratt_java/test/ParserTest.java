@@ -7,6 +7,7 @@ import parser.CallException;
 import parser.Parser;
 import statements.AssignStatement;
 import statements.ConditionalStatement;
+import statements.LoopStatement;
 import statements.Statement;
 
 import java.util.ArrayList;
@@ -135,6 +136,53 @@ public class ParserTest {
 
         assertEquals(result, actual);
     }
+
+    @Test
+    public void testWhileStatement() {
+        Lexer l = new Lexer("while(a == c) {a = stupid;}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
+
+        Expression condition = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_EQ,
+                new IdentifierExpression("c"));
+
+        ArrayList<Statement> body = new ArrayList<>();
+        body.add(new AssignStatement(
+                        new IdentifierExpression("a"),
+                        new IdentifierExpression("stupid")
+                )
+        );
+
+        ArrayList<Statement> actual = new ArrayList<>();
+        actual.add(new LoopStatement(condition, body));
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testWhileEmptyStatement() {
+        Lexer l = new Lexer("while(a == c) {}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
+
+        Expression condition = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_EQ,
+                new IdentifierExpression("c"));
+
+        ArrayList<Statement> body = new ArrayList<>();
+
+        ArrayList<Statement> actual = new ArrayList<>();
+        actual.add(new LoopStatement(condition, body));
+
+        assertEquals(result, actual);
+    }
+
+
 
 	@Test
 	public void testNegativeIdentifier() {

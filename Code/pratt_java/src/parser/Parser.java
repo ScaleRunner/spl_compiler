@@ -88,15 +88,16 @@ public class Parser {
         // Register Statements
         registerInfixStatement(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefixStatement(TokenType.TOK_KW_IF, new ConditionalParselet());
+        registerPrefixStatement(TokenType.TOK_KW_WHILE, new WhileParselet());
         //TODO: WHILE
     }
 
     public ArrayList<Statement> parseBlock(){
         ArrayList<Statement> statements = new ArrayList<>();
-        while(!lookAhead(0).getType().equals(TokenType.TOK_EOF)){
+        while (lookAhead(0).getType() != TokenType.TOK_EOF && lookAhead(0).getType() != TokenType.TOK_CLOSE_CURLY) {
             Statement expr = parseStatement();
             statements.add(expr);
-            if ((lookAhead(0).getType().equals(TokenType.TOK_EOF)))
+            if (lookAhead(0).getType() == TokenType.TOK_EOF)
                 //consume();
                 break;
         }
@@ -136,7 +137,11 @@ public class Parser {
 
 //            return (new ConditionalParselet().parse(this, lookAhead(0)));
         }
-        if (match(TokenType.TOK_KW_WHILE)) return (new WhileParselet().parse(this, lookAhead(0)));
+        if (lookAhead(0).getType() == TokenType.TOK_KW_WHILE) {
+            Token token = consume();
+            PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
+            return prefix.parse(this, token);
+        }
         if (lookAhead(lookahead).getType() == TokenType.TOK_IDENTIFIER) {
             Token id = consume();
             Expression left = new IdentifierParselet().parse(this, id);
