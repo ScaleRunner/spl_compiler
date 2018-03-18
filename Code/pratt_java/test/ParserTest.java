@@ -5,10 +5,7 @@ import lexer.TokenType;
 import org.junit.Test;
 import parser.CallException;
 import parser.Parser;
-import statements.AssignStatement;
-import statements.ConditionalStatement;
-import statements.LoopStatement;
-import statements.Statement;
+import statements.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -351,7 +348,7 @@ public class ParserTest {
     }
 
 	@Test
-	public void testFunCall() {
+    public void testFunCall() {
         Lexer l = new Lexer("a()");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -363,6 +360,26 @@ public class ParserTest {
         );
 
         assertEquals(result, actual);
+    }
+
+    @Test
+    public void testFunCallStatement() {
+        Lexer l = new Lexer("a();");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
+
+        ArrayList<Statement> expected = new ArrayList<>();
+        expected.add(
+                new CallStatement(
+                        new CallExpression(
+                                new IdentifierExpression("a"),
+                                new ArrayList<>()
+                        )
+                )
+        );
+
+        assertEquals(result, expected);
     }
 
     @Test(expected = CallException.class)
@@ -821,19 +838,6 @@ public class ParserTest {
 //										TokenType.TOK_DOT,
 //										new AstExprField("fst")
 //											)
-//									)
-//					, ast);
-//		System.out.println(ast.toString());
-//	}
-//
-//	@Test
-//	public void testIdentifierWrongFieldValue() {
-//		SPLParser p = new SPLParser("alan.fst");
-//		AstExpr ast = p.pExpr();
-//		assertEquals(new AstExprBinOp(
-//								new AstExprIdentifier("alan"),
-//								TokenType.TOK_DOT,
-//								new AstExprField("fst")
 //									)
 //					, ast);
 //		System.out.println(ast.toString());

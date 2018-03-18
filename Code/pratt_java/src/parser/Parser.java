@@ -1,9 +1,11 @@
 package parser;
 
+import expressions.CallExpression;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
 import parselets.*;
+import statements.CallStatement;
 import statements.Statement;
 import statements.parselets.*;
 
@@ -150,13 +152,11 @@ public class Parser {
             if (lookAhead(lookahead).getType() == TokenType.TOK_OPEN_PARENTESIS){
 
                 consume();
-                throw new UnsupportedOperationException("Function call not working right now...");
-//                Statement funcall = new CallParselet().parse(this, left,lookAhead(0));
-//
-//                if (match(TokenType.TOK_SEMI_COLON))
-//                    return funcall;
-//                else throw new ParseException(String.format("Expected ';' and found '%s'.", lookAhead(0).toString()));
+                CallExpression funcall = (CallExpression) new CallParselet().parse(this, left, lookAhead(0));
 
+                if (match(TokenType.TOK_SEMI_COLON))
+                    return (Statement) new CallStatement(funcall);
+                else throw new ParseException(String.format("Expected ';' and found '%s'.", lookAhead(0).toString()));
             }
             else{
                 while ((lookAhead(0).getType().compareTo(TokenType.TOK_HD) == 0) ||
