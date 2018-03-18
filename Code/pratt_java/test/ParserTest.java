@@ -70,6 +70,29 @@ public class ParserTest {
     }
 
     @Test
+    public void field_assignment() {
+        Lexer l = new Lexer("a.hd.fst = 1;");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
+
+        ArrayList<Statement> expected = new ArrayList<>();
+        expected.add(
+                new AssignStatement(
+                        new PostfixExpression(
+                                new PostfixExpression(
+                                        new IdentifierExpression("a"),
+                                        TokenType.TOK_HD
+                                ),
+                                TokenType.TOK_FST
+                        ),
+                        new IntegerExpression(1)
+                )
+        );
+        assertEquals(result, expected);
+    }
+
+    @Test
     public void nested_addition() {
         // Expected: (a + b) + c
         Lexer l = new Lexer("a + b + c");

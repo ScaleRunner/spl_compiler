@@ -2,6 +2,7 @@ package parser;
 
 import expressions.CallExpression;
 import expressions.Expression;
+import expressions.IdentifierExpression;
 import lexer.Token;
 import lexer.TokenType;
 import parselets.*;
@@ -131,7 +132,6 @@ public class Parser {
     }
 
     public Statement parseStatement() {
-        int lookahead = 0;
         if (lookAhead(0).getType() == TokenType.TOK_KW_IF) {
             Token token = consume();
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
@@ -144,34 +144,29 @@ public class Parser {
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
             return prefix.parse(this, token);
         }
-        if (lookAhead(lookahead).getType() == TokenType.TOK_IDENTIFIER) {
+        if (lookAhead(0).getType() == TokenType.TOK_IDENTIFIER) {
             Token id = consume();
             Expression left = new IdentifierParselet().parse(this, id);
             //consume();
 
-            if (lookAhead(lookahead).getType() == TokenType.TOK_OPEN_PARENTESIS){
+            if (lookAhead(0).getType() == TokenType.TOK_OPEN_PARENTESIS) {
 
                 consume();
                 CallExpression funcall = (CallExpression) new CallParselet().parse(this, left, lookAhead(0));
 
                 if (match(TokenType.TOK_SEMI_COLON))
-                    return (Statement) new CallStatement(funcall);
+                    return new CallStatement(funcall);
                 else throw new ParseException(String.format("Expected ';' and found '%s'.", lookAhead(0).toString()));
             }
             else{
-                while ((lookAhead(0).getType().compareTo(TokenType.TOK_HD) == 0) ||
-                       (lookAhead(0).getType().compareTo(TokenType.TOK_TL) == 0) ||
-                       (lookAhead(0).getType().compareTo(TokenType.TOK_FST) == 0) ||
-                       (lookAhead(0).getType().compareTo(TokenType.TOK_SND) == 0)  ){
-                        //Expression right =  (parseExpression());
-                    Token field = consume();
-                    left = new PostfixOperatorParselet(Precedence.POSTFIX).parse(this, left, field);
-
+                // Consume all fields if any
+                if (fieldAhead()) {
+                    left = IdentifierExpression.parseFields(this, left);
                     }
                     //else throw new ParseException(String.format("There was an error parsing '%s'.", lookAhead(0).toString()));
                 }
 
-                if (lookAhead(lookahead).getType() == TokenType.TOK_ASSIGN) {
+            if (lookAhead(0).getType() == TokenType.TOK_ASSIGN) {
                     Token tok = consume();
                     InfixParseletStatement parselet =  mInfixParseletsStatement.get(tok.getType());
                     return parselet.parse(this, left, tok);
@@ -200,6 +195,13 @@ public class Parser {
         return true;
     }
 
+    public boolean fieldAhead() {
+        return (lookAhead(0).getType() == TokenType.TOK_HD ||
+                lookAhead(0).getType() == TokenType.TOK_TL ||
+                lookAhead(0).getType() == TokenType.TOK_FST ||
+                lookAhead(0).getType() == TokenType.TOK_SND);
+    }
+
     public Token consume(TokenType expected) {
         Token token = lookAhead(0);
         if (token.getType() != expected) {
@@ -212,7 +214,7 @@ public class Parser {
         return consume();
     }
 
-    private Token consume() {
+    public Token consume() {
         // Make sure we've read the token.
         lookAhead(0);
 
