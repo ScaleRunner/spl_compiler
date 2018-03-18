@@ -74,7 +74,7 @@ public class PrettyPrinterTest {
 
     @Test
     public void testPlusMult() {
-        Lexer l = new Lexer("res = 4   + 2*3; \n res = 7* 8 \t  *9;");
+        Lexer l = new Lexer("res = 4 \n  + 2*3; res = 7* 8 \t  *9;");
         Parser p = new Parser(l.tokenize());
         ArrayList<Statement> result = p.parseBlock();
         PrettyPrinter pp = new PrettyPrinter();

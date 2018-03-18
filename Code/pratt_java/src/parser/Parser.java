@@ -132,26 +132,23 @@ public class Parser {
     }
 
     public Statement parseStatement() {
-        // IF
-        if (lookAhead(0).getType() == TokenType.TOK_KW_IF) {
-            Token token = consume();
+        Token token = consume();
+
+        // WHILE OR IF
+        if (token.getType() == TokenType.TOK_KW_WHILE ||
+                token.getType() == TokenType.TOK_KW_IF) {
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
+
+            if (prefix == null) throw new ParseException(
+                    String.format("There was an error parsing '%s'.", token.toString()));
+
             return prefix.parse(this, token);
-        }
-        // WHILE
-        if (lookAhead(0).getType() == TokenType.TOK_KW_WHILE) {
-            Token token = consume();
-            PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
-            return prefix.parse(this, token);
-        }
-        // ASSIGNMENT OR FUNCALL
-        if (lookAhead(0).getType() == TokenType.TOK_IDENTIFIER) {
-            Token id = consume();
-            Expression left = new IdentifierParselet().parse(this, id);
+        } else if (token.getType() == TokenType.TOK_IDENTIFIER) {
+            Expression id = mPrefixParselets.get(token.getType()).parse(this, token);
 
             // FUNCALL
             if (match(TokenType.TOK_OPEN_PARENTHESIS)) {
-                CallExpression funcall = (CallExpression) new CallParselet().parse(this, left, lookAhead(0));
+                CallExpression funcall = (CallExpression) new CallParselet().parse(this, id, lookAhead(0));
 
                 if (match(TokenType.TOK_EOL))
                     return new CallStatement(funcall);
@@ -162,19 +159,16 @@ public class Parser {
             else{
                 // Consume all fields if any
                 if (fieldAhead()) {
-                    left = IdentifierExpression.parseFields(this, left);
-                    }
+                    id = IdentifierExpression.parseFields(this, id);
                 }
 
-            if (lookAhead(0).getType() == TokenType.TOK_ASSIGN) {
-                    Token tok = consume();
-                    InfixParseletStatement parselet =  mInfixParseletsStatement.get(tok.getType());
-                    return parselet.parse(this, left, tok);
-                }
+                token = consume(TokenType.TOK_ASSIGN);
+                InfixParseletStatement parselet = mInfixParseletsStatement.get(token.getType());
+
+                return parselet.parse(this, id, token);
             }
-
+        }
         throw new ParseException("No statement could be parsed " + lookAhead(0) );
-        //return parseExpression(0);
     }
 
 
