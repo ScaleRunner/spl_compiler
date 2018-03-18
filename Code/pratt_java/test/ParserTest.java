@@ -202,7 +202,36 @@ public class ParserTest {
         assertEquals(result, actual);
     }
 
+    @Test
+    public void testReturnStatementEmpty() {
+        Lexer l = new Lexer("return();");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
 
+        ArrayList<Statement> actual = new ArrayList<>();
+
+        actual.add(new ReturnStatement(new ArrayList<>()));
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testReturnStatement() {
+        Lexer l = new Lexer("return(a);");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
+
+        ArrayList<Statement> actual = new ArrayList<>();
+
+        ArrayList<Expression> args = new ArrayList<>();
+        args.add(new IdentifierExpression("a"));
+
+        actual.add(new ReturnStatement(args));
+
+        assertEquals(result, actual);
+    }
 
 	@Test
 	public void testNegativeIdentifier() {
@@ -833,36 +862,4 @@ public class ParserTest {
 //
 //        assertEquals(result, actual);
 //    }
-
-
-//
-//	@Test
-//	public void testIdentifierField() {
-//		SPLParser p = new SPLParser("alan.hd");
-//		AstExpr ast = p.pExpr();
-//		assertEquals(new AstExprBinOp(
-//								new AstExprIdentifier("alan"),
-//								TokenType.TOK_DOT,
-//								new AstExprField("hd")
-//									)
-//					, ast);
-//		System.out.println(ast.toString());
-//	}
-//
-//	@Test
-//	public void testIdentifierMultipleFields() {
-//		SPLParser p = new SPLParser("alan.hd.fst");
-//		AstExpr ast = p.pExpr();
-//		assertEquals(new AstExprBinOp(
-//								new AstExprIdentifier("alan"),
-//								TokenType.TOK_DOT,
-//								new AstExprBinOp(
-//										new AstExprIdentifier("hd"),
-//										TokenType.TOK_DOT,
-//										new AstExprField("fst")
-//											)
-//									)
-//					, ast);
-//		System.out.println(ast.toString());
-//	}
 }

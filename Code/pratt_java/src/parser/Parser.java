@@ -17,8 +17,8 @@ public class Parser {
     private final Iterator<Token> mTokens;
     private int currentToken = 0;
     private final List<Token> mRead = new ArrayList<>();
-    private final Map<TokenType, PrefixParseletExpression> mPrefixParselets = new HashMap<>();
-    private final Map<TokenType, InfixParseletExpression> mInfixParselets = new HashMap<>();
+    private final Map<TokenType, PrefixParseletExpression> mPrefixParseletsExpression = new HashMap<>();
+    private final Map<TokenType, InfixParseletExpression> mInfixParseletsExpression = new HashMap<>();
 
     private final Map<TokenType, InfixParseletStatement> mInfixParseletsStatement = new HashMap<>();
     private final Map<TokenType, PrefixParseletStatement> mPrefixParseletsStatement = new HashMap<>();
@@ -28,12 +28,13 @@ public class Parser {
         this.mTokens = tokens.iterator();
         setup_parser();
     }
-    private void registerPrefix(TokenType token, PrefixParseletExpression parselet){
-        mPrefixParselets.put(token, parselet);
+
+    private void registerPrefixExpression(TokenType token, PrefixParseletExpression parselet) {
+        mPrefixParseletsExpression.put(token, parselet);
     }
 
-    private void registerInfix(TokenType type, InfixParseletExpression parselet){
-        mInfixParselets.put(type, parselet);
+    private void registerInfixExpression(TokenType type, InfixParseletExpression parselet) {
+        mInfixParseletsExpression.put(type, parselet);
     }
 
     private void registerInfixStatement(TokenType type, InfixParseletStatement parselet){
@@ -51,48 +52,49 @@ public class Parser {
      */
     private void setup_parser(){
         // Register Prefixes
-//        registerPrefix(TokenType.TOK_PLUS, new PrefixOperatorParselet(prefix_precedence));
-        registerPrefix(TokenType.TOK_MINUS, new PrefixOperatorParselet(Precedence.UNARY));
-        registerPrefix(TokenType.TOK_NOT, new PrefixOperatorParselet(Precedence.UNARY));
+//        registerPrefixExpression(TokenType.TOK_PLUS, new PrefixOperatorParselet(prefix_precedence));
+        registerPrefixExpression(TokenType.TOK_MINUS, new PrefixOperatorParselet(Precedence.UNARY));
+        registerPrefixExpression(TokenType.TOK_NOT, new PrefixOperatorParselet(Precedence.UNARY));
 
         // Register Operations
-        registerInfix(TokenType.TOK_PLUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
-        registerInfix(TokenType.TOK_MINUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
-        registerInfix(TokenType.TOK_MULT, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
-        registerInfix(TokenType.TOK_DIV, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
-        registerInfix(TokenType.TOK_MOD, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
+        registerInfixExpression(TokenType.TOK_PLUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
+        registerInfixExpression(TokenType.TOK_MINUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
+        registerInfixExpression(TokenType.TOK_MULT, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
+        registerInfixExpression(TokenType.TOK_DIV, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
+        registerInfixExpression(TokenType.TOK_MOD, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
 
         // Register Comparisons
-        registerInfix(TokenType.TOK_EQ, new BinaryOperatorParselet(Precedence.EQUALITY, false));
-        registerInfix(TokenType.TOK_NEQ, new BinaryOperatorParselet(Precedence.EQUALITY, false));
+        registerInfixExpression(TokenType.TOK_EQ, new BinaryOperatorParselet(Precedence.EQUALITY, false));
+        registerInfixExpression(TokenType.TOK_NEQ, new BinaryOperatorParselet(Precedence.EQUALITY, false));
 
-        registerInfix(TokenType.TOK_GEQ, new BinaryOperatorParselet(Precedence.COMPARISON, false));
-        registerInfix(TokenType.TOK_LEQ, new BinaryOperatorParselet(Precedence.COMPARISON, false));
-        registerInfix(TokenType.TOK_GT, new BinaryOperatorParselet(Precedence.COMPARISON, false));
-        registerInfix(TokenType.TOK_LT, new BinaryOperatorParselet(Precedence.COMPARISON, false));
+        registerInfixExpression(TokenType.TOK_GEQ, new BinaryOperatorParselet(Precedence.COMPARISON, false));
+        registerInfixExpression(TokenType.TOK_LEQ, new BinaryOperatorParselet(Precedence.COMPARISON, false));
+        registerInfixExpression(TokenType.TOK_GT, new BinaryOperatorParselet(Precedence.COMPARISON, false));
+        registerInfixExpression(TokenType.TOK_LT, new BinaryOperatorParselet(Precedence.COMPARISON, false));
 
         // Register Logical AND and OR
-        registerInfix(TokenType.TOK_AND, new BinaryOperatorParselet(Precedence.AND, false));
-        registerInfix(TokenType.TOK_OR, new BinaryOperatorParselet(Precedence.OR, false));
+        registerInfixExpression(TokenType.TOK_AND, new BinaryOperatorParselet(Precedence.AND, false));
+        registerInfixExpression(TokenType.TOK_OR, new BinaryOperatorParselet(Precedence.OR, false));
 
         // Register Other Rules
-        registerPrefix(TokenType.TOK_INT, new IntegerParselet());
-        registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
-        registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
-        registerPrefix(TokenType.TOK_OPEN_PARENTHESIS, new GroupParselet());
-        //registerPrefix(TokenType.TOK_OPEN_CURLY, new BlockParselet());
-        registerInfix(TokenType.TOK_OPEN_PARENTHESIS, new CallParselet());
+        registerPrefixExpression(TokenType.TOK_INT, new IntegerParselet());
+        registerPrefixExpression(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
+        registerPrefixExpression(TokenType.TOK_BOOL, new BooleanParselet());
+        registerPrefixExpression(TokenType.TOK_OPEN_PARENTHESIS, new GroupParselet());
+        //registerPrefixExpression(TokenType.TOK_OPEN_CURLY, new BlockParselet());
+        registerInfixExpression(TokenType.TOK_OPEN_PARENTHESIS, new CallParselet());
 
         // Register Fields
-        registerInfix(TokenType.TOK_HD, new PostfixOperatorParselet(Precedence.POSTFIX));
-        registerInfix(TokenType.TOK_TL, new PostfixOperatorParselet(Precedence.POSTFIX));
-        registerInfix(TokenType.TOK_FST, new PostfixOperatorParselet(Precedence.POSTFIX));
-        registerInfix(TokenType.TOK_SND, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerInfixExpression(TokenType.TOK_HD, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerInfixExpression(TokenType.TOK_TL, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerInfixExpression(TokenType.TOK_FST, new PostfixOperatorParselet(Precedence.POSTFIX));
+        registerInfixExpression(TokenType.TOK_SND, new PostfixOperatorParselet(Precedence.POSTFIX));
 
         // Register Statements
         registerInfixStatement(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefixStatement(TokenType.TOK_KW_IF, new ConditionalParselet());
         registerPrefixStatement(TokenType.TOK_KW_WHILE, new WhileParselet());
+        registerPrefixStatement(TokenType.TOK_KW_RETURN, new ReturnParselet());
     }
 
     public ArrayList<Statement> parseBlock(){
@@ -115,7 +117,7 @@ public class Parser {
      */
     public Expression parseExpression(int precedence) {
         Token token = consume();
-        PrefixParseletExpression prefix = mPrefixParselets.get(token.getType());
+        PrefixParseletExpression prefix = mPrefixParseletsExpression.get(token.getType());
 
         if (prefix == null) throw new ParseException(
                 String.format("There was an error parsing '%s'.", token.toString()));
@@ -125,7 +127,7 @@ public class Parser {
         while (precedence < getPrecedence()) {
             token = consume();
 
-            InfixParseletExpression infix = mInfixParselets.get(token.getType());
+            InfixParseletExpression infix = mInfixParseletsExpression.get(token.getType());
             left = infix.parse(this, left, token);
         }
         return left;
@@ -134,9 +136,10 @@ public class Parser {
     public Statement parseStatement() {
         Token token = consume();
 
-        // WHILE OR IF
+        // WHILE-IF-RETURN
         if (token.getType() == TokenType.TOK_KW_WHILE ||
-                token.getType() == TokenType.TOK_KW_IF) {
+                token.getType() == TokenType.TOK_KW_IF ||
+                token.getType() == TokenType.TOK_KW_RETURN) {
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
 
             if (prefix == null) throw new ParseException(
@@ -144,7 +147,7 @@ public class Parser {
 
             return prefix.parse(this, token);
         } else if (token.getType() == TokenType.TOK_IDENTIFIER) {
-            Expression id = mPrefixParselets.get(token.getType()).parse(this, token);
+            Expression id = mPrefixParseletsExpression.get(token.getType()).parse(this, token);
 
             // FUNCALL
             if (match(TokenType.TOK_OPEN_PARENTHESIS)) {
@@ -225,7 +228,7 @@ public class Parser {
 
 
     private int getPrecedence() {
-        InfixParseletExpression parser = mInfixParselets.get(lookAhead(0).getType());
+        InfixParseletExpression parser = mInfixParseletsExpression.get(lookAhead(0).getType());
         if (parser != null){
             return parser.getPrecedence();
         }
