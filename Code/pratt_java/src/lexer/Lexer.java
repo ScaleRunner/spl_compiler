@@ -190,13 +190,13 @@ public class Lexer {
         if (match('(')) {
             currentPosition++;
 
-            return new TokenOther(TokenType.TOK_OPEN_PARENTESIS);
+            return new TokenOther(TokenType.TOK_OPEN_PARENTHESIS);
         }
 
         if (match(')')) {
             currentPosition++;
 
-            return new TokenOther(TokenType.TOK_CLOSE_PARENTESIS);
+            return new TokenOther(TokenType.TOK_CLOSE_PARENTHESIS);
         }
 
         if (match(',')) {
@@ -208,7 +208,7 @@ public class Lexer {
         if (match(';')) {
             currentPosition++;
 
-            return new TokenOther(TokenType.TOK_SEMI_COLON);
+            return new TokenOther(TokenType.TOK_EOL);
         }
 
         if (Character.isAlphabetic(input.charAt(currentPosition)) || match('.')) {

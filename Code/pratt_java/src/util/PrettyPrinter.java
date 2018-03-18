@@ -1,12 +1,14 @@
 package util;
 
 import expressions.*;
+import lexer.Token;
 import lexer.TokenType;
 import statements.AssignStatement;
 import statements.ConditionalStatement;
 import statements.LoopStatement;
 import statements.Statement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PrettyPrinter implements Visitor {
@@ -117,14 +119,18 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(List<Statement> es){
-        for(Statement e : es){
-            this.visit(e);
+        for (int i = 0; i < es.size(); i++) {
+            this.visit(es.get(i));
+            if (i < es.size() - 1) {
+                builder.append("\n");
+            }
         }
     }
 
     @Override
     public void visit(AssignStatement e){
-        builder.append(e.name).append(" = ");
+        this.visit(e.name);
+        builder.append(" = ");
         this.visit(e.right);
         builder.append(";");
     }
@@ -213,4 +219,11 @@ public class PrettyPrinter implements Visitor {
         this.visit(e.right);
     }
 
+    public static String printLine(ArrayList<Token> tokens) {
+        PrettyPrinter p = new PrettyPrinter();
+        for (Token t : tokens) {
+            p.builder.append(" ").append(t.getStringValue()).append(" ");
+        }
+        return p.getResultString();
+    }
 }

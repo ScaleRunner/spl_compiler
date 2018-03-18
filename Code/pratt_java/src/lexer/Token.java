@@ -12,8 +12,7 @@ public abstract class Token<T> {
     }
 
     public Token(TokenType tokenType){
-        this.tokenType = tokenType;
-        this.value = null;
+        this(tokenType, null);
     }
 
     public TokenType getType() {
@@ -24,8 +23,16 @@ public abstract class Token<T> {
         return value;
     }
 
+    public String getStringValue() {
+        if (value == null) {
+            return tokenType.getValue();
+        } else {
+            return String.valueOf(value);
+        }
+    }
+
     public String toString() {
-        return String.format("(%s, %s)", tokenType.toString(), String.valueOf(value));
+        return String.format("(%s, %s)", tokenType.toString(), getStringValue());
     }
 
     @Override

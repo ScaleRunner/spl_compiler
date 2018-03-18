@@ -11,7 +11,7 @@ import parser.Parser;
 public class GroupParselet implements PrefixParseletExpression {
     public Expression parse(Parser parser, Token token) {
         Expression expression = parser.parseExpression();
-        parser.consume(TokenType.TOK_CLOSE_PARENTESIS);
+        parser.consume(TokenType.TOK_CLOSE_PARENTHESIS);
         return expression;
     }
 }

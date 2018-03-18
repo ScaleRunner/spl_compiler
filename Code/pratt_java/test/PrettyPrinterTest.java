@@ -1,11 +1,13 @@
-import static org.junit.Assert.*;
-
 import expressions.*;
 import lexer.Lexer;
 import org.junit.Test;
-
 import parser.Parser;
+import statements.Statement;
 import util.PrettyPrinter;
+
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
 
 public class PrettyPrinterTest {
 
@@ -69,14 +71,15 @@ public class PrettyPrinterTest {
         assertEquals("foo + bar + 1 + True", pp.getResultString());
     }
 
-//
-//	@Test
-//	public void testPlusMult() {
-//		Parser p = new Parser("4   + 2*3\n+7* 8 \t  *9");
-//		AstNode ast = p.pExpr();
-//		PrettyPrinter pp = new PrettyPrinter();
-//		ast.accept(pp);
-//		assertEquals("4+2*3+7*8*9", pp.getResultString());
-//	}
+
+    @Test
+    public void testPlusMult() {
+        Lexer l = new Lexer("res = 4   + 2*3; \n res = 7* 8 \t  *9;");
+        Parser p = new Parser(l.tokenize());
+        ArrayList<Statement> result = p.parseBlock();
+        PrettyPrinter pp = new PrettyPrinter();
+        pp.visit(result);
+        assertEquals("res = 4 + 2 * 3;\nres = 7 * 8 * 9;", pp.getResultString());
+    }
 
 }

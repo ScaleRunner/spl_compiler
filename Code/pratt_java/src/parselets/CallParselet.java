@@ -19,11 +19,11 @@ public class CallParselet implements InfixParseletExpression {
         List<Expression> args = new ArrayList<>();
 
         // There may be no arguments at all.
-        if (!parser.match(TokenType.TOK_CLOSE_PARENTESIS)) {
+        if (!parser.match(TokenType.TOK_CLOSE_PARENTHESIS)) {
             do {
                 args.add(parser.parseExpression());
             } while (parser.match(TokenType.TOK_COMMA));
-            parser.consume(TokenType.TOK_CLOSE_PARENTESIS);
+            parser.consume(TokenType.TOK_CLOSE_PARENTHESIS);
         }
 
         return new CallExpression(left, args);

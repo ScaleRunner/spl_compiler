@@ -20,7 +20,7 @@ public class AssignParselet implements InfixParseletStatement {
     public Statement parse(Parser parser, Expression left, Token token) {
         Expression right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
-        if (!parser.match(TokenType.TOK_SEMI_COLON))
+        if (!parser.match(TokenType.TOK_EOL))
             throw new ParseException("There mush be a ';' at the end of an assignment.");
 
         return new AssignStatement(left, right);

@@ -15,6 +15,7 @@ import java.util.*;
 public class Parser {
 
     private final Iterator<Token> mTokens;
+    private int currentToken = 0;
     private final List<Token> mRead = new ArrayList<>();
     private final Map<TokenType, PrefixParseletExpression> mPrefixParselets = new HashMap<>();
     private final Map<TokenType, InfixParseletExpression> mInfixParselets = new HashMap<>();
@@ -78,9 +79,9 @@ public class Parser {
         registerPrefix(TokenType.TOK_INT, new IntegerParselet());
         registerPrefix(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefix(TokenType.TOK_BOOL, new BooleanParselet());
-        registerPrefix(TokenType.TOK_OPEN_PARENTESIS, new GroupParselet());
+        registerPrefix(TokenType.TOK_OPEN_PARENTHESIS, new GroupParselet());
         //registerPrefix(TokenType.TOK_OPEN_CURLY, new BlockParselet());
-        registerInfix(TokenType.TOK_OPEN_PARENTESIS, new CallParselet());
+        registerInfix(TokenType.TOK_OPEN_PARENTHESIS, new CallParselet());
 
         // Register Fields
         registerInfix(TokenType.TOK_HD, new PostfixOperatorParselet(Precedence.POSTFIX));
@@ -92,7 +93,6 @@ public class Parser {
         registerInfixStatement(TokenType.TOK_ASSIGN, new AssignParselet());
         registerPrefixStatement(TokenType.TOK_KW_IF, new ConditionalParselet());
         registerPrefixStatement(TokenType.TOK_KW_WHILE, new WhileParselet());
-        //TODO: WHILE
     }
 
     public ArrayList<Statement> parseBlock(){
@@ -132,38 +132,38 @@ public class Parser {
     }
 
     public Statement parseStatement() {
+        // IF
         if (lookAhead(0).getType() == TokenType.TOK_KW_IF) {
             Token token = consume();
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
             return prefix.parse(this, token);
-
-//            return (new ConditionalParselet().parse(this, lookAhead(0)));
         }
+        // WHILE
         if (lookAhead(0).getType() == TokenType.TOK_KW_WHILE) {
             Token token = consume();
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
             return prefix.parse(this, token);
         }
+        // ASSIGNMENT OR FUNCALL
         if (lookAhead(0).getType() == TokenType.TOK_IDENTIFIER) {
             Token id = consume();
             Expression left = new IdentifierParselet().parse(this, id);
-            //consume();
 
-            if (lookAhead(0).getType() == TokenType.TOK_OPEN_PARENTESIS) {
-
-                consume();
+            // FUNCALL
+            if (match(TokenType.TOK_OPEN_PARENTHESIS)) {
                 CallExpression funcall = (CallExpression) new CallParselet().parse(this, left, lookAhead(0));
 
-                if (match(TokenType.TOK_SEMI_COLON))
+                if (match(TokenType.TOK_EOL))
                     return new CallStatement(funcall);
                 else throw new ParseException(String.format("Expected ';' and found '%s'.", lookAhead(0).toString()));
             }
+
+            // ASSIGNMENT
             else{
                 // Consume all fields if any
                 if (fieldAhead()) {
                     left = IdentifierExpression.parseFields(this, left);
                     }
-                    //else throw new ParseException(String.format("There was an error parsing '%s'.", lookAhead(0).toString()));
                 }
 
             if (lookAhead(0).getType() == TokenType.TOK_ASSIGN) {
@@ -171,9 +171,6 @@ public class Parser {
                     InfixParseletStatement parselet =  mInfixParseletsStatement.get(tok.getType());
                     return parselet.parse(this, left, tok);
                 }
-
-
-
             }
 
         throw new ParseException("No statement could be parsed " + lookAhead(0) );
@@ -217,6 +214,7 @@ public class Parser {
     public Token consume() {
         // Make sure we've read the token.
         lookAhead(0);
+        currentToken++;
 
         return mRead.remove(0);
     }
@@ -230,6 +228,7 @@ public class Parser {
         // Get the queued token.
         return mRead.get(distance);
     }
+
 
     private int getPrecedence() {
         InfixParseletExpression parser = mInfixParselets.get(lookAhead(0).getType());
