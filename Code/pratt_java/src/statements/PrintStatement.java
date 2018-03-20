@@ -6,7 +6,7 @@ import util.Visitor;
 import java.util.Objects;
 
 public class PrintStatement implements Statement {
-    final Expression arg;
+    public final Expression arg;
 
     public PrintStatement(Expression arg) {
         this.arg = arg;

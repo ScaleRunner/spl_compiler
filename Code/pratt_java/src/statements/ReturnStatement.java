@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class ReturnStatement implements Statement {
-    final List<Expression> args;
+
+    public final List<Expression> args;
 
     public ReturnStatement(List<Expression> args) {
         this.args = args;

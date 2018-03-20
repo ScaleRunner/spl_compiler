@@ -3,10 +3,7 @@ package util;
 import expressions.*;
 import lexer.Token;
 import lexer.TokenType;
-import statements.AssignStatement;
-import statements.ConditionalStatement;
-import statements.LoopStatement;
-import statements.Statement;
+import statements.*;
 
 import java.util.List;
 
@@ -74,12 +71,18 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(Statement s) {
-        if (s.getClass() == LoopStatement.class) {
-            this.visit((LoopStatement) s);
+        if (s.getClass() == AssignStatement.class) {
+            this.visit((AssignStatement) s);
+        } else if (s.getClass() == CallStatement.class) {
+            this.visit((CallStatement) s);
         } else if (s.getClass() == ConditionalStatement.class) {
             this.visit((ConditionalStatement) s);
-        } else if (s.getClass() == AssignStatement.class) {
-            this.visit((AssignStatement) s);
+        } else if (s.getClass() == LoopStatement.class) {
+            this.visit((LoopStatement) s);
+        } else if (s.getClass() == PrintStatement.class) {
+            this.visit((PrintStatement) s);
+        } else if (s.getClass() == ReturnStatement.class) {
+            this.visit((ReturnStatement) s);
         }
     }
 
@@ -93,26 +96,22 @@ public class PrettyPrinter implements Visitor {
             this.visit((CallExpression) e);
         }
 
-
         else if(e.getClass() == IdentifierExpression.class){
             this.visit((IdentifierExpression) e);
         }
 
         else if(e.getClass() == IntegerExpression.class){
             this.visit((IntegerExpression) e);
-        }
-
-
-        else if(e.getClass() == OperatorExpression.class){
+        } else if (e.getClass() == ListExpression.class) {
+            this.visit((ListExpression) e);
+        } else if(e.getClass() == OperatorExpression.class){
             this.visit((OperatorExpression) e);
-        }
-
-        else if(e.getClass() == PostfixExpression.class){
+        } else if(e.getClass() == PostfixExpression.class){
             this.visit((PostfixExpression) e);
-        }
-
-        else if(e.getClass() == PrefixExpression.class){
+        } else if(e.getClass() == PrefixExpression.class){
             this.visit((PrefixExpression) e);
+        } else if (e.getClass() == TupleExpression.class) {
+            this.visit((TupleExpression) e);
         }
     }
 
@@ -132,6 +131,19 @@ public class PrettyPrinter implements Visitor {
         builder.append(" = ");
         this.visit(e.right);
         builder.append(";");
+    }
+
+    @Override
+    public void visit(CallStatement s) {
+        this.visit(s.function_name);
+        builder.append("(");
+        for (int i = 0; i < s.args.size(); i++) {
+            this.visit(s.args.get(i));
+            if (i < s.args.size() - 1) {
+                builder.append(", ");
+            }
+        }
+        builder.append(")");
     }
 
     @Override
@@ -158,18 +170,12 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(ConditionalStatement e) {
-        builder.append("(if").append(" (");
+        builder.append("if").append("(");
         this.visit(e.condition);
         builder.append(") ");
-        builder.append("{");
+        builder.append("{\n");
         this.visit(e.then_expression);
-        builder.append("}");
-        if (e.else_expression != null){
-            builder.append(" else ").append("{");
-            this.visit(e.else_expression);
-            builder.append("}");
-        }
-        builder.append(";");
+        builder.append("\n}");
     }
 
     @Override
@@ -182,6 +188,18 @@ public class PrettyPrinter implements Visitor {
         builder.append(e.name);
     }
 
+    @Override
+    public void visit(ListExpression e) {
+        builder.append('[');
+        for (int i = 0; i < e.items.size(); i++) {
+            this.visit(e.items.get(i));
+            if (i < e.items.size() - 1) {
+                builder.append(", ");
+            }
+        }
+        builder.append("]");
+    }
+
     /**
      * Prints a conditional expression as:
      *         (if (CONDITIONAL) {EXPRESSION} else {EXPRESSION})
@@ -189,12 +207,32 @@ public class PrettyPrinter implements Visitor {
      */
     @Override
     public void visit(LoopStatement e) {
-        builder.append("while").append(" (");
+        builder.append("while").append("(");
         this.visit(e.condition);
-        builder.append(") \n");
-        builder.append("{");
+        builder.append(") {\n");
         this.visit(e.body);
-        builder.append("};");
+        builder.append("\n}");
+    }
+
+    @Override
+    public void visit(PrintStatement s) {
+        builder.append("print(");
+        if (s.arg != null) {
+            this.visit(s.arg);
+        }
+        builder.append(");");
+    }
+
+    @Override
+    public void visit(ReturnStatement s) {
+        builder.append("return(");
+        for (int i = 0; i < s.args.size(); i++) {
+            this.visit(s.args.get(i));
+            if (i < s.args.size() - 1) {
+                builder.append(", ");
+            }
+        }
+        builder.append(");");
     }
 
     @Override
@@ -216,6 +254,15 @@ public class PrettyPrinter implements Visitor {
         // However, we have to remove the space between the operator and the expression
         builder.setLength(builder.length() - 1);
         this.visit(e.right);
+    }
+
+    @Override
+    public void visit(TupleExpression e) {
+        builder.append('(');
+        this.visit(e.left);
+        builder.append(',');
+        this.visit(e.right);
+        builder.append(')');
     }
 
     public static String printLine(List<Token> tokens) {

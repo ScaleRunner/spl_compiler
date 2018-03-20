@@ -3,6 +3,7 @@ import lexer.Lexer;
 import lexer.Token;
 import org.junit.Test;
 import parser.Parser;
+import parser.exceptions.ParseException;
 import statements.Statement;
 import util.PrettyPrinter;
 
@@ -23,7 +24,67 @@ public class PrettyPrinterTest {
 		assertEquals("42", pp.getResultString());
 	}
 
-	@Test
+    @Test
+    public void testEmptyList() {
+        Lexer l = new Lexer("[]");
+        Parser p = new Parser(l.tokenize());
+        Expression e = p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        e.accept(pp);
+        assertEquals("[]", pp.getResultString());
+    }
+
+    @Test(expected = ParseException.class) //FOR NOW
+    public void testList() {
+        Lexer l = new Lexer("[1, 4]");
+        Parser p = new Parser(l.tokenize());
+        Expression e = p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        e.accept(pp);
+        assertEquals("[1, 4]", pp.getResultString());
+    }
+
+    @Test
+    public void testReturn() {
+        Lexer l = new Lexer("return([]    , \n 1 + 6 \t, b);");
+        Parser p = new Parser(l.tokenize());
+        Statement s = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        s.accept(pp);
+        assertEquals("return([], 1 + 6, b);", pp.getResultString());
+    }
+
+    @Test
+    public void testPrint() {
+        Lexer l = new Lexer("print(         1);");
+        Parser p = new Parser(l.tokenize());
+        Statement s = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        s.accept(pp);
+        assertEquals("print(1);", pp.getResultString());
+    }
+
+    @Test
+    public void testConditional() {
+        Lexer l = new Lexer("if(a==b && 1 == 1){\n this=correct\n; this=True;}");
+        Parser p = new Parser(l.tokenize());
+        Statement s = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        s.accept(pp);
+        assertEquals("if(a == b && 1 == 1) {\nthis = correct;\nthis = True;\n}", pp.getResultString());
+    }
+
+    @Test
+    public void testWhile() {
+        Lexer l = new Lexer("while(a==b && 1 == 1){\n this=correct\n; this=True;}");
+        Parser p = new Parser(l.tokenize());
+        Statement s = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        s.accept(pp);
+        assertEquals("while(a == b && 1 == 1) {\nthis = correct;\nthis = True;\n}", pp.getResultString());
+    }
+
+    @Test
     public void testIdentifier() {
         Lexer l = new Lexer("hello_its_me_");
         Parser p = new Parser(l.tokenize());
@@ -92,7 +153,4 @@ public class PrettyPrinterTest {
         String reprint = PrettyPrinter.printLine(tokens);
         assertEquals("foo(bar) + 3 + true + field.hd", reprint);
     }
-
-
-
 }
