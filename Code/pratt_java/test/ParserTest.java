@@ -126,6 +126,14 @@ public class ParserTest {
         assertEquals(result, expected);
     }
 
+    @Test(expected = ParseException.class)
+    public void nested_tuple_unbalanced() {
+        Lexer l = new Lexer("a=((a, b), 1+True));");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseStatement();
+    }
+
     @Test
     public void list() {
         Lexer l = new Lexer("[]");

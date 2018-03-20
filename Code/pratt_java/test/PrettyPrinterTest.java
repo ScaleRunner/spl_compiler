@@ -45,6 +45,26 @@ public class PrettyPrinterTest {
     }
 
     @Test
+    public void testTuple() {
+        Lexer l = new Lexer("(1,2)");
+        Parser p = new Parser(l.tokenize());
+        Expression e = p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        e.accept(pp);
+        assertEquals("(1, 2)", pp.getResultString());
+    }
+
+    @Test
+    public void testNestedTuple() {
+        Lexer l = new Lexer("(1,(a,([],[])))");
+        Parser p = new Parser(l.tokenize());
+        Expression e = p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        e.accept(pp);
+        assertEquals("(1, (a, ([], [])))", pp.getResultString());
+    }
+
+    @Test
     public void testReturn() {
         Lexer l = new Lexer("return([]    , \n 1 + 6 \t, b);");
         Parser p = new Parser(l.tokenize());
@@ -82,6 +102,26 @@ public class PrettyPrinterTest {
         PrettyPrinter pp = new PrettyPrinter();
         s.accept(pp);
         assertEquals("while(a == b && 1 == 1) {\nthis = correct;\nthis = True;\n}", pp.getResultString());
+    }
+
+    @Test
+    public void testCallStatement() {
+        Lexer l = new Lexer("foo(b,a,r,1);");
+        Parser p = new Parser(l.tokenize());
+        Statement s = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        s.accept(pp);
+        assertEquals("foo(b, a, r, 1);", pp.getResultString());
+    }
+
+    @Test
+    public void testAssignStatement() {
+        Lexer l = new Lexer("foo=bar\n;");
+        Parser p = new Parser(l.tokenize());
+        Statement s = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        s.accept(pp);
+        assertEquals("foo = bar;", pp.getResultString());
     }
 
     @Test

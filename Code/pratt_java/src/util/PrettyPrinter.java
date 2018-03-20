@@ -143,7 +143,7 @@ public class PrettyPrinter implements Visitor {
                 builder.append(", ");
             }
         }
-        builder.append(")");
+        builder.append(");");
     }
 
     @Override
@@ -260,7 +260,7 @@ public class PrettyPrinter implements Visitor {
     public void visit(TupleExpression e) {
         builder.append('(');
         this.visit(e.left);
-        builder.append(',');
+        builder.append(", ");
         this.visit(e.right);
         builder.append(')');
     }
