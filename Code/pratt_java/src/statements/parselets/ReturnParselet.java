@@ -20,6 +20,9 @@ public class ReturnParselet implements PrefixParseletStatement {
 
     public Statement parse(Parser parser, Token token) {
         List<Expression> args = new ArrayList<>();
+        //TODO
+        //Return statements do not necessarily need parenthesis.
+        //Do we want to keep it like this or make like the original grammar?
         if (parser.match(TokenType.TOK_OPEN_PARENTHESIS)) {
             while (parser.lookAhead(0).getType() != TokenType.TOK_CLOSE_PARENTHESIS) {
                 args.add(parser.parseExpression());

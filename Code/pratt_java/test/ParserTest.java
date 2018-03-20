@@ -1,3 +1,6 @@
+import declarations.Declaration;
+import declarations.FunctionDeclaration;
+import declarations.VariableDeclaration;
 import expressions.*;
 import lexer.Lexer;
 import lexer.Token;
@@ -133,6 +136,9 @@ public class ParserTest {
         Parser p = new Parser(tokens);
         p.parseStatement();
     }
+
+
+
 
     @Test
     public void list() {
@@ -331,6 +337,25 @@ public class ParserTest {
 
         assertEquals(result, actual);
     }
+
+
+//    @Test
+//    public void testReturnStatementWithoutParenthesis() {
+//        Lexer l = new Lexer("return a;");
+//        List<Token> tokens = l.tokenize();
+//        Parser p = new Parser(tokens);
+//        ArrayList<Statement> result = p.parseBlock();
+//
+//        ArrayList<Statement> actual = new ArrayList<>();
+//
+//        ArrayList<Expression> args = new ArrayList<>();
+//        args.add(new IdentifierExpression("a"));
+//
+//
+//        actual.add(new ReturnStatement(args));
+//
+//        assertEquals(result, actual);
+//    }
 
     @Test(expected = ParseException.class)
     public void testReturnStatementMultipleArgsFail() {
@@ -837,6 +862,153 @@ public class ParserTest {
         assertEquals(result, actual);
     }
 
+
+    @Test(expected = ParseException.class)
+    public void testSPLEmpty() {
+        Lexer l = new Lexer("");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+
+    }
+
+    @Test
+    public void testSPLSingleVarDeclaration() {
+        Lexer l = new Lexer("var alan = 5+3*2;");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+        List<Declaration> actual = new ArrayList<>();
+        actual.add(new VariableDeclaration(TokenType.TOK_KW_VAR,
+                            new IdentifierExpression("alan"),
+                            new OperatorExpression(
+                                    new IntegerExpression(5),
+                                    TokenType.TOK_PLUS,
+                                    new OperatorExpression(
+                                            new IntegerExpression(3),
+                                            TokenType.TOK_MULT,
+                                            new IntegerExpression(2)
+                                    )
+                            )
+                        )
+                    );
+        assertEquals(result, actual);
+
+    }
+
+    @Test
+    public void testSPLSingleFunctionDeclaration() {
+        Lexer l = new Lexer("sumOfTwoNumbers(a,b){\n" +
+                                    "a = b;\n" +
+                                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+        List<Declaration> actual = new ArrayList<>();
+        List<IdentifierExpression> args = new ArrayList<>();
+        List<Declaration> decls = new ArrayList<>();
+        List<Statement> stats = new ArrayList<>();
+
+        IdentifierExpression name = new IdentifierExpression("sumOfTwoNumbers");
+
+        args.add(new IdentifierExpression("a"));
+        args.add(new IdentifierExpression("b"));
+
+        stats.add(new AssignStatement(new IdentifierExpression("a"), new IdentifierExpression("b")));
+
+
+        actual.add(new FunctionDeclaration(name,args, decls, stats, new ArrayList<>(), null));
+
+        assertEquals(result, actual);
+
+    }
+
+
+    @Test
+    public void testSPLSingleFunctionDeclarationWithReturnType() {
+        Lexer l = new Lexer("sumOfTwoNumbers(a,b):: Int Int -> Void{\na = b;\n}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+
+        List<Declaration> actual = new ArrayList<>();
+
+        IdentifierExpression name = new IdentifierExpression("sumOfTwoNumbers");
+
+        List<IdentifierExpression> args = new ArrayList<>();
+        List<Declaration> decls = new ArrayList<>();
+        List<Statement> stats = new ArrayList<>();
+
+        List<TokenType> fargsType = new ArrayList<>();
+        fargsType.add(TokenType.TOK_KW_INT);
+        fargsType.add(TokenType.TOK_KW_INT);
+
+        TokenType returnType = TokenType.TOK_KW_VOID;
+
+        args.add(new IdentifierExpression("a"));
+        args.add(new IdentifierExpression("b"));
+
+        stats.add(new AssignStatement(new IdentifierExpression("a"), new IdentifierExpression("b")));
+
+        actual.add(new FunctionDeclaration(name, args, decls, stats, fargsType, returnType));
+
+        assertEquals(result, actual);
+
+    }
+
+
+    @Test
+    public void testSPLSingleFunctionDeclarationWithReturnTypeManyDeclarations() {
+        Lexer l = new Lexer("sumOfTwoNumbers(a,b):: Int Int -> Void{\n" +
+                                    "Int c = 0;\n " +
+                                    "var useless = 2;\n " +
+                                    "c = a + b;\n" +
+                                    "return (c);\n" +
+                                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+
+        List<Declaration> actual = new ArrayList<>();
+
+        IdentifierExpression name = new IdentifierExpression("sumOfTwoNumbers");
+
+        List<IdentifierExpression> args = new ArrayList<>();
+        List<Declaration> decls = new ArrayList<>();
+        List<Statement> stats = new ArrayList<>();
+
+        List<TokenType> fargsType = new ArrayList<>();
+        fargsType.add(TokenType.TOK_KW_INT);
+        fargsType.add(TokenType.TOK_KW_INT);
+
+        TokenType returnType = TokenType.TOK_KW_VOID;
+
+        args.add(new IdentifierExpression("a"));
+        args.add(new IdentifierExpression("b"));
+
+        decls.add(new VariableDeclaration(TokenType.TOK_KW_INT, new IdentifierExpression("c"), new IntegerExpression(0) ));
+        decls.add(new VariableDeclaration(TokenType.TOK_KW_VAR,new IdentifierExpression("useless"), new IntegerExpression(2) ));
+
+
+        stats.add(new AssignStatement(
+                        new IdentifierExpression("c"),
+                        new OperatorExpression(
+                                new IdentifierExpression("a"),
+                                TokenType.TOK_PLUS,
+                                new IdentifierExpression("b")
+                        )
+                    )
+        );
+
+        ArrayList<Expression> temp = new ArrayList<>();
+        temp.add(new IdentifierExpression("c"));
+        stats.add(new ReturnStatement(temp));
+
+        actual.add(new FunctionDeclaration(name, args, decls, stats, fargsType, returnType));
+
+        assertEquals(result, actual);
+
+    }
 //    @Test
 //    public void testStatementIf() {
 //        Lexer l = new Lexer("if (a>0 && a * 2 < 4){ b = 5 *6 if (a == 2){ c = 3 } } else { a = 3 } ");

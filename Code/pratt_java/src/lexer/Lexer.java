@@ -52,6 +52,10 @@ public class Lexer {
 
         if (match('-')) {
             currentPosition++;
+            if (match('>')) {
+                currentPosition++;
+                return new TokenOther(TokenType.TOK_KW_ARROW);
+            }
             return new TokenOther(TokenType.TOK_MINUS);
         }
 
@@ -319,9 +323,6 @@ public class Lexer {
             return new TokenOther(TokenType.TOK_KW_VOID);
         }
 
-        if (result.equals("->")) {
-            return new TokenOther(TokenType.TOK_KW_ARROW);
-        }
 
         if (result.contains(".")){
             throw new TokenException("Invalid field keyword in '" + result + "'.\n\t Did you put a space between field keywords?");

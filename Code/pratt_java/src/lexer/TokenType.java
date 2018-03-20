@@ -25,7 +25,7 @@ public enum TokenType {
     TOK_ASSIGN("="),
     TOK_NOT("!"),
     TOK_CONS(":"),
-    TOK_FUNC_TYPE_DEF("????????????????????"),
+    TOK_FUNC_TYPE_DEF("::"),
     TOK_KW_ELSE("else"),
     TOK_KW_WHILE("while"),
     TOK_KW_INT("Int"),

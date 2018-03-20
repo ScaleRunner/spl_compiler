@@ -1,5 +1,9 @@
 package parser;
 
+import declarations.Declaration;
+import declarations.FunctionDeclaration;
+import declarations.parselets.FunctionDeclarationParselet;
+import declarations.parselets.VariableDeclarationParselet;
 import expressions.CallExpression;
 import expressions.Expression;
 import expressions.IdentifierExpression;
@@ -13,6 +17,7 @@ import statements.CallStatement;
 import statements.Statement;
 import statements.parselets.*;
 import util.PrettyPrinter;
+import declarations.VariableDeclaration;
 
 import java.util.*;
 
@@ -187,10 +192,52 @@ public class Parser {
         throw new ParseException(this, String.format("No statement could be parsed in line %s", getLine()));
     }
 
+    public ArrayList<Declaration> parseSPL(){
+        ArrayList<Declaration> declarations = new ArrayList<>();
+        while (lookAhead(0).getType() != TokenType.TOK_EOF) {
+            Declaration decl = parseDeclaration();
+            declarations.add(decl);
+            if (lookAhead(0).getType() == TokenType.TOK_EOF)
+                //consume();
+                break;
+        }
+        if(declarations.size()== 0){
+            throw new ParseException(this, "A SPL program needs at least one declaration.");
+        }
+
+        return declarations;
+    }
+
+    private Declaration parseDeclaration() {
+        Token token = consume();
+
+        //variable declaration
+        if (token.getType() == TokenType.TOK_KW_VAR ||
+                token.getType() == TokenType.TOK_KW_CHAR ||
+                token.getType() == TokenType.TOK_KW_INT ||
+                token.getType() == TokenType.TOK_KW_BOOL) {
+            //PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
+
+            //if (prefix == null) throw new ParseException(this, token);
+
+            return new VariableDeclarationParselet().parse(this, token);
+        }
+        else{
+            //Function declaration
+            if(token.getType() == TokenType.TOK_IDENTIFIER){
+                return new FunctionDeclarationParselet().parse(this, token);
+            }
+            else throw new ParseException(this, String.format("No Declaration could be parsed in line %s", getLine()));
+        }
+
+
+    }
+
 
     public Expression parseExpression() {
         return parseExpression(0);
     }
+
 
     public boolean match(TokenType expected) {
         Token token = lookAhead(0);
