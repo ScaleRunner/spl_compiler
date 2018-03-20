@@ -82,13 +82,20 @@ public class Parser {
         registerInfixExpression(TokenType.TOK_AND, new BinaryOperatorParselet(Precedence.AND, false));
         registerInfixExpression(TokenType.TOK_OR, new BinaryOperatorParselet(Precedence.OR, false));
 
-        // Register Other Rules
+        // Register Types
+        //TODO: Lists
         registerPrefixExpression(TokenType.TOK_INT, new IntegerParselet());
         registerPrefixExpression(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefixExpression(TokenType.TOK_BOOL, new BooleanParselet());
-        registerPrefixExpression(TokenType.TOK_OPEN_PARENTHESIS, new GroupParselet());
+
+        // Register Other
+        registerPrefixExpression(TokenType.TOK_OPEN_PARENTHESIS, new ParenthesisParselet());
         //registerPrefixExpression(TokenType.TOK_OPEN_CURLY, new BlockParselet());
         registerInfixExpression(TokenType.TOK_OPEN_PARENTHESIS, new CallParselet());
+
+        // Register Functions
+        //TODO: read()
+        //TODO: isEmpty()
 
         // Register Fields
         registerInfixExpression(TokenType.TOK_HD, new PostfixOperatorParselet(Precedence.POSTFIX));

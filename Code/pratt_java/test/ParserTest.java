@@ -88,6 +88,45 @@ public class ParserTest {
     }
 
     @Test
+    public void tuple() {
+        Lexer l = new Lexer("(a, 1+True)");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression expected = new TupleExpression(
+                new IdentifierExpression("a"),
+                new OperatorExpression(
+                        new IntegerExpression(1),
+                        TokenType.TOK_PLUS,
+                        new BooleanExpression(true)
+                )
+        );
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void nested_tuple() {
+        Lexer l = new Lexer("((a, b), 1+True)");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression expected = new TupleExpression(
+                new TupleExpression(
+                        new IdentifierExpression("a"),
+                        new IdentifierExpression("b")
+                ),
+                new OperatorExpression(
+                        new IntegerExpression(1),
+                        TokenType.TOK_PLUS,
+                        new BooleanExpression(true)
+                )
+        );
+        assertEquals(result, expected);
+    }
+
+    @Test
     public void field_assignment() {
         Lexer l = new Lexer("a.hd.fst = 1;");
         List<Token> tokens = l.tokenize();
