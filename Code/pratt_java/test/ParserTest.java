@@ -127,6 +127,17 @@ public class ParserTest {
     }
 
     @Test
+    public void list() {
+        Lexer l = new Lexer("[]");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression expected = new ListExpression();
+        assertEquals(result, expected);
+    }
+
+    @Test
     public void field_assignment() {
         Lexer l = new Lexer("a.hd.fst = 1;");
         List<Token> tokens = l.tokenize();
