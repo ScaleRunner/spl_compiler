@@ -1,6 +1,5 @@
 import lexer.*;
 import org.junit.Test;
-import parser.exceptions.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -423,12 +422,10 @@ public class LexerTest {
 //        System.out.println(lexedTokenized);
     }
 
-    @Test(expected = ParseException.class)
+    @Test(expected = TokenException.class)
     public void testWrongField() {
         Lexer l = new Lexer("a + True + 1 + b.hdd");
         List<Token> lexedTokenized = l.tokenize();
-
-
     }
 
     @Test
