@@ -3,17 +3,22 @@ package parser;
 import expressions.CallExpression;
 import expressions.Expression;
 import expressions.IdentifierExpression;
+import expressions.parselets.*;
 import lexer.Token;
+import lexer.TokenOther;
 import lexer.TokenType;
-import parselets.*;
+import parser.exceptions.ParseException;
+import parser.exceptions.SemicolonError;
 import statements.CallStatement;
 import statements.Statement;
 import statements.parselets.*;
+import util.PrettyPrinter;
 
 import java.util.*;
 
 public class Parser {
 
+    private final List<Token> input;
     private final Iterator<Token> mTokens;
     private int currentToken = 0;
     private final List<Token> mRead = new ArrayList<>();
@@ -25,6 +30,7 @@ public class Parser {
 
 
     public Parser(List<Token> tokens) {
+        this.input = tokens;
         this.mTokens = tokens.iterator();
         setup_parser();
     }
@@ -119,8 +125,7 @@ public class Parser {
         Token token = consume();
         PrefixParseletExpression prefix = mPrefixParseletsExpression.get(token.getType());
 
-        if (prefix == null) throw new ParseException(
-                String.format("There was an error parsing '%s'.", token.toString()));
+        if (prefix == null) throw new ParseException(this, token);
 
         Expression left = prefix.parse(this, token);
 
@@ -142,8 +147,7 @@ public class Parser {
                 token.getType() == TokenType.TOK_KW_RETURN) {
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
 
-            if (prefix == null) throw new ParseException(
-                    String.format("There was an error parsing '%s'.", token.toString()));
+            if (prefix == null) throw new ParseException(this, token);
 
             return prefix.parse(this, token);
         } else if (token.getType() == TokenType.TOK_IDENTIFIER) {
@@ -155,7 +159,7 @@ public class Parser {
 
                 if (match(TokenType.TOK_EOL))
                     return new CallStatement(funcall);
-                else throw new ParseException(String.format("Expected ';' and found '%s'.", lookAhead(0).toString()));
+                else throw new SemicolonError(this);
             }
 
             // ASSIGNMENT
@@ -171,7 +175,7 @@ public class Parser {
                 return parselet.parse(this, id, token);
             }
         }
-        throw new ParseException("No statement could be parsed " + lookAhead(0) );
+        throw new ParseException(this, String.format("No statement could be parsed in line %s", getLine()));
     }
 
 
@@ -234,5 +238,19 @@ public class Parser {
         }
 
         return 0;
+    }
+
+    public String getLine() {
+        List<Token> currentList = new ArrayList<>(input);
+        int lastChar = currentList.indexOf(new TokenOther(TokenType.TOK_EOL));
+        while (currentToken > lastChar) {
+            if (lastChar == -1) {
+                lastChar = currentList.size();
+                break;
+            }
+            currentList = currentList.subList(lastChar + 1, currentList.size());
+            lastChar = currentList.indexOf(new TokenOther(TokenType.TOK_EOL));
+        }
+        return PrettyPrinter.printLine(currentList.subList(0, lastChar));
     }
 }

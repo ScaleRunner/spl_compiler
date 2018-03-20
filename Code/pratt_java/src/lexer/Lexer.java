@@ -1,7 +1,5 @@
 package lexer;
 
-import parser.ParseException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -214,7 +212,7 @@ public class Lexer {
         if (Character.isAlphabetic(input.charAt(currentPosition)) || match('.')) {
             return lexIdentifier();
         }
-        throw new ParseException(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
+        throw new TokenException(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
 //        return new TokenError(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
     }
 
@@ -326,7 +324,7 @@ public class Lexer {
         }
 
         if (result.contains(".")){
-            throw new ParseException("Invalid field keyword in '" + result+"'");
+            throw new TokenException("Invalid field keyword in '" + result + "'.\n\t Did you put a space between field keywords?");
         }
         // Identifier is not a keyword, so we treat it as identifier
         return new TokenIdentifier(result);

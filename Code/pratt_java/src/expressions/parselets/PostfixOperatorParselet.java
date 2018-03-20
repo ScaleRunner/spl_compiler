@@ -1,4 +1,4 @@
-package parselets;
+package expressions.parselets;
 
 import expressions.Expression;
 import expressions.PostfixExpression;

@@ -3,9 +3,9 @@ package statements.parselets;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
-import parser.ParseException;
 import parser.Parser;
 import parser.Precedence;
+import parser.exceptions.SemicolonError;
 import statements.AssignStatement;
 import statements.Statement;
 
@@ -21,7 +21,7 @@ public class AssignParselet implements InfixParseletStatement {
         Expression right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
         if (!parser.match(TokenType.TOK_EOL))
-            throw new ParseException("There mush be a ';' at the end of an assignment.");
+            throw new SemicolonError(parser);
 
         return new AssignStatement(left, right);
     }

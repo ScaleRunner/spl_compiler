@@ -4,8 +4,8 @@ package statements.parselets;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
-import parser.ParseException;
 import parser.Parser;
+import parser.exceptions.ParseException;
 import statements.LoopStatement;
 import statements.Statement;
 
@@ -24,7 +24,7 @@ public class WhileParselet implements PrefixParseletStatement {
             body = parser.parseBlock();
             parser.match(TokenType.TOK_CLOSE_CURLY);
         } else {
-            throw new ParseException("While statements should have a condition, like while(a==b){}");
+            throw new ParseException(parser, "While statements should have a condition, like while(a==b){}");
         }
 
         return new LoopStatement(condition, body);

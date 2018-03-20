@@ -1,6 +1,6 @@
 package expressions;
 
-import parser.CallException;
+import parser.exceptions.CallException;
 import util.Visitor;
 
 import java.util.List;

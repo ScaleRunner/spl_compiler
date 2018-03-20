@@ -3,8 +3,10 @@ import lexer.Lexer;
 import lexer.Token;
 import lexer.TokenType;
 import org.junit.Test;
-import parser.CallException;
 import parser.Parser;
+import parser.exceptions.CallException;
+import parser.exceptions.ParseException;
+import parser.exceptions.SemicolonError;
 import statements.*;
 
 import java.util.ArrayList;
@@ -13,6 +15,22 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class ParserTest {
+
+    @Test(expected = SemicolonError.class)
+    public void no_semicolon() {
+        Lexer l = new Lexer("foo = bar");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseBlock();
+    }
+
+    @Test//(expected = SemicolonError.class)
+    public void no_semicolon_second_line() {
+        Lexer l = new Lexer("foo = bar; this=wrong");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseBlock();
+    }
 
     @Test
     public void slides_example() {
@@ -231,6 +249,14 @@ public class ParserTest {
         actual.add(new ReturnStatement(args));
 
         assertEquals(result, actual);
+    }
+
+    @Test(expected = ParseException.class)
+    public void testReturnStatementNoParentheses() {
+        Lexer l = new Lexer("return a;");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseBlock();
     }
 
 	@Test

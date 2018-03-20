@@ -4,8 +4,9 @@ package statements.parselets;
 import expressions.Expression;
 import lexer.Token;
 import lexer.TokenType;
-import parser.ParseException;
 import parser.Parser;
+import parser.exceptions.ParseException;
+import parser.exceptions.SemicolonError;
 import statements.ReturnStatement;
 import statements.Statement;
 
@@ -27,11 +28,11 @@ public class ReturnParselet implements PrefixParseletStatement {
             }
             parser.consume(TokenType.TOK_CLOSE_PARENTHESIS);
         } else {
-            throw new ParseException("Return statements should have parentheses around the expression.");
+            throw new ParseException(parser, "Return statements should have parentheses around the expression.");
         }
 
         if (!parser.match(TokenType.TOK_EOL)) {
-            throw new ParseException("Return statements should be ended with a ';'");
+            throw new SemicolonError(parser);
         }
 
         return new ReturnStatement(args);

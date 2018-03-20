@@ -8,7 +8,6 @@ import statements.ConditionalStatement;
 import statements.LoopStatement;
 import statements.Statement;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PrettyPrinter implements Visitor {
@@ -23,54 +22,54 @@ public class PrettyPrinter implements Visitor {
     }
 
     private void printToken(TokenType t) {
-        builder.append(" ");
         switch (t) {
             case TOK_NOT:
-                builder.append("!");
+                builder.append(" !");
                 break;
             case TOK_MINUS:
-                builder.append("-");
+                builder.append(" - ");
                 break;
             case TOK_PLUS:
-                builder.append("+");
+                builder.append(" + ");
                 break;
             case TOK_MULT:
-                builder.append("*");
+                builder.append(" * ");
                 break;
             case TOK_DIV:
-                builder.append("/");
+                builder.append(" / ");
                 break;
             case TOK_MOD:
-                builder.append("%");
+                builder.append(" % ");
                 break;
             case TOK_EQ:
-                builder.append("==");
+                builder.append(" == ");
                 break;
             case TOK_LT:
-                builder.append("<");
+                builder.append(" < ");
                 break;
             case TOK_GT:
-                builder.append(">");
+                builder.append(" >");
                 break;
             case TOK_LEQ:
-                builder.append("<=");
+                builder.append(" <= ");
                 break;
             case TOK_GEQ:
-                builder.append(">=");
+                builder.append(" >= ");
                 break;
             case TOK_NEQ:
-                builder.append("!=");
+                builder.append(" != ");
                 break;
             case TOK_AND:
-                builder.append("&&");
+                builder.append(" && ");
                 break;
             case TOK_OR:
-                builder.append("||");
+                builder.append(" || ");
+                break;
+            case TOK_EOF:
                 break;
             default:
                 throw new Error("PrettyPrinter: cannot accept token " + t);
         }
-        builder.append(" ");
     }
 
     @Override
@@ -219,10 +218,14 @@ public class PrettyPrinter implements Visitor {
         this.visit(e.right);
     }
 
-    public static String printLine(ArrayList<Token> tokens) {
+    public static String printLine(List<Token> tokens) {
         PrettyPrinter p = new PrettyPrinter();
         for (Token t : tokens) {
-            p.builder.append(" ").append(t.getStringValue()).append(" ");
+            try {
+                p.printToken(t.getType());
+            } catch (Error e) {
+                p.builder.append(t.getStringValue());
+            }
         }
         return p.getResultString();
     }

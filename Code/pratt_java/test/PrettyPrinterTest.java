@@ -1,11 +1,13 @@
 import expressions.*;
 import lexer.Lexer;
+import lexer.Token;
 import org.junit.Test;
 import parser.Parser;
 import statements.Statement;
 import util.PrettyPrinter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -81,5 +83,16 @@ public class PrettyPrinterTest {
         pp.visit(result);
         assertEquals("res = 4 + 2 * 3;\nres = 7 * 8 * 9;", pp.getResultString());
     }
+
+    @Test
+    public void testPrintInput() {
+        Lexer l = new Lexer("foo(bar) + 3 + True + field.hd");
+        List<Token> tokens = l.tokenize();
+
+        String reprint = PrettyPrinter.printLine(tokens);
+        assertEquals("foo(bar) + 3 + true + field.hd", reprint);
+    }
+
+
 
 }

@@ -1,6 +1,6 @@
-import parser.ParseException;
 import lexer.*;
 import org.junit.Test;
+import parser.exceptions.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;

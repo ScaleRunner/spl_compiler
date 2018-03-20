@@ -1,7 +1,7 @@
 package expressions;
 
+import expressions.parselets.PostfixOperatorParselet;
 import lexer.Token;
-import parselets.PostfixOperatorParselet;
 import parser.Parser;
 import parser.Precedence;
 import util.Visitor;
