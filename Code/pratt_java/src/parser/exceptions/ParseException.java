@@ -10,6 +10,6 @@ public class ParseException extends RuntimeException {
     }
 
     public ParseException(Parser p, Token t) {
-        super(String.format("There was an error parsing '%s'.\n\tError found in line %s", t, p.getLine()));
+        super(String.format("There was an error parsing '%s'.\n\tError found in line \t '%s'", t, p.getLine()));
     }
 }

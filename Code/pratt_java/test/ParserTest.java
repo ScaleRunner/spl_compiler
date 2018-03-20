@@ -24,7 +24,7 @@ public class ParserTest {
         p.parseBlock();
     }
 
-    @Test//(expected = SemicolonError.class)
+    @Test(expected = SemicolonError.class)
     public void no_semicolon_second_line() {
         Lexer l = new Lexer("foo = bar; this=wrong");
         List<Token> tokens = l.tokenize();
@@ -249,6 +249,49 @@ public class ParserTest {
         actual.add(new ReturnStatement(args));
 
         assertEquals(result, actual);
+    }
+
+    @Test
+    public void testPrintStatementEmpty() {
+        Lexer l = new Lexer("print();");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
+
+        ArrayList<Statement> actual = new ArrayList<>();
+
+        actual.add(new PrintStatement(null));
+
+        assertEquals(result, actual);
+    }
+
+    @Test
+    public void testPrintStatement() {
+        Lexer l = new Lexer("print(a + 1);");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
+
+        ArrayList<Statement> actual = new ArrayList<>();
+
+        Expression arg = new OperatorExpression(
+                new IdentifierExpression("a"),
+                TokenType.TOK_PLUS,
+                new IntegerExpression(1)
+        );
+
+        actual.add(new PrintStatement(arg));
+
+        assertEquals(result, actual);
+    }
+
+    @Test(expected = ParseException.class)
+    public void testPrintStatementFaulty() {
+        //TODO: Do we want a prettier error?
+        Lexer l = new Lexer("print(a + 1, 1);");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseBlock();
     }
 
     @Test(expected = ParseException.class)

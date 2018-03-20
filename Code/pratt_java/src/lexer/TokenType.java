@@ -32,6 +32,7 @@ public enum TokenType {
     TOK_KW_BOOL("Bool"),
     TOK_KW_CHAR("Char"),
     TOK_KW_RETURN("return"),
+    TOK_KW_PRINT("print"),
     TOK_KW_VAR("var"),
     TOK_OPEN_PARENTHESIS("("),
     TOK_CLOSE_PARENTHESIS(")"),

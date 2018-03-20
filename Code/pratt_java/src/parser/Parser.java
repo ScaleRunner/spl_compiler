@@ -101,6 +101,7 @@ public class Parser {
         registerPrefixStatement(TokenType.TOK_KW_IF, new ConditionalParselet());
         registerPrefixStatement(TokenType.TOK_KW_WHILE, new WhileParselet());
         registerPrefixStatement(TokenType.TOK_KW_RETURN, new ReturnParselet());
+        registerPrefixStatement(TokenType.TOK_KW_PRINT, new PrintParselet());
     }
 
     public ArrayList<Statement> parseBlock(){
@@ -141,10 +142,11 @@ public class Parser {
     public Statement parseStatement() {
         Token token = consume();
 
-        // WHILE-IF-RETURN
+        // WHILE-IF-RETURN-PRINT
         if (token.getType() == TokenType.TOK_KW_WHILE ||
                 token.getType() == TokenType.TOK_KW_IF ||
-                token.getType() == TokenType.TOK_KW_RETURN) {
+                token.getType() == TokenType.TOK_KW_RETURN ||
+                token.getType() == TokenType.TOK_KW_PRINT) {
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
 
             if (prefix == null) throw new ParseException(this, token);
@@ -203,8 +205,8 @@ public class Parser {
     public Token consume(TokenType expected) {
         Token token = lookAhead(0);
         if (token.getType() != expected) {
-            throw new RuntimeException(
-                    String.format("Expected token: \t %s \n Found token: \t %s",
+            throw new ParseException(this,
+                    String.format("Expected token: \t %s\n\tFound token: \t %s",
                             expected, token.getType())
             );
         }

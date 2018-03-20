@@ -287,25 +287,25 @@ public class Lexer {
             return new TokenOther(TokenType.TOK_KW_RETURN);
         }
 
+        if (result.equals("print")) {
+            return new TokenOther(TokenType.TOK_KW_PRINT);
+        }
+
         if (result.equals(".hd")) {
             return new TokenOther(TokenType.TOK_HD);
         }
 
         if (result.equals(".tl")) {
             return new TokenOther(TokenType.TOK_TL);
-
         }
 
         if (result.equals(".fst")) {
             return new TokenOther(TokenType.TOK_FST);
-
         }
 
         if (result.equals(".snd")) {
             return new TokenOther(TokenType.TOK_SND);
-
         }
-
 
         if (result.equals("True")) {
             return new TokenBool(true);
