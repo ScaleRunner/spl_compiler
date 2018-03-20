@@ -302,6 +302,37 @@ public class ParserTest {
     }
 
     @Test
+    public void testReturnStatementMultipleArgs() {
+        Lexer l = new Lexer("return(a, b, 1 % []);");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
+
+        ArrayList<Statement> actual = new ArrayList<>();
+
+        ArrayList<Expression> args = new ArrayList<>();
+        args.add(new IdentifierExpression("a"));
+        args.add(new IdentifierExpression("b"));
+        args.add(new OperatorExpression(
+                new IntegerExpression(1),
+                TokenType.TOK_MOD,
+                new ListExpression()
+        ));
+
+        actual.add(new ReturnStatement(args));
+
+        assertEquals(result, actual);
+    }
+
+    @Test(expected = ParseException.class)
+    public void testReturnStatementMultipleArgsFail() {
+        Lexer l = new Lexer("return(a, b, 1 % [] 1337;");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseBlock();
+    }
+
+    @Test
     public void testPrintStatementEmpty() {
         Lexer l = new Lexer("print();");
         List<Token> tokens = l.tokenize();

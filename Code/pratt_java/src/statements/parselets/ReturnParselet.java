@@ -21,10 +21,9 @@ public class ReturnParselet implements PrefixParseletStatement {
     public Statement parse(Parser parser, Token token) {
         List<Expression> args = new ArrayList<>();
         if (parser.match(TokenType.TOK_OPEN_PARENTHESIS)) {
-            if (parser.lookAhead(0).getType() != TokenType.TOK_CLOSE_PARENTHESIS) {
-                //TODO: RECOGNIZE MULTIPLE EXPRESSIONS
+            while (parser.lookAhead(0).getType() != TokenType.TOK_CLOSE_PARENTHESIS) {
                 args.add(parser.parseExpression());
-//                parser.match(TokenType.TOK_COMMA);
+                parser.match(TokenType.TOK_COMMA);
             }
             parser.consume(TokenType.TOK_CLOSE_PARENTHESIS);
         } else {
