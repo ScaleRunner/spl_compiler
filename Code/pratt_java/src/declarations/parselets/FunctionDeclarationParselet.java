@@ -39,7 +39,7 @@ public class FunctionDeclarationParselet {
 
 
                 // There may be no arguments at all.
-                //TODO: Fix no args
+                
                 if (!(parser.lookAhead(0).getType() == TokenType.TOK_CLOSE_PARENTHESIS)) {
                     do {
                         Expression arg = parser.parseExpression();
