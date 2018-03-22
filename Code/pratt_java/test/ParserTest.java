@@ -923,6 +923,34 @@ public class ParserTest {
 
     }
 
+    @Test
+    public void testSPLSingleFunctionDeclarationNoArgsWithReturnType() {
+        Lexer l = new Lexer("simpleAssignment():: -> Void{\na = b;\n}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+
+        List<Declaration> actual = new ArrayList<>();
+
+        IdentifierExpression name = new IdentifierExpression("simpleAssignment");
+
+        List<IdentifierExpression> args = new ArrayList<>();
+        List<Declaration> decls = new ArrayList<>();
+        List<Statement> stats = new ArrayList<>();
+
+        List<TokenType> fargsType = new ArrayList<>();
+
+        TokenType returnType = TokenType.TOK_KW_VOID;
+
+
+        stats.add(new AssignStatement(new IdentifierExpression("a"), new IdentifierExpression("b")));
+
+        actual.add(new FunctionDeclaration(name, args, decls, stats, fargsType, returnType));
+
+        assertEquals(result, actual);
+
+    }
+
 
     @Test
     public void testSPLSingleFunctionDeclarationWithReturnType() {
@@ -955,6 +983,8 @@ public class ParserTest {
         assertEquals(result, actual);
 
     }
+
+
 
 
     @Test

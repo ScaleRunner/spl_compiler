@@ -40,80 +40,84 @@ public class FunctionDeclarationParselet {
 
                 // There may be no arguments at all.
                 //TODO: Fix no args
-                if (!parser.match(TokenType.TOK_CLOSE_PARENTHESIS)) {
+                if (!(parser.lookAhead(0).getType() == TokenType.TOK_CLOSE_PARENTHESIS)) {
                     do {
                         Expression arg = parser.parseExpression();
-                        if(arg.getClass() == IdentifierExpression.class){
+                        if (arg.getClass() == IdentifierExpression.class) {
                             args.add((IdentifierExpression) arg);
-                        }
-                        else{
-                            throw new ParseException(parser, "Arguments have to be identifiers not "+arg.getClass() );
+                        } else {
+                            throw new ParseException(parser, "Arguments have to be identifiers not " + arg.getClass());
                         }
                     } while (parser.match(TokenType.TOK_COMMA));
-                    if(parser.match(TokenType.TOK_CLOSE_PARENTHESIS)){
 
-                        if(parser.match(TokenType.TOK_FUNC_TYPE_DEF)){
-                            //TODO: TUPLES, LISTS, IDs
-                            while(parser.lookAhead(0).getType() == (TokenType.TOK_KW_BOOL)||
-                                    parser.lookAhead(0).getType() ==(TokenType.TOK_KW_INT)||
-                                    parser.lookAhead(0).getType() ==(TokenType.TOK_KW_CHAR)){
-                                fargsTypes.add(parser.consume().getType());
+                }
 
-                            }
+                if(parser.match(TokenType.TOK_CLOSE_PARENTHESIS)){
 
-                            if(parser.match(TokenType.TOK_KW_ARROW)){
-                                if(parser.lookAhead(0).getType() == (TokenType.TOK_KW_BOOL)||
-                                        parser.lookAhead(0).getType() ==(TokenType.TOK_KW_INT)||
-                                        parser.lookAhead(0).getType() ==(TokenType.TOK_KW_CHAR)||
-                                        parser.lookAhead(0).getType() ==(TokenType.TOK_KW_VOID))
-                                {
-                                    returnType = parser.consume().getType();
-                                }
-                                else{
-                                    throw new ParseException(parser, "Invalid Return type " + parser.getLine());
-                                }
-                            }
-                            else{
-                                throw new ParseException(parser, "Missing '->' after argument types. " + parser.getLine());
-                            }
-
+                    if(parser.match(TokenType.TOK_FUNC_TYPE_DEF)){
+                        //TODO: TUPLES, LISTS
+                        while(parser.lookAhead(0).getType() == (TokenType.TOK_KW_BOOL)||
+                                parser.lookAhead(0).getType() ==(TokenType.TOK_KW_INT)||
+                                parser.lookAhead(0).getType() ==(TokenType.TOK_KW_CHAR) ||
+                                parser.lookAhead(0).getType() ==(TokenType.TOK_IDENTIFIER)){
+                            fargsTypes.add(parser.consume().getType());
 
                         }
 
-                        if(parser.match(TokenType.TOK_OPEN_CURLY)){
-                            while (parser.lookAhead(0).getType() == TokenType.TOK_KW_VAR ||
-                                    parser.lookAhead(0).getType() == TokenType.TOK_KW_CHAR ||
-                                    parser.lookAhead(0).getType() == TokenType.TOK_KW_INT ||
-                                    parser.lookAhead(0).getType() == TokenType.TOK_KW_BOOL) {
-                                //PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
-
-                                //if (prefix == null) throw new ParseException(this, token);
-
-                                funVarDecl.add(new VariableDeclarationParselet().parse(parser, parser.consume()));
-                            }
-                            stats = parser.parseBlock();
-                            if(stats.size() > 0){
-                                if(parser.match(TokenType.TOK_CLOSE_CURLY)){
-                                    return new FunctionDeclaration(name, args, funVarDecl, stats, fargsTypes, returnType);
-                                }
-                                else{
-                                    throw new ParseException(parser, "Missing '}' in function definition.");
-                                }
-
+                        if(parser.match(TokenType.TOK_KW_ARROW)){
+                            if(parser.lookAhead(0).getType() == (TokenType.TOK_KW_BOOL)||
+                                    parser.lookAhead(0).getType() ==(TokenType.TOK_KW_INT)||
+                                    parser.lookAhead(0).getType() ==(TokenType.TOK_KW_CHAR)||
+                                    parser.lookAhead(0).getType() ==(TokenType.TOK_KW_VOID))
+                            {
+                                returnType = parser.consume().getType();
                             }
                             else{
-                                throw new ParseException(parser, "Function definition needs at least one statement.");
+                                throw new ParseException(parser, "Invalid Return type " + parser.getLine());
+                            }
+                        }
+                        else{
+                            throw new ParseException(parser, "Missing '->' after argument types. " + parser.getLine());
+                        }
+
+
+                    }
+
+                    if(parser.match(TokenType.TOK_OPEN_CURLY)){
+                        while (parser.lookAhead(0).getType() == TokenType.TOK_KW_VAR ||
+                                parser.lookAhead(0).getType() == TokenType.TOK_KW_CHAR ||
+                                parser.lookAhead(0).getType() == TokenType.TOK_KW_INT ||
+                                parser.lookAhead(0).getType() == TokenType.TOK_KW_BOOL) {
+                            //PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
+
+                            //if (prefix == null) throw new ParseException(this, token);
+
+                            funVarDecl.add(new VariableDeclarationParselet().parse(parser, parser.consume()));
+                        }
+                        stats = parser.parseBlock();
+                        if(stats.size() > 0){
+                            if(parser.match(TokenType.TOK_CLOSE_CURLY)){
+                                return new FunctionDeclaration(name, args, funVarDecl, stats, fargsTypes, returnType);
+                            }
+                            else{
+                                throw new ParseException(parser, "Missing '}' in function definition.");
                             }
 
                         }
                         else{
-                            throw new ParseException(parser, "Missing '{' after arguments definition ");
+                            throw new ParseException(parser, "Function definition needs at least one statement.");
                         }
+
                     }
                     else{
-                        throw new ParseException(parser, "Missing ')' at the end of arguments definition");
+                        throw new ParseException(parser, "Missing '{' after arguments definition ");
                     }
                 }
+                else{
+                    throw new ParseException(parser, "Missing ')' at the end of arguments definition");
+                }
+
+
 
             }
             else{
@@ -124,7 +128,7 @@ public class FunctionDeclarationParselet {
             throw new ParseException(parser, "Identifier in variable declaration is missing");
         }
 
-        return null;
+
     }
 
 }
