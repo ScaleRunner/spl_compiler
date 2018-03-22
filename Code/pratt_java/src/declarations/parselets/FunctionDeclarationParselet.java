@@ -16,19 +16,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FunctionDeclarationParselet {
-    IdentifierExpression name;
-    List<IdentifierExpression> args = new ArrayList<>();
-    List<Declaration> funVarDecl = new ArrayList<>();
-    List<Statement> stats = new ArrayList<>();
-    List<TokenType> fargsTypes = new ArrayList<>();
-    TokenType returnType = null;
+    public final IdentifierExpression name;
+    public final List<IdentifierExpression> args;
+    public final List<Declaration> funVarDecl;
+    public List<Statement> stats;
+    public final List<TokenType> fargsTypes;
+    public TokenType returnType;
+
+    public FunctionDeclarationParselet(IdentifierExpression name){
+        this.name = name;
+        this.args = new ArrayList<>();
+        this.funVarDecl = new ArrayList<>();
+        this.stats = new ArrayList<>();
+        this.fargsTypes = new ArrayList<>();
+        this.returnType = null;
+    }
+
     public FunctionDeclaration parse(Parser parser, Token token) {
         if(token.getType() == TokenType.TOK_IDENTIFIER){
-            name = new IdentifierExpression(token.getStringValue());
+//            name = new IdentifierExpression(token.getStringValue());
             if(parser.match(TokenType.TOK_OPEN_PARENTHESIS)){
 
 
                 // There may be no arguments at all.
+                //TODO: Fix no args
                 if (!parser.match(TokenType.TOK_CLOSE_PARENTHESIS)) {
                     do {
                         Expression arg = parser.parseExpression();
@@ -42,6 +53,7 @@ public class FunctionDeclarationParselet {
                     if(parser.match(TokenType.TOK_CLOSE_PARENTHESIS)){
 
                         if(parser.match(TokenType.TOK_FUNC_TYPE_DEF)){
+                            //TODO: TUPLES, LISTS, IDs
                             while(parser.lookAhead(0).getType() == (TokenType.TOK_KW_BOOL)||
                                     parser.lookAhead(0).getType() ==(TokenType.TOK_KW_INT)||
                                     parser.lookAhead(0).getType() ==(TokenType.TOK_KW_CHAR)){

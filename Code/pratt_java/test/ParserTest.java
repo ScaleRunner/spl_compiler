@@ -1192,4 +1192,73 @@ public class ParserTest {
 //
 //        assertEquals(result, actual);
 //    }
+
+    @Test
+    public void testSPLExample1() {
+        Lexer l = new Lexer("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                    "return(1);\n " +
+                "} else {\n" +
+                    "return(n * facR ( n - 1 ));\n" +
+                "}\n" +
+            "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+
+        List<Declaration> actual = new ArrayList<>();
+
+        IdentifierExpression name = new IdentifierExpression("facR");
+
+        List<IdentifierExpression> args = new ArrayList<>();
+        args.add(new IdentifierExpression("n"));
+
+        List<Declaration> decls = new ArrayList<>();
+
+        List<Statement> stats = new ArrayList<>();
+
+        List<Statement> thenArm = new ArrayList<>();
+        List<Expression> returnArgs = new ArrayList<>();
+        returnArgs.add(new IntegerExpression(1));
+        thenArm.add(new ReturnStatement(returnArgs));
+
+        List<Statement> elseArm = new ArrayList<>();
+        List<Expression> returnArgs2 = new ArrayList<>();
+        List<Expression> funArgs = new ArrayList<>();
+        funArgs.add(new OperatorExpression(
+                new IdentifierExpression("n"),
+                TokenType.TOK_MINUS,
+                new IntegerExpression(1)
+        ));
+        returnArgs2.add(new OperatorExpression(
+                new IdentifierExpression("n"),
+                TokenType.TOK_MULT,
+                new CallExpression(
+                        new IdentifierExpression("facR"), funArgs
+                )
+        ));
+
+        elseArm.add(new ReturnStatement(returnArgs2));
+
+        stats.add(new ConditionalStatement(
+                new OperatorExpression(
+                        new IdentifierExpression("n"),
+                        TokenType.TOK_LT,
+                        new IntegerExpression(2)
+                ),
+                thenArm,
+                elseArm
+        ));
+
+        List<TokenType> fargsType = new ArrayList<>();
+        fargsType.add(TokenType.TOK_KW_INT);
+
+        TokenType returnType = TokenType.TOK_KW_INT;
+
+        actual.add(new FunctionDeclaration(name, args, decls, stats, fargsType, returnType));
+
+        assertEquals(result, actual);
+
+    }
+
 }

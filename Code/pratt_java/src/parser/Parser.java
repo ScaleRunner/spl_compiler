@@ -197,9 +197,6 @@ public class Parser {
         while (lookAhead(0).getType() != TokenType.TOK_EOF) {
             Declaration decl = parseDeclaration();
             declarations.add(decl);
-            if (lookAhead(0).getType() == TokenType.TOK_EOF)
-                //consume();
-                break;
         }
         if(declarations.size()== 0){
             throw new ParseException(this, "A SPL program needs at least one declaration.");
@@ -210,6 +207,11 @@ public class Parser {
 
     private Declaration parseDeclaration() {
         Token token = consume();
+
+        /*
+         * DeclPar dec = mDecl.get(token.gettype)
+         * Decl decl = dec.parse(this)
+         */
 
         //variable declaration
         if (token.getType() == TokenType.TOK_KW_VAR ||
@@ -225,7 +227,7 @@ public class Parser {
         else{
             //Function declaration
             if(token.getType() == TokenType.TOK_IDENTIFIER){
-                return new FunctionDeclarationParselet().parse(this, token);
+                return new FunctionDeclarationParselet(new IdentifierExpression(token.getStringValue())).parse(this, token);
             }
             else throw new ParseException(this, String.format("No Declaration could be parsed in line %s", getLine()));
         }
