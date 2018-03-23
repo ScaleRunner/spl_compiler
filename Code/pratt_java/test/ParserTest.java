@@ -50,6 +50,17 @@ public class ParserTest {
     }
 
     @Test
+    public void testChar(){
+        Lexer l = new Lexer("'a'");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Node result = p.parseExpression();
+
+        Node expected = new CharacterExpression('a');
+        assertEquals(result, expected);
+    }
+
+    @Test
     public void slides_example() {
         Lexer l = new Lexer("-5 + b");
         List<Token> tokens = l.tokenize();
@@ -151,9 +162,6 @@ public class ParserTest {
         p.parseStatement();
     }
 
-
-
-
     @Test
     public void list() {
         Lexer l = new Lexer("[]");
@@ -162,6 +170,25 @@ public class ParserTest {
         Expression result = p.parseExpression();
 
         Expression expected = new ListExpression();
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void consOperator() {
+        Lexer l = new Lexer("1:2:[]");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Node result = p.parseExpression();
+
+        Node expected = new OperatorExpression(
+                new IntegerExpression(1),
+                TokenType.TOK_CONS,
+                new OperatorExpression(
+                        new IntegerExpression(2),
+                        TokenType.TOK_CONS,
+                        new ListExpression()
+                )
+        );
         assertEquals(result, expected);
     }
 

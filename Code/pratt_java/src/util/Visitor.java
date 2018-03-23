@@ -12,6 +12,8 @@ public interface Visitor {
 
     void visit(BooleanExpression e);
 
+    void visit(CharacterExpression e);
+
     void visit(CallExpression e);
 
     void visit(IdentifierExpression e);

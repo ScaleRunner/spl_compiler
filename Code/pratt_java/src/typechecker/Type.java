@@ -13,6 +13,8 @@ public abstract class Type {
 			return unifyWith((TypeInt) t);
 		else if (t instanceof TypeBool)
 			return unifyWith((TypeBool) t);
+		else if (t instanceof TypeChar)
+			return unifyWith((TypeChar) t);
 		else if (t instanceof TypeFunction)
 			return unifyWith((TypeFunction) t);
 		else if (t instanceof TypeVariable)
@@ -25,6 +27,10 @@ public abstract class Type {
 	}
 
 	protected Substitution unifyWith(TypeBool t) {
+		return cannotUnify(this, t);
+	}
+
+	protected Substitution unifyWith(TypeChar t) {
 		return cannotUnify(this, t);
 	}
 

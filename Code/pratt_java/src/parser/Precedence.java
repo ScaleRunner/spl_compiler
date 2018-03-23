@@ -8,9 +8,10 @@ public class Precedence {
     public static final int AND = 4;
     public static final int EQUALITY = 5;
     public static final int COMPARISON = 6;
-    public static final int ADDITIVE = 7;
-    public static final int MULTIPLICATIVE = 8;
-    public static final int UNARY = 9;
-    public static final int POSTFIX = 10;
-    public static final int CALL = 11;
+    public static final int CONS = 7;
+    public static final int ADDITIVE = 8;
+    public static final int MULTIPLICATIVE = 9;
+    public static final int UNARY = 10;
+    public static final int POSTFIX = 11;
+    public static final int CALL = 12;
 }

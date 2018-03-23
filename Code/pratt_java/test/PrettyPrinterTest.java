@@ -5,6 +5,7 @@ import org.junit.Test;
 import parser.Parser;
 import parser.exceptions.ParseException;
 import parser.statements.Statement;
+import util.Node;
 import util.PrettyPrinter;
 
 import java.util.ArrayList;
@@ -23,6 +24,16 @@ public class PrettyPrinterTest {
 		e.accept(pp);
 		assertEquals("42", pp.getResultString());
 	}
+
+    @Test
+    public void testCharacter() {
+        Lexer l = new Lexer("'a'");
+        Parser p = new Parser(l.tokenize());
+        Node e = p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        e.accept(pp);
+        assertEquals("'a'", pp.getResultString());
+    }
 
     @Test
     public void testEmptyList() {

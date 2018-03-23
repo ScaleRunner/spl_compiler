@@ -46,7 +46,8 @@ public enum TokenType {
     TOK_HD(".hd"),
     TOK_TL(".tl"),
     TOK_FST(".fst"),
-    TOK_SND(".snd");
+    TOK_SND(".snd"),
+    TOK_CHAR("Char");
 
     private final String value;
 

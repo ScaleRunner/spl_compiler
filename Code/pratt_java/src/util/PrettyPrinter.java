@@ -96,6 +96,10 @@ public class PrettyPrinter implements Visitor {
             this.visit((CallExpression) e);
         }
 
+        else if(e.getClass() == CharacterExpression.class){
+            this.visit((CharacterExpression) e);
+        }
+
         else if(e.getClass() == IdentifierExpression.class){
             this.visit((IdentifierExpression) e);
         }
@@ -181,6 +185,11 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void visit(IdentifierExpression e) {
         builder.append(e.name);
+    }
+
+    @Override
+    public void visit(CharacterExpression e) {
+        builder.append("'").append(e.name).append("'");
     }
 
     @Override
