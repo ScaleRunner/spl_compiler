@@ -184,7 +184,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(ReturnStatement s) {
-//        s.setType();
+        s.setType(s.arg.getType());
 	}
 
 
