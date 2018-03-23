@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Identifier Expression: abc
  */
-public class IntegerExpression implements Expression {
+public class IntegerExpression extends Expression {
 
     public final int name;
 

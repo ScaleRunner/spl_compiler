@@ -6,7 +6,7 @@ import util.Visitor;
 
 import java.util.Objects;
 
-public class VariableDeclaration implements Declaration{
+public class VariableDeclaration extends Declaration{
 
     public final TokenType varType;
     public final Expression left;

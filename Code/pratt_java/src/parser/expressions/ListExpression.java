@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * Identifier Expression: abc
  */
-public class ListExpression implements Expression {
+public class ListExpression extends Expression {
 
     public final List<Expression> items;
 

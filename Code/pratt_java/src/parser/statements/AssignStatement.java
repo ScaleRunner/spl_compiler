@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * Assignment: a = b
  */
-public class AssignStatement implements Statement {
+public class AssignStatement extends Statement {
     public final Expression name;
     public final Expression right;
 

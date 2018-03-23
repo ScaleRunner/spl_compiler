@@ -9,7 +9,7 @@ import java.util.Objects;
  * A prefix unary expression like: !a
  *                                 -b
  */
-public class PrefixExpression implements Expression {
+public class PrefixExpression extends Expression {
     public final TokenType operator;
     public final Expression right;
 

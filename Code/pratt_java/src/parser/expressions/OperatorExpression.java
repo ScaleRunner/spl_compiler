@@ -11,7 +11,7 @@ import java.util.Objects;
  *                                a * b
  *                                etc.
  */
-public class OperatorExpression implements Expression {
+public class OperatorExpression extends Expression {
     public final Expression left;
     public final TokenType operator;
     public final Expression right;

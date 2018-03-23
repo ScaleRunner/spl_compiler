@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Conditional Expression: if a then b else c
  */
-public class LoopStatement implements Statement {
+public class LoopStatement extends Statement {
     public final Expression condition;
     public final List<Statement> body;
 

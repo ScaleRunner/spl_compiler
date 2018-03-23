@@ -5,7 +5,7 @@ import util.Visitor;
 
 import java.util.Objects;
 
-public class PrintStatement implements Statement {
+public class PrintStatement extends Statement {
     public final Expression arg;
 
     public PrintStatement(Expression arg) {

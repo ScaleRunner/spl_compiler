@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Conditional Expression: if a then b else c
  */
-public class ConditionalStatement implements Statement {
+public class ConditionalStatement extends Statement {
     public final Expression condition;
     public final List<Statement> then_expression;
     public final List<Statement> else_expression;

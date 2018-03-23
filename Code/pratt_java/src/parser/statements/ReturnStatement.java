@@ -6,7 +6,7 @@ import util.Visitor;
 import java.util.List;
 import java.util.Objects;
 
-public class ReturnStatement implements Statement {
+public class ReturnStatement extends Statement {
 
     public final List<Expression> args;
 

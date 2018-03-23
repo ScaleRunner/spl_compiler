@@ -3,7 +3,6 @@ package parser.statements;
 import util.Node;
 import util.Visitor;
 
-public interface Statement extends Node {
+public abstract class Statement extends Node {
 
-    void accept(Visitor v);
 }

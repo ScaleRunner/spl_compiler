@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * Identifier Expression: abc
  */
-public class IdentifierExpression implements Expression {
+public class IdentifierExpression extends Expression {
 
     public final String name;
 

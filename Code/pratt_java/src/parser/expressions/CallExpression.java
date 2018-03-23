@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * Function Call: foo(bar)
  */
-public class CallExpression implements Expression {
+public class CallExpression extends Expression {
     public final IdentifierExpression function_name;
     public final List<Expression> args;
 

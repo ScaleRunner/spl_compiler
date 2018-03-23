@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import lexer.TokenType;
 
-public class FunctionDeclaration implements Declaration{
+public class FunctionDeclaration extends Declaration{
     IdentifierExpression funName;
     List<IdentifierExpression> args;
     List<Declaration> decls;

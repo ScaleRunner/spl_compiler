@@ -8,7 +8,7 @@ import util.Visitor;
 import java.util.List;
 import java.util.Objects;
 
-public class CallStatement implements Statement {
+public class CallStatement extends Statement {
     public final IdentifierExpression function_name;
     public final List<Expression> args;
 

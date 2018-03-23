@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Identifier Expression: abc
  */
-public class TupleExpression implements Expression {
+public class TupleExpression extends Expression {
 
     public final Expression left;
     public final Expression right;

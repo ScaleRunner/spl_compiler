@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Boolean Expression: True, False
  */
-public class BooleanExpression implements Expression {
+public class BooleanExpression extends Expression {
 
     public final boolean name;
 

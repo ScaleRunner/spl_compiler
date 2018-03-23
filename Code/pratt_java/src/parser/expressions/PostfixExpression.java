@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * A postfix unary expression like: a.hd
  */
-public class PostfixExpression implements Expression {
+public class PostfixExpression extends Expression {
     public final Expression left;
     public final TokenType operator;
 
