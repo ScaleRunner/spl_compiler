@@ -1,13 +1,16 @@
 import static org.junit.Assert.*;
 
+import lexer.Lexer;
 import org.junit.Before;
 import org.junit.Test;
 
 import parser.Parser;
+import parser.expressions.Expression;
 import typechecker.TypeBool;
 import typechecker.TypeFunction;
 import typechecker.TypeInt;
 import typechecker.Typechecker;
+import util.Node;
 
 public class TypecheckerTest {
 	private Typechecker tc = null;
@@ -17,39 +20,40 @@ public class TypecheckerTest {
 		tc = new Typechecker();
 	}
 //
-//	private void assertTypecheckSuccess() {
-//		assertTrue(tc.getAllErrors(), tc.getAllErrors().length() == 0);
-//	}
+	private void assertTypecheckSuccess() {
+		assertTrue(tc.getAllErrors(), tc.getAllErrors().length() == 0);
+	}
 
-//	private AstNode typecheckExpr(String input) {
-//		Parser p = new Parser(input);
-//		AstExpr expr = p.pExpr();
-//		tc.typecheck(expr);
-//		return expr;
-//	}
-//
-//	@Test
-//	public void testCompareTypes() {
-//		assertEquals(new TypeInt(), new TypeInt());
-//		assertEquals(new TypeBool(), new TypeBool());
-//		assertNotEquals(new TypeInt(), new TypeBool());
-//	}
-//
-//	@Test
-//	public void testIntegerConstant() {
-//		AstNode e = typecheckExpr("5");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeInt(), e.getType());
-//	}
-//
-//	@Test
-//	public void testBooleanConstantTrue() {
-//		AstNode eTrue = typecheckExpr("True");
-//		AstNode eFalse = typecheckExpr("False");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeBool(), eTrue.getType());
-//		assertEquals(new TypeBool(), eFalse.getType());
-//	}
+	private Node typecheckExpr(String input) {
+		Lexer l = new Lexer(input);
+		Parser p = new Parser(l.tokenize());
+		Expression expr = p.parseExpression();
+		tc.typecheck(expr);
+		return expr;
+	}
+
+	@Test
+	public void testCompareTypes() {
+		assertEquals(new TypeInt(), new TypeInt());
+		assertEquals(new TypeBool(), new TypeBool());
+		assertNotEquals(new TypeInt(), new TypeBool());
+	}
+
+	@Test
+	public void testIntegerConstant() {
+		Node e = typecheckExpr("5");
+		assertTypecheckSuccess();
+		assertEquals(new TypeInt(), e.getType());
+	}
+
+	@Test
+	public void testBooleanConstantTrueAndFalse() {
+		Node eTrue = typecheckExpr("True");
+		Node eFalse = typecheckExpr("False");
+		assertTypecheckSuccess();
+		assertEquals(new TypeBool(), eTrue.getType());
+		assertEquals(new TypeBool(), eFalse.getType());
+	}
 //
 //	@Test
 //	public void testPlus() {

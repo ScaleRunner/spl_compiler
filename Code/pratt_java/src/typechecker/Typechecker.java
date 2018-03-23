@@ -6,6 +6,8 @@ import java.util.List;
 
 import parser.expressions.*;
 import parser.statements.*;
+import util.Node;
+import util.TypeError;
 import util.Visitor;
 
 public class Typechecker implements Visitor {
@@ -15,30 +17,37 @@ public class Typechecker implements Visitor {
 	private static final Type typeBool = new TypeBool();
 	private HashMap<String, Type> env;
 
-//	private List<CompileError> errors = null;
-//
-//	public List<CompileError> getErrors() {
-//		return errors;
-//	}
-//
-//	private void error(String errorMessage) {
-//		errors.add(new CompileError(errorMessage));
-//	}
-//
-//	public void printErrors() {
-//		for (CompileError e : errors) {
-//			System.out.println(e.getErrorMessage());
-//		}
-//	}
-//
-//	public String getAllErrors() {
-//		StringBuilder result = new StringBuilder();
-//		for (CompileError e : errors) {
-//			result.append(e.getErrorMessage());
-//			result.append("\n");
-//		}
-//		return result.toString();
-//	}
+	private List<TypeError> errors = null;
+
+	public boolean typecheck(Node ast) {
+		errors = new LinkedList<>();
+		env = new HashMap<>();
+		ast.accept(this);
+		return errors.isEmpty();
+	}
+
+	public List<TypeError> getErrors() {
+		return errors;
+	}
+
+	private void error(String errorMessage) {
+		errors.add(new TypeError(errorMessage));
+	}
+
+	public void printErrors() {
+		for (TypeError e : errors) {
+			System.out.println(e.getErrorMessage());
+		}
+	}
+
+	public String getAllErrors() {
+		StringBuilder result = new StringBuilder();
+		for (TypeError e : errors) {
+			result.append(e.getErrorMessage());
+			result.append("\n");
+		}
+		return result.toString();
+	}
 
 	@Override
 	public void visit(Expression e) {
@@ -47,7 +56,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(BooleanExpression e) {
-
+		e.setType(new TypeBool());
 	}
 
 	@Override
@@ -62,7 +71,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(IntegerExpression e) {
-
+		e.setType(new TypeInt());
 	}
 
 	@Override
@@ -130,6 +139,9 @@ public class Typechecker implements Visitor {
 
 	}
 
+
+
+
 //	@Override
 //	public void visit(AstExprInteger e) {
 //		e.setType(new TypeInt());
@@ -165,13 +177,7 @@ public class Typechecker implements Visitor {
 //		e.setType(new TypeBool());
 //	}
 //
-//	public boolean typecheck(AstNode ast) {
-//		errors = new LinkedList<>();
-//		env = new HashMap<>();
-//		ast.accept(this);
-//		return errors.isEmpty();
-//	}
-//
+
 //	@Override
 //	public void visit(AstAbstraction astLetBinding) {
 //		// TODO: make a deep copy of the current environment and restore it at
