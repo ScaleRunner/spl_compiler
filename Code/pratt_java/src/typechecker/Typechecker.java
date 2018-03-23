@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import expressions.*;
-import statements.*;
+import parser.expressions.*;
+import parser.statements.*;
 import util.Visitor;
 
 public class Typechecker implements Visitor {

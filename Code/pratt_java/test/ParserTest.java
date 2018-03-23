@@ -1,7 +1,7 @@
-import declarations.Declaration;
-import declarations.FunctionDeclaration;
-import declarations.VariableDeclaration;
-import expressions.*;
+import parser.declarations.Declaration;
+import parser.declarations.FunctionDeclaration;
+import parser.declarations.VariableDeclaration;
+import parser.expressions.*;
 import lexer.Lexer;
 import lexer.Token;
 import lexer.TokenType;
@@ -10,7 +10,7 @@ import parser.Parser;
 import parser.exceptions.CallException;
 import parser.exceptions.ParseException;
 import parser.exceptions.SemicolonError;
-import statements.*;
+import parser.statements.*;
 
 import java.util.ArrayList;
 import java.util.List;

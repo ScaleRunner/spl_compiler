@@ -1,7 +1,7 @@
 package util;
 
-import expressions.*;
-import statements.*;
+import parser.expressions.*;
+import parser.statements.*;
 
 import java.util.List;
 

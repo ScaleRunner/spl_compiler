@@ -1,9 +1,9 @@
 package util;
 
-import expressions.*;
+import parser.expressions.*;
 import lexer.Token;
 import lexer.TokenType;
-import statements.*;
+import parser.statements.*;
 
 import java.util.List;
 

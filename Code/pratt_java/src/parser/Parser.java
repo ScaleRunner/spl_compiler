@@ -1,23 +1,23 @@
 package parser;
 
-import declarations.Declaration;
-import declarations.FunctionDeclaration;
-import declarations.parselets.FunctionDeclarationParselet;
-import declarations.parselets.VariableDeclarationParselet;
-import expressions.CallExpression;
-import expressions.Expression;
-import expressions.IdentifierExpression;
-import expressions.parselets.*;
+import parser.declarations.Declaration;
+import parser.declarations.FunctionDeclaration;
+import parser.declarations.parselets.FunctionDeclarationParselet;
+import parser.declarations.parselets.VariableDeclarationParselet;
+import parser.expressions.CallExpression;
+import parser.expressions.Expression;
+import parser.expressions.IdentifierExpression;
+import parser.expressions.parselets.*;
 import lexer.Token;
 import lexer.TokenOther;
 import lexer.TokenType;
 import parser.exceptions.ParseException;
 import parser.exceptions.SemicolonError;
-import statements.CallStatement;
-import statements.Statement;
-import statements.parselets.*;
+import parser.statements.CallStatement;
+import parser.statements.Statement;
+import parser.statements.parselets.*;
 import util.PrettyPrinter;
-import declarations.VariableDeclaration;
+import parser.declarations.VariableDeclaration;
 
 import java.util.*;
 
@@ -130,7 +130,7 @@ public class Parser {
     }
 
     /**
-     * Parses expressions
+     * Parses parser.expressions
      * @param precedence precedence value
      * @return ABST
      */

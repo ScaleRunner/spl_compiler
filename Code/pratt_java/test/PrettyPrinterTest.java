@@ -1,10 +1,10 @@
-import expressions.*;
+import parser.expressions.*;
 import lexer.Lexer;
 import lexer.Token;
 import org.junit.Test;
 import parser.Parser;
 import parser.exceptions.ParseException;
-import statements.Statement;
+import parser.statements.Statement;
 import util.PrettyPrinter;
 
 import java.util.ArrayList;
