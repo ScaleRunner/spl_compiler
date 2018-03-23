@@ -11,6 +11,7 @@ import parser.exceptions.CallException;
 import parser.exceptions.ParseException;
 import parser.exceptions.SemicolonError;
 import parser.statements.*;
+import util.Node;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,19 @@ public class ParserTest {
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         p.parseBlock();
+    }
+
+    @Test
+    public void node_check(){
+        Lexer l = new Lexer("foo = bar;");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Node result = p.parseStatement();
+
+        Node expected = new AssignStatement(
+                new IdentifierExpression("foo"), new IdentifierExpression("bar")
+        );
+        assertEquals(result, expected);
     }
 
     @Test
