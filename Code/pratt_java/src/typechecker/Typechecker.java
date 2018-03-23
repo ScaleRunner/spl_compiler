@@ -73,7 +73,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(IdentifierExpression e) {
-
+        e.setType(env.get(e.name));
 	}
 
 	@Override
@@ -130,17 +130,21 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PostfixExpression e) {
-
+        e.setType(e.left.getType());
 	}
 
 	@Override
 	public void visit(PrefixExpression e) {
-
+        e.setType(e.right.getType());
 	}
 
 	@Override
 	public void visit(TupleExpression e) {
-
+        if(e.left.getType() == e.right.getType()){
+            e.setType(e.left.getType());
+        } else{
+            error("The types of the tuple mismatch.");
+        }
 	}
 
 	@Override
@@ -160,7 +164,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(CallStatement s) {
-
+        s.setType(env.get(s.function_name.name));
 	}
 
 	@Override
@@ -175,25 +179,14 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PrintStatement s) {
-
+        s.setType(s.arg.getType());
 	}
 
 	@Override
 	public void visit(ReturnStatement s) {
-
+//        s.setType();
 	}
 
-
-//	@Override
-//	public void visit(AstExprBinOp e) {
-//
-//	}
-//
-//	@Override
-//	public void visit(AstExprBool e) {
-//		e.setType(new TypeBool());
-//	}
-//
 
 //	@Override
 //	public void visit(AstAbstraction astLetBinding) {
@@ -209,27 +202,6 @@ public class Typechecker implements Visitor {
 //		astLetBinding.getBody().accept(this);
 //		astLetBinding.setType(new TypeFunction(astLetBinding.getAstType()
 //				.getType(), astLetBinding.getBody().getType()));
-//	}
-//
-//	@Override
-//	public void visit(AstTypeInt astTypeInt) {
-//		astTypeInt.setType(typeInt);
-//	}
-//
-//	@Override
-//	public void visit(AstTypeBool astTypeBool) {
-//		astTypeBool.setType(typeBool);
-//	}
-//
-//	@Override
-//	public void visit(AstIdentifier astIdentifier) {
-//		astIdentifier.setType(env.get(astIdentifier.getIdentifier()));
-//	}
-//
-//	@Override
-//	public void visit(AstTypeFunction astTypeFunction) {
-//		// TODO Auto-generated method stub
-//
 //	}
 
 }

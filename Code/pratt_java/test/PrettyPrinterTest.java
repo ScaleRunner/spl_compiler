@@ -77,17 +77,17 @@ public class PrettyPrinterTest {
 
     @Test
     public void testReturn() {
-        Lexer l = new Lexer("return([]    , \n 1 + 6 \t, b);");
+        Lexer l = new Lexer("return ([]    , (\n 1 + 6 \t, b));");
         Parser p = new Parser(l.tokenize());
         Statement s = p.parseStatement();
         PrettyPrinter pp = new PrettyPrinter();
         s.accept(pp);
-        assertEquals("return([], 1 + 6, b);", pp.getResultString());
+        assertEquals("return ([], (1 + 6, b));", pp.getResultString());
     }
 
     @Test
     public void testPrint() {
-        Lexer l = new Lexer("print(         1);");
+        Lexer l = new Lexer("print(        1);");
         Parser p = new Parser(l.tokenize());
         Statement s = p.parseStatement();
         PrettyPrinter pp = new PrettyPrinter();

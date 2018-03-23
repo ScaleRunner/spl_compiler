@@ -234,14 +234,9 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(ReturnStatement s) {
-        builder.append("return(");
-        for (int i = 0; i < s.args.size(); i++) {
-            this.visit(s.args.get(i));
-            if (i < s.args.size() - 1) {
-                builder.append(", ");
-            }
-        }
-        builder.append(");");
+        builder.append("return ");
+        this.visit(s.arg);
+        builder.append(";");
     }
 
     @Override
