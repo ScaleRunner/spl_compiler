@@ -1,10 +1,7 @@
 package parser.FunType;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import typechecker.Substitution;
 import util.Visitor;
-
-import java.util.Objects;
 
 public class BoolType extends Type {
 

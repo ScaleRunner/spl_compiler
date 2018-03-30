@@ -1,11 +1,8 @@
 package parser.FunType;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import typechecker.Substitution;
 import util.Visitor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class ListType extends Type{
@@ -37,7 +34,7 @@ public class ListType extends Type{
 
     @Override
     public Type applySubstitution(Substitution substitution) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }
 

@@ -1,11 +1,13 @@
 package typechecker;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import parser.declarations.Declaration;
+import parser.declarations.FunctionDeclaration;
+import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import util.Visitor;
+
+import java.util.List;
 
 public class TypeInference implements Visitor {
 //	// input parameters
@@ -177,6 +179,21 @@ public class TypeInference implements Visitor {
 
 	@Override
 	public void visit(ReturnStatement s) {
+
+	}
+
+	@Override
+	public void visit(Declaration d) {
+
+	}
+
+	@Override
+	public void visit(FunctionDeclaration d) {
+
+	}
+
+	@Override
+	public void visit(VariableDeclaration d) {
 
 	}
 ////

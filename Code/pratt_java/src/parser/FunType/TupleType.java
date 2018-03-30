@@ -1,6 +1,5 @@
 package parser.FunType;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import typechecker.Substitution;
 import util.Visitor;
 
@@ -37,6 +36,6 @@ public class TupleType extends Type{
 
     @Override
     public Type applySubstitution(Substitution substitution) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }
