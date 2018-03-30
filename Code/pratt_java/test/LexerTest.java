@@ -23,6 +23,28 @@ public class LexerTest {
     }
 
     @Test
+    public void testChar() {
+        Lexer l = new Lexer("'a'");
+        Token t = l.nextToken();
+        assertEquals(TokenType.TOK_CHAR, t.getType());
+        assertEquals('a', t.getValue());
+    }
+
+    @Test
+    public void testCharNumeric() {
+        Lexer l = new Lexer("'1'");
+        Token t = l.nextToken();
+        assertEquals(TokenType.TOK_CHAR, t.getType());
+        assertEquals('1', t.getValue());
+    }
+
+    @Test(expected = TokenException.class)
+    public void testCharNumericError() {
+        Lexer l = new Lexer("'1");
+        l.nextToken();
+    }
+
+    @Test
     public void testMultiDigitInteger() {
         Lexer l = new Lexer("4545372");
         Token t = l.nextToken();

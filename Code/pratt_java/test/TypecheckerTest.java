@@ -6,10 +6,7 @@ import org.junit.Test;
 
 import parser.Parser;
 import parser.expressions.Expression;
-import typechecker.TypeBool;
-import typechecker.TypeFunction;
-import typechecker.TypeInt;
-import typechecker.Typechecker;
+import typechecker.*;
 import util.Node;
 
 public class TypecheckerTest {
@@ -46,7 +43,14 @@ public class TypecheckerTest {
 		assertEquals(new TypeInt(), e.getType());
 	}
 
-	@Test
+    @Test
+    public void testCharacterConstant() {
+        Node e = typecheckExpr("'a'");
+        assertTypecheckSuccess();
+        assertEquals(new TypeChar(), e.getType());
+    }
+
+    @Test
 	public void testBooleanConstantTrueAndFalse() {
 		Node eTrue = typecheckExpr("True");
 		Node eFalse = typecheckExpr("False");
@@ -54,22 +58,22 @@ public class TypecheckerTest {
 		assertEquals(new TypeBool(), eTrue.getType());
 		assertEquals(new TypeBool(), eFalse.getType());
 	}
-//
-//	@Test
-//	public void testPlus() {
-//		AstNode e = typecheckExpr("5 + 3");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeInt(), e.getType());
-//	}
-//
-//	@Test
-//	public void testLessThan() {
-//		AstNode e = typecheckExpr("5 < 3");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeBool(), e.getType());
-//	}
-//
-//	@Test
+
+	@Test
+	public void testPlus() {
+		Node e = typecheckExpr("5 + 3");
+		assertTypecheckSuccess();
+		assertEquals(new TypeInt(), e.getType());
+	}
+
+	@Test
+	public void testLessThan() {
+		Node e = typecheckExpr("5 < 3");
+		assertTypecheckSuccess();
+		assertEquals(new TypeBool(), e.getType());
+	}
+
+	//	@Test
 //	public void testLetUnrelated() {
 //		AstNode e = typecheckExpr("fun b : Bool . 5");
 //		assertTypecheckSuccess();

@@ -15,6 +15,8 @@ public class Typechecker implements Visitor {
 	// These are for convenience.
 	private static final Type typeInt = new TypeInt();
 	private static final Type typeBool = new TypeBool();
+    private static final Type typeChar = new TypeChar();
+
 	private HashMap<String, Type> env;
 
 	private List<TypeError> errors = null;
@@ -64,9 +66,14 @@ public class Typechecker implements Visitor {
 
 	}
 
+    @Override
+    public void visit(CharacterExpression e) {
+        e.setType(new TypeChar());
+    }
+
 	@Override
 	public void visit(IdentifierExpression e) {
-
+        e.setType(env.get(e.name));
 	}
 
 	@Override
@@ -81,22 +88,63 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(OperatorExpression e) {
+        /*
+         * + : char, int
+         * - : char, int
+         * * : int
+         * / : int
+         * % : int
+         * ==: int, char, bool
+         * comperators
+         */
+        e.left.accept(this);
+		e.right.accept(this);
 
+		switch (e.operator) {
+            case TOK_PLUS:
+            case TOK_MINUS:
+            case TOK_MULT:
+            case TOK_DIV:
+            case TOK_MOD:
+                if (e.left.getType().equals(typeInt) && e.right.getType().equals(typeInt))
+                    e.setType(typeInt);
+                 else
+                    error("Typechecker: Type Mismatch");
+                break;
+
+		    case TOK_LT:
+            case TOK_GT:
+            case TOK_GEQ:
+            case TOK_EQ:
+            case TOK_LEQ:
+            case TOK_NEQ:
+                if (e.left.getType().equals(typeInt) && e.right.getType().equals(typeInt))
+                    e.setType(typeBool);
+                break;
+
+		default:
+			error("Typechecker: Unknown operator " + e.operator);
+			break;
+		}
 	}
 
 	@Override
 	public void visit(PostfixExpression e) {
-
+        e.setType(e.left.getType());
 	}
 
 	@Override
 	public void visit(PrefixExpression e) {
-
+        e.setType(e.right.getType());
 	}
 
 	@Override
 	public void visit(TupleExpression e) {
-
+        if(e.left.getType() == e.right.getType()){
+            e.setType(e.left.getType());
+        } else{
+            error("The types of the tuple mismatch.");
+        }
 	}
 
 	@Override
@@ -116,7 +164,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(CallStatement s) {
-
+        s.setType(env.get(s.function_name.name));
 	}
 
 	@Override
@@ -131,52 +179,14 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PrintStatement s) {
-
+        s.setType(s.arg.getType());
 	}
 
 	@Override
 	public void visit(ReturnStatement s) {
-
+        s.setType(s.arg.getType());
 	}
 
-
-
-
-//	@Override
-//	public void visit(AstExprInteger e) {
-//		e.setType(new TypeInt());
-//	}
-//
-//	@Override
-//	public void visit(AstExprBinOp e) {
-//		e.getLeft().accept(this);
-//		e.getRight().accept(this);
-//
-//		switch (e.getOperator()) {
-//		case TOK_PLUS:
-//		case TOK_MINUS:
-//			if (e.getLeft().getType().equals(typeInt)
-//					&& e.getRight().getType().equals(typeInt))
-//				e.setType(typeInt);
-//			break;
-//
-//		case TOK_LESS_THAN:
-//			if (e.getLeft().getType().equals(typeInt)
-//					&& e.getRight().getType().equals(typeInt))
-//				e.setType(typeBool);
-//			break;
-//
-//		default:
-//			error("Typechecker: Unknown operator " + e.getOperator());
-//			break;
-//		}
-//	}
-//
-//	@Override
-//	public void visit(AstExprBool e) {
-//		e.setType(new TypeBool());
-//	}
-//
 
 //	@Override
 //	public void visit(AstAbstraction astLetBinding) {
@@ -192,27 +202,6 @@ public class Typechecker implements Visitor {
 //		astLetBinding.getBody().accept(this);
 //		astLetBinding.setType(new TypeFunction(astLetBinding.getAstType()
 //				.getType(), astLetBinding.getBody().getType()));
-//	}
-//
-//	@Override
-//	public void visit(AstTypeInt astTypeInt) {
-//		astTypeInt.setType(typeInt);
-//	}
-//
-//	@Override
-//	public void visit(AstTypeBool astTypeBool) {
-//		astTypeBool.setType(typeBool);
-//	}
-//
-//	@Override
-//	public void visit(AstIdentifier astIdentifier) {
-//		astIdentifier.setType(env.get(astIdentifier.getIdentifier()));
-//	}
-//
-//	@Override
-//	public void visit(AstTypeFunction astTypeFunction) {
-//		// TODO Auto-generated method stub
-//
 //	}
 
 }

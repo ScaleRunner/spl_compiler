@@ -52,6 +52,17 @@ public class ParserTest {
     }
 
     @Test
+    public void testChar(){
+        Lexer l = new Lexer("'a'");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Node result = p.parseExpression();
+
+        Node expected = new CharacterExpression('a');
+        assertEquals(result, expected);
+    }
+
+    @Test
     public void slides_example() {
         Lexer l = new Lexer("-5 + b");
         List<Token> tokens = l.tokenize();
@@ -153,9 +164,6 @@ public class ParserTest {
         p.parseStatement();
     }
 
-
-
-
     @Test
     public void list() {
         Lexer l = new Lexer("[]");
@@ -164,6 +172,25 @@ public class ParserTest {
         Expression result = p.parseExpression();
 
         Expression expected = new ListExpression();
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void consOperator() {
+        Lexer l = new Lexer("1:2:[]");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Node result = p.parseExpression();
+
+        Node expected = new OperatorExpression(
+                new IntegerExpression(1),
+                TokenType.TOK_CONS,
+                new OperatorExpression(
+                        new IntegerExpression(2),
+                        TokenType.TOK_CONS,
+                        new ListExpression()
+                )
+        );
         assertEquals(result, expected);
     }
 
@@ -302,83 +329,32 @@ public class ParserTest {
 
     @Test
     public void testReturnStatementEmpty() {
-        Lexer l = new Lexer("return();");
+        Lexer l = new Lexer("return;");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         ArrayList<Statement> result = p.parseBlock();
 
         ArrayList<Statement> actual = new ArrayList<>();
 
-        actual.add(new ReturnStatement(new ArrayList<>()));
+        actual.add(new ReturnStatement(null));
 
         assertEquals(result, actual);
     }
 
     @Test
     public void testReturnStatement() {
-        Lexer l = new Lexer("return(a);");
+        Lexer l = new Lexer("return a;");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         ArrayList<Statement> result = p.parseBlock();
 
         ArrayList<Statement> actual = new ArrayList<>();
 
-        ArrayList<Expression> args = new ArrayList<>();
-        args.add(new IdentifierExpression("a"));
+        Expression arg = new IdentifierExpression("a");
 
-        actual.add(new ReturnStatement(args));
-
-        assertEquals(result, actual);
-    }
-
-    @Test
-    public void testReturnStatementMultipleArgs() {
-        Lexer l = new Lexer("return(a, b, 1 % []);");
-        List<Token> tokens = l.tokenize();
-        Parser p = new Parser(tokens);
-        ArrayList<Statement> result = p.parseBlock();
-
-        ArrayList<Statement> actual = new ArrayList<>();
-
-        ArrayList<Expression> args = new ArrayList<>();
-        args.add(new IdentifierExpression("a"));
-        args.add(new IdentifierExpression("b"));
-        args.add(new OperatorExpression(
-                new IntegerExpression(1),
-                TokenType.TOK_MOD,
-                new ListExpression()
-        ));
-
-        actual.add(new ReturnStatement(args));
+        actual.add(new ReturnStatement(arg));
 
         assertEquals(result, actual);
-    }
-
-
-//    @Test
-//    public void testReturnStatementWithoutParenthesis() {
-//        Lexer l = new Lexer("return a;");
-//        List<Token> tokens = l.tokenize();
-//        Parser p = new Parser(tokens);
-//        ArrayList<Statement> result = p.parseBlock();
-//
-//        ArrayList<Statement> actual = new ArrayList<>();
-//
-//        ArrayList<Expression> args = new ArrayList<>();
-//        args.add(new IdentifierExpression("a"));
-//
-//
-//        actual.add(new ReturnStatement(args));
-//
-//        assertEquals(result, actual);
-//    }
-
-    @Test(expected = ParseException.class)
-    public void testReturnStatementMultipleArgsFail() {
-        Lexer l = new Lexer("return(a, b, 1 % [] 1337;");
-        List<Token> tokens = l.tokenize();
-        Parser p = new Parser(tokens);
-        p.parseBlock();
     }
 
     @Test
@@ -1028,7 +1004,7 @@ public class ParserTest {
                                     "Int c = 0;\n " +
                                     "var useless = 2;\n " +
                                     "c = a + b;\n" +
-                                    "return (c);\n" +
+                                    "return c;\n" +
                                 "}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -1066,9 +1042,8 @@ public class ParserTest {
                     )
         );
 
-        ArrayList<Expression> temp = new ArrayList<>();
-        temp.add(new IdentifierExpression("c"));
-        stats.add(new ReturnStatement(temp));
+
+        stats.add(new ReturnStatement(new IdentifierExpression("c")));
 
         actual.add(new FunctionDeclaration(name, args, decls, stats, funType));
 
@@ -1263,9 +1238,9 @@ public class ParserTest {
     public void testSPLExample1() {
         Lexer l = new Lexer("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
-                    "return(1);\n " +
+                    "return 1;\n " +
                 "} else {\n" +
-                    "return(n * facR ( n - 1 ));\n" +
+                    "return n * facR ( n - 1 );\n" +
                 "}\n" +
             "}");
         List<Token> tokens = l.tokenize();
@@ -1284,27 +1259,25 @@ public class ParserTest {
         List<Statement> stats = new ArrayList<>();
 
         List<Statement> thenArm = new ArrayList<>();
-        List<Expression> returnArgs = new ArrayList<>();
-        returnArgs.add(new IntegerExpression(1));
-        thenArm.add(new ReturnStatement(returnArgs));
+        thenArm.add(new ReturnStatement(new IntegerExpression(1)));
 
         List<Statement> elseArm = new ArrayList<>();
-        List<Expression> returnArgs2 = new ArrayList<>();
         List<Expression> funArgs = new ArrayList<>();
         funArgs.add(new OperatorExpression(
                 new IdentifierExpression("n"),
                 TokenType.TOK_MINUS,
                 new IntegerExpression(1)
         ));
-        returnArgs2.add(new OperatorExpression(
-                new IdentifierExpression("n"),
-                TokenType.TOK_MULT,
-                new CallExpression(
-                        new IdentifierExpression("facR"), funArgs
-                )
-        ));
 
-        elseArm.add(new ReturnStatement(returnArgs2));
+        elseArm.add(new ReturnStatement(
+                new OperatorExpression(
+                    new IdentifierExpression("n"),
+                    TokenType.TOK_MULT,
+                    new CallExpression(
+                            new IdentifierExpression("facR"),
+                            funArgs
+                )
+        )));
 
         stats.add(new ConditionalStatement(
                 new OperatorExpression(

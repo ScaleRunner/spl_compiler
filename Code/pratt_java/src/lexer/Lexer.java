@@ -45,6 +45,19 @@ public class Lexer {
             return lexInteger();
         }
 
+        if (match('\'')) {
+            currentPosition++;
+            if(Character.isLetterOrDigit(input.charAt(currentPosition))){
+                char c = input.charAt(currentPosition);
+                currentPosition++;
+                if(match('\'')){
+                    currentPosition++;
+                    return new TokenChar(c);
+                }
+            }
+            throw new TokenException("Unfinished Char expression, you probably forgot a '.");
+        }
+
         if (match('+')) {
             currentPosition++;
             return new TokenOther(TokenType.TOK_PLUS);

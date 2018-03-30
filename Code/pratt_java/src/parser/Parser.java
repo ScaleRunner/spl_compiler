@@ -70,6 +70,7 @@ public class Parser {
         // Register Operations
         registerInfixExpression(TokenType.TOK_PLUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
         registerInfixExpression(TokenType.TOK_MINUS, new BinaryOperatorParselet(Precedence.ADDITIVE, false));
+        registerInfixExpression(TokenType.TOK_CONS, new BinaryOperatorParselet(Precedence.CONS, true));
         registerInfixExpression(TokenType.TOK_MULT, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
         registerInfixExpression(TokenType.TOK_DIV, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
         registerInfixExpression(TokenType.TOK_MOD, new BinaryOperatorParselet(Precedence.MULTIPLICATIVE, false));
@@ -91,6 +92,7 @@ public class Parser {
         registerPrefixExpression(TokenType.TOK_INT, new IntegerParselet());
         registerPrefixExpression(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefixExpression(TokenType.TOK_BOOL, new BooleanParselet());
+        registerPrefixExpression(TokenType.TOK_CHAR, new CharacterParselet());
         registerPrefixExpression(TokenType.TOK_OPEN_BRACKETS, new ListParselet());
 
         // Register Other

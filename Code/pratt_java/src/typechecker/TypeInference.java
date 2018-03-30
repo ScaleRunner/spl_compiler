@@ -96,6 +96,11 @@ public class TypeInference implements Visitor {
 	}
 
 	@Override
+	public void visit(CharacterExpression e) {
+
+	}
+
+	@Override
 	public void visit(CallExpression e) {
 
 	}
