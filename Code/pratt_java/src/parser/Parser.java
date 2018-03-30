@@ -1,23 +1,21 @@
 package parser;
 
+import lexer.Token;
+import lexer.TokenOther;
+import lexer.TokenType;
 import parser.declarations.Declaration;
-import parser.declarations.FunctionDeclaration;
 import parser.declarations.parselets.FunctionDeclarationParselet;
 import parser.declarations.parselets.VariableDeclarationParselet;
+import parser.exceptions.ParseException;
+import parser.exceptions.SemicolonError;
 import parser.expressions.CallExpression;
 import parser.expressions.Expression;
 import parser.expressions.IdentifierExpression;
 import parser.expressions.parselets.*;
-import lexer.Token;
-import lexer.TokenOther;
-import lexer.TokenType;
-import parser.exceptions.ParseException;
-import parser.exceptions.SemicolonError;
 import parser.statements.CallStatement;
 import parser.statements.Statement;
 import parser.statements.parselets.*;
 import util.PrettyPrinter;
-import parser.declarations.VariableDeclaration;
 
 import java.util.*;
 
@@ -57,7 +55,7 @@ public class Parser {
     }
 
     /**
-     * This function registers all the rules in the grammer.
+     * This function registers all the rules in the grammar.
      * The precedences are taken from the official Java Documentation.
      * @see <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html">Java Operators</a>
      */
@@ -118,39 +116,53 @@ public class Parser {
         registerPrefixStatement(TokenType.TOK_KW_PRINT, new PrintParselet());
     }
 
+
+    /* ********************************************
+     *        Beginning of Parsing the SPL        *
+     *********************************************/
+
+    public ArrayList<Declaration> parseSPL(){
+        ArrayList<Declaration> declarations = new ArrayList<>();
+        while (lookAhead(0).getType() != TokenType.TOK_EOF) {
+            Declaration decl = parseDeclaration();
+            declarations.add(decl);
+        }
+        if(declarations.size()== 0){
+            throw new ParseException(this, "A SPL program needs at least one declaration.");
+        }
+
+        return declarations;
+    }
+
+    private Declaration parseDeclaration() {
+        Token token = consume();
+
+        // Variable declaration
+        if (token.getType() == TokenType.TOK_KW_VAR ||
+                token.getType() == TokenType.TOK_KW_CHAR ||
+                token.getType() == TokenType.TOK_KW_INT ||
+                token.getType() == TokenType.TOK_KW_BOOL) {
+
+            return new VariableDeclarationParselet().parse(this, token);
+        }
+
+        // Function declaration
+        if (token.getType() == TokenType.TOK_IDENTIFIER) {
+            return new FunctionDeclarationParselet(new IdentifierExpression(token.getStringValue())).parse(this, token);
+        }
+
+        throw new ParseException(this, "No valid keyword is found!.");
+    }
+
     public ArrayList<Statement> parseBlock(){
         ArrayList<Statement> statements = new ArrayList<>();
         while (lookAhead(0).getType() != TokenType.TOK_EOF && lookAhead(0).getType() != TokenType.TOK_CLOSE_CURLY) {
             Statement expr = parseStatement();
             statements.add(expr);
             if (lookAhead(0).getType() == TokenType.TOK_EOF)
-                //consume();
                 break;
         }
-
         return statements;
-    }
-
-    /**
-     * Parses parser.expressions
-     * @param precedence precedence value
-     * @return ABST
-     */
-    public Expression parseExpression(int precedence) {
-        Token token = consume();
-        PrefixParseletExpression prefix = mPrefixParseletsExpression.get(token.getType());
-
-        if (prefix == null) throw new ParseException(this, token);
-
-        Expression left = prefix.parse(this, token);
-
-        while (precedence < getPrecedence()) {
-            token = consume();
-
-            InfixParseletExpression infix = mInfixParseletsExpression.get(token.getType());
-            left = infix.parse(this, left, token);
-        }
-        return left;
     }
 
     public Statement parseStatement() {
@@ -194,57 +206,46 @@ public class Parser {
         throw new ParseException(this, String.format("No statement could be parsed in line %s", getLine()));
     }
 
-    public ArrayList<Declaration> parseSPL(){
-        ArrayList<Declaration> declarations = new ArrayList<>();
-        while (lookAhead(0).getType() != TokenType.TOK_EOF) {
-            Declaration decl = parseDeclaration();
-            declarations.add(decl);
-        }
-        if(declarations.size()== 0){
-            throw new ParseException(this, "A SPL program needs at least one declaration.");
-        }
-
-        return declarations;
-    }
-
-    private Declaration parseDeclaration() {
-        Token token = consume();
-
-        /*
-         * DeclPar dec = mDecl.get(token.gettype)
-         * Decl decl = dec.parse(this)
-         */
-
-        //variable declaration
-        if (token.getType() == TokenType.TOK_KW_VAR ||
-                token.getType() == TokenType.TOK_KW_CHAR ||
-                token.getType() == TokenType.TOK_KW_INT ||
-                token.getType() == TokenType.TOK_KW_BOOL) {
-            //PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
-
-            //if (prefix == null) throw new ParseException(this, token);
-
-            return new VariableDeclarationParselet().parse(this, token);
-        }
-        else{
-            //Function declaration
-            if(token.getType() == TokenType.TOK_IDENTIFIER){
-                return new FunctionDeclarationParselet(new IdentifierExpression(token.getStringValue())).parse(this, token);
-            }
-            else throw new ParseException(this, String.format("No Declaration could be parsed in line %s", getLine()));
-        }
-
-
-    }
-
-
-
-
+    /**
+     * Parses the topmost Expression
+     * This function should be called when you want to parse a full expression.
+     * @return ABST belonging to the topmost expression.
+     */
     public Expression parseExpression() {
         return parseExpression(0);
     }
 
+    /**
+     * Parses one Expression
+     * @param precedence precedence value
+     * @return ABST belonging to the Expression
+     */
+    public Expression parseExpression(int precedence) {
+        Token token = consume();
+        PrefixParseletExpression prefix = mPrefixParseletsExpression.get(token.getType());
 
+        if (prefix == null) throw new ParseException(this, token);
+
+        Expression left = prefix.parse(this, token);
+
+        while (precedence < getPrecedence()) {
+            token = consume();
+
+            InfixParseletExpression infix = mInfixParseletsExpression.get(token.getType());
+            left = infix.parse(this, left, token);
+        }
+        return left;
+    }
+
+    /* ********************************************
+     *        End of the Parsing functions        *
+     *********************************************/
+
+    /**
+     * Tries to match a token of the given type. If it matches it gets consumed.
+     * @param expected TokenType of the to-be-matched token
+     * @return Bool if the Token was there.
+     */
     public boolean match(TokenType expected) {
         Token token = lookAhead(0);
         if (token.getType() != expected) {
@@ -255,6 +256,10 @@ public class Parser {
         return true;
     }
 
+    /**
+     * Checks if the next token is a field.
+     * @return Bool whether the next token is a field.
+     */
     public boolean fieldAhead() {
         return (lookAhead(0).getType() == TokenType.TOK_HD ||
                 lookAhead(0).getType() == TokenType.TOK_TL ||
@@ -262,6 +267,11 @@ public class Parser {
                 lookAhead(0).getType() == TokenType.TOK_SND);
     }
 
+    /**
+     * Consumes the token of given type, if it cannot be found it throws an error.
+     * @param expected TokenType of the to-be-consumed token.
+     * @return Token
+     */
     public Token consume(TokenType expected) {
         Token token = lookAhead(0);
         if (token.getType() != expected) {
@@ -274,6 +284,10 @@ public class Parser {
         return consume();
     }
 
+    /**
+     * Load in one token into the buffer
+     * @return First Token in the buffer.
+     */
     public Token consume() {
         // Make sure we've read the token.
         lookAhead(0);
@@ -282,6 +296,11 @@ public class Parser {
         return mRead.remove(0);
     }
 
+    /**
+     * LookAhead to get the specified Token
+     * @param distance size of LookAhead
+     * @return Token that is 'distance' tokens ahead
+     */
     public Token lookAhead(int distance) {
         // Read in as many as needed.
         while (distance >= mRead.size()) {
@@ -293,6 +312,10 @@ public class Parser {
     }
 
 
+    /**
+     * Gets the precendence of the next expression if it exists.
+     * @return Precedence of next expression, else 0.
+     */
     private int getPrecedence() {
         InfixParseletExpression parser = mInfixParseletsExpression.get(lookAhead(0).getType());
         if (parser != null){
@@ -302,6 +325,10 @@ public class Parser {
         return 0;
     }
 
+    /**
+     * Helper function to identify what the line number is of the current token.
+     * @return current line number.
+     */
     public String getLine() {
         List<Token> currentList = new ArrayList<>(input);
         int lastChar = currentList.indexOf(new TokenOther(TokenType.TOK_EOL));
