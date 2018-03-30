@@ -1,14 +1,13 @@
-import parser.expressions.*;
 import lexer.Lexer;
 import lexer.Token;
 import org.junit.Test;
 import parser.Parser;
 import parser.exceptions.ParseException;
+import parser.expressions.*;
 import parser.statements.Statement;
 import util.Node;
 import util.PrettyPrinter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -102,7 +101,7 @@ public class PrettyPrinterTest {
         Statement s = p.parseStatement();
         PrettyPrinter pp = new PrettyPrinter();
         s.accept(pp);
-        assertEquals("if(a == b && 1 == 1) {\nthis = correct;\nthis = True;\n}", pp.getResultString());
+        assertEquals("if(a == b && 1 == 1) {\n\tthis = correct;\n\tthis = True;\n}", pp.getResultString());
     }
 
     @Test
@@ -112,7 +111,17 @@ public class PrettyPrinterTest {
         Statement s = p.parseStatement();
         PrettyPrinter pp = new PrettyPrinter();
         s.accept(pp);
-        assertEquals("while(a == b && 1 == 1) {\nthis = correct;\nthis = True;\n}", pp.getResultString());
+        assertEquals("while(a == b && 1 == 1) {\n\tthis = correct;\n\tthis = True;\n}", pp.getResultString());
+    }
+
+    @Test
+    public void testNestedLoop() {
+        Lexer l = new Lexer("while(a==b && 1 == 1){ while(outer==True) {this=correct; this=True;}}");
+        Parser p = new Parser(l.tokenize());
+        Statement s = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        s.accept(pp);
+        assertEquals("while(a == b && 1 == 1) {\n\twhile(outer == True) {\n\t\tthis = correct;\n\t\tthis = True;\n\t}\n}", pp.getResultString());
     }
 
     @Test
@@ -188,12 +197,22 @@ public class PrettyPrinterTest {
 
     @Test
     public void testPlusMult() {
-        Lexer l = new Lexer("res = 4 \n  + 2*3; res = 7* 8 \t  *9;");
+        Lexer l = new Lexer("res = 4 \n  + 2*3; \n");
         Parser p = new Parser(l.tokenize());
-        ArrayList<Statement> result = p.parseBlock();
+        Statement result = p.parseStatement();
         PrettyPrinter pp = new PrettyPrinter();
         pp.visit(result);
-        assertEquals("res = 4 + 2 * 3;\nres = 7 * 8 * 9;", pp.getResultString());
+        assertEquals("res = 4 + 2 * 3;", pp.getResultString());
+    }
+
+    @Test
+    public void testAllOps(){
+        Lexer l = new Lexer("res.hd = 1 + 2 - 3 * 4 / 5 % 6 : [] && True || False != c == 2 < 1 > 2 >= 3 <= 4;");
+        Parser p = new Parser(l.tokenize());
+        Statement result = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        pp.visit(result);
+        assertEquals("res.hd = 1 + 2 - 3 * 4 / 5 % 6 : [] && True || False != c == 2 < 1 > 2 >= 3 <= 4;", pp.getResultString());
     }
 
     @Test

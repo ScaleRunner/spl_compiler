@@ -1,17 +1,18 @@
 package util;
 
+import lexer.Token;
+import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
-import lexer.Token;
-import lexer.TokenType;
 import parser.statements.*;
 
 import java.util.List;
 
 public class PrettyPrinter implements Visitor {
     private StringBuilder builder;
+    private String prefix;
 
     public String getResultString() {
         return builder.toString();
@@ -19,6 +20,7 @@ public class PrettyPrinter implements Visitor {
 
     public PrettyPrinter() {
         builder = new StringBuilder();
+        prefix = "";
     }
 
     private void printToken(TokenType t) {
@@ -38,6 +40,9 @@ public class PrettyPrinter implements Visitor {
             case TOK_DIV:
                 builder.append(" / ");
                 break;
+            case TOK_CONS:
+                builder.append(" : ");
+                break;
             case TOK_MOD:
                 builder.append(" % ");
                 break;
@@ -48,7 +53,7 @@ public class PrettyPrinter implements Visitor {
                 builder.append(" < ");
                 break;
             case TOK_GT:
-                builder.append(" >");
+                builder.append(" > ");
                 break;
             case TOK_LEQ:
                 builder.append(" <= ");
@@ -65,63 +70,40 @@ public class PrettyPrinter implements Visitor {
             case TOK_OR:
                 builder.append(" || ");
                 break;
+            case TOK_HD:
+            case TOK_TL:
+            case TOK_FST:
+            case TOK_SND:
+                builder.append(t.getValue());
+                break;
             case TOK_EOF:
                 break;
             default:
-                throw new Error("PrettyPrinter: cannot accept token " + t);
+                throw new Error("PrettyPrinter: cannot print token " + t);
         }
     }
 
     @Override
     public void visit(Statement s) {
-        if (s.getClass() == AssignStatement.class) {
-            this.visit((AssignStatement) s);
-        } else if (s.getClass() == CallStatement.class) {
-            this.visit((CallStatement) s);
-        } else if (s.getClass() == ConditionalStatement.class) {
-            this.visit((ConditionalStatement) s);
-        } else if (s.getClass() == LoopStatement.class) {
-            this.visit((LoopStatement) s);
-        } else if (s.getClass() == PrintStatement.class) {
-            this.visit((PrintStatement) s);
-        } else if (s.getClass() == ReturnStatement.class) {
-            this.visit((ReturnStatement) s);
-        }
+        Statement.visitStatement(this, s);
     }
 
     @Override
     public void visit(Expression e){
-        if (e.getClass() == BooleanExpression.class) {
-            this.visit((BooleanExpression) e);
-        } else if(e.getClass() == CallExpression.class){
-            this.visit((CallExpression) e);
-        } else if(e.getClass() == CharacterExpression.class){
-            this.visit((CharacterExpression) e);
-        } else if(e.getClass() == IdentifierExpression.class){
-            this.visit((IdentifierExpression) e);
-        } else if(e.getClass() == IntegerExpression.class){
-            this.visit((IntegerExpression) e);
-        } else if (e.getClass() == ListExpression.class) {
-            this.visit((ListExpression) e);
-        } else if(e.getClass() == OperatorExpression.class){
-            this.visit((OperatorExpression) e);
-        } else if(e.getClass() == PostfixExpression.class){
-            this.visit((PostfixExpression) e);
-        } else if(e.getClass() == PrefixExpression.class){
-            this.visit((PrefixExpression) e);
-        } else if (e.getClass() == TupleExpression.class) {
-            this.visit((TupleExpression) e);
-        }
+        Expression.visitExpression(this, e);
     }
 
     @Override
     public void visit(List<Statement> es){
+        prefix = prefix + "\t";
         for (int i = 0; i < es.size(); i++) {
+            builder.append(prefix);
             this.visit(es.get(i));
             if (i < es.size() - 1) {
                 builder.append("\n");
             }
         }
+        prefix = prefix.replaceFirst("\t", "");
     }
 
     @Override
@@ -174,7 +156,7 @@ public class PrettyPrinter implements Visitor {
         builder.append(") ");
         builder.append("{\n");
         this.visit(e.then_expression);
-        builder.append("\n}");
+        builder.append("\n").append(prefix).append("}");
     }
 
     @Override
@@ -215,7 +197,7 @@ public class PrettyPrinter implements Visitor {
         this.visit(e.condition);
         builder.append(") {\n");
         this.visit(e.body);
-        builder.append("\n}");
+        builder.append("\n").append(prefix).append("}");
     }
 
     @Override
