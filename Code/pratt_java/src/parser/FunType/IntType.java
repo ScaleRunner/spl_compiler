@@ -1,15 +1,23 @@
 package parser.FunType;
 
+import typechecker.Substitution;
 import util.Visitor;
 
 import java.util.Objects;
 
-public class IntType extends BasicType{
+public class IntType extends Type{
 
-    Basic b;
+    private static IntType instance;
 
-    public IntType(Basic b){
-        this.b = b;
+    private IntType(){
+
+    }
+
+    public static IntType getInstance(){
+        if(instance == null){
+            instance = new IntType();
+        }
+        return instance;
     }
 
     @Override
@@ -18,16 +26,7 @@ public class IntType extends BasicType{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        IntType intType = (IntType) o;
-        return b == intType.b;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(b);
+    public Type applySubstitution(Substitution substitution) {
+        return this;
     }
 }

@@ -1,14 +1,24 @@
 package parser.FunType;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import typechecker.Substitution;
 import util.Visitor;
 
 import java.util.Objects;
 
-public class BoolType extends BasicType{
-    Basic b;
+public class BoolType extends Type {
 
-    public BoolType(Basic b){
-        this.b = b;
+    private static BoolType instance = null;
+
+    private BoolType(){
+
+    }
+
+    public static BoolType getInstance(){
+        if(instance == null){
+            instance = new BoolType();
+        }
+        return instance;
     }
 
     @Override
@@ -17,16 +27,7 @@ public class BoolType extends BasicType{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BoolType boolType = (BoolType) o;
-        return b == boolType.b;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(b);
+    public Type applySubstitution(Substitution substitution) {
+        return this;
     }
 }

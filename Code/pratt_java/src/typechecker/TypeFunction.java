@@ -1,6 +1,8 @@
 package typechecker;
 
-public class TypeFunction extends Type {
+import parser.FunType.Type;
+
+public class TypeFunction {
 	private Type argType;
 	private Type resultType;
 
@@ -16,15 +18,15 @@ public class TypeFunction extends Type {
 		this.argType = argType;
 		this.resultType = resultType;
 	}
-	
-	@Override
-	protected Substitution unifyWith(TypeFunction t)
-	{
-		Substitution s1 = this.getArgType().unifyWith(t.getArgType());
-		Substitution s2 = this.getResultType().applySubstitution(s1).unifyWith(t.getResultType().applySubstitution(s1));
-		s1.putAll(s2);
-		return s1;
-	}
+
+//	@Override
+//	protected Substitution unifyWith(TypeFunction t)
+//	{
+//		Substitution s1 = this.getArgType().unifyWith(t.getArgType());
+//		Substitution s2 = this.getResultType().applySubstitution(s1).unifyWith(t.getResultType().applySubstitution(s1));
+//		s1.putAll(s2);
+//		return s1;
+//	}
 
 	@Override
 	public int hashCode() {
@@ -58,11 +60,11 @@ public class TypeFunction extends Type {
 		return true;
 	}
 
-	@Override
-	public Type applySubstitution(Substitution substitution) {
-		this.argType = this.argType.applySubstitution(substitution);
-		this.resultType = this.resultType.applySubstitution(substitution);
-		return this;
-	}
+//	@Override
+//	public Type applySubstitution(Substitution substitution) {
+//		this.argType = this.argType.applySubstitution(substitution);
+//		this.resultType = this.resultType.applySubstitution(substitution);
+//		return this;
+//	}
 
 }

@@ -1,5 +1,7 @@
 package typechecker;
 
+import parser.FunType.Type;
+
 import java.util.HashMap;
 
 // We extend HashMap to give it a better name

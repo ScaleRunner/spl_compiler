@@ -2,7 +2,6 @@ import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
-import parser.declarations.parselets.TypeParselet;
 import parser.expressions.*;
 import lexer.Lexer;
 import lexer.Token;
@@ -395,14 +394,6 @@ public class ParserTest {
     public void testPrintStatementFaulty() {
         //TODO: Do we want a prettier error?
         Lexer l = new Lexer("print(a + 1, 1);");
-        List<Token> tokens = l.tokenize();
-        Parser p = new Parser(tokens);
-        p.parseBlock();
-    }
-
-    @Test(expected = ParseException.class)
-    public void testReturnStatementNoParentheses() {
-        Lexer l = new Lexer("return a;");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         p.parseBlock();
@@ -910,7 +901,7 @@ public class ParserTest {
 
         List<Type> fargsType = new ArrayList<>();
 
-        Type returnType = new VoidType(Return.VOID);
+        Type returnType = Types.voidType;
 
         FunType funtype = new FunType(fargsType, returnType);
 
@@ -919,15 +910,6 @@ public class ParserTest {
 
         assertEquals(result, actual);
 
-    }
-
-    @Test
-    public void testParseInt(){
-        List<Token> tokens = new Lexer("Int").tokenize();
-        Parser p = new Parser(tokens);
-        Type expected = new IntType(Basic.INT);
-        Type actual = new TypeParselet().parse(tokens.get(0));
-        assertEquals(expected, actual);
     }
 
     @Test
@@ -947,7 +929,7 @@ public class ParserTest {
 
         List<Type> fargsType = new ArrayList<>();
 
-        Type returnType = new VoidType(Return.VOID);
+        Type returnType = Types.voidType;
 
         FunType funType = new FunType(fargsType, returnType);
 
@@ -977,10 +959,10 @@ public class ParserTest {
         List<Statement> stats = new ArrayList<>();
 
         List<Type> fargsType = new ArrayList<>();
-        fargsType.add(new IntType(Basic.INT));
-        fargsType.add(new IntType(Basic.INT));
+        fargsType.add(Types.intType);
+        fargsType.add(Types.intType);
 
-        Type returnType = new VoidType(Return.VOID);
+        Type returnType = Types.voidType;
 
         FunType funType = new FunType(fargsType, returnType);
 
@@ -1019,10 +1001,10 @@ public class ParserTest {
         List<Statement> stats = new ArrayList<>();
 
         List<Type> fargsType = new ArrayList<>();
-        fargsType.add(new IntType(Basic.INT));
-        fargsType.add(new IntType(Basic.INT));
+        fargsType.add(Types.intType);
+        fargsType.add(Types.intType);
 
-        Type returnType = new VoidType(Return.VOID);
+        Type returnType = Types.voidType;
         FunType funType = new FunType(fargsType, returnType);
 
         args.add(new IdentifierExpression("a"));
@@ -1290,9 +1272,9 @@ public class ParserTest {
         ));
 
         List<Type> fargsType = new ArrayList<>();
-        fargsType.add(new IntType(Basic.INT));
+        fargsType.add(Types.intType);
 
-        Type returnType = new IntType(Basic.INT);
+        Type returnType = Types.intType;
         FunType funType = new FunType(fargsType, returnType);
 
         actual.add(new FunctionDeclaration(name, args, decls, stats, funType));

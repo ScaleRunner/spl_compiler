@@ -8,65 +8,20 @@ import parser.exceptions.ParseException;
 
 public class TupleTypeParselet {
     public TupleType parse(Parser parser, Token token) {
-        Token next;
-        Type left;
-        Type right;
 
-        switch(token.getType()){
-            case TOK_KW_BOOL:
-                left = new BoolType(Basic.BOOL);
-                break;
-            case TOK_KW_INT:
-                left = (new IntType(Basic.INT));
-                break;
-            case TOK_KW_CHAR:
-                left = (new CharType(Basic.CHAR));
-                break;
-            case TOK_OPEN_PARENTHESIS:
-                next = parser.consume();
-                left = (new TupleTypeParselet().parse(parser,next));
-                break;
-            case TOK_OPEN_BRACKETS:
-                next = parser.consume();
-                left = (new TypeParselet().parse(parser, next));
-                break;
-            default:
-                throw new ParseException(parser, "Invalid argument type");
+        Type left = new TypeParselet().parse(parser, token);
 
+        if(!parser.match(TokenType.TOK_COMMA)) {
+            throw new ParseException(parser, "Tuple type with missing comma");
         }
 
-        if(parser.match(TokenType.TOK_COMMA)){
-            Token rightToken = parser.consume();
-            switch(rightToken.getType()){
-                case TOK_KW_BOOL:
-                    right = new BoolType(Basic.BOOL);
-                    break;
-                case TOK_KW_INT:
-                    right = (new IntType(Basic.INT));
-                    break;
-                case TOK_KW_CHAR:
-                    right = (new CharType(Basic.CHAR));
-                    break;
-                case TOK_OPEN_PARENTHESIS:
-                    next = parser.consume();
-                    right = (new TupleTypeParselet().parse(parser,next));
-                    break;
-                case TOK_OPEN_BRACKETS:
-                    next = parser.consume();
-                    right = (new TypeParselet().parse(parser, next));
-                    break;
-                default:
-                    throw new ParseException(parser, "Invalid argument type");
+        Type right = new TypeParselet().parse(parser, parser.consume());
 
-            }
-
-            return new TupleType(left, right);
-
-
+        if(!parser.match(TokenType.TOK_CLOSE_PARENTHESIS)){
+            throw new ParseException(parser, "Tuple type with missing closing parenthesis.");
         }
-        else{
-            throw new ParseException(parser, "Error in parsing, Tuple type with missing comma ',' \n"+parser.getLine());
-        }
+
+        return new TupleType(left, right);
     }
 
 }

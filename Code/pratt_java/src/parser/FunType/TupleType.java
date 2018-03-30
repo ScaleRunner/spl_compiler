@@ -1,12 +1,14 @@
 package parser.FunType;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import typechecker.Substitution;
 import util.Visitor;
 
 import java.util.Objects;
 
 public class TupleType extends Type{
-    Type left;
-    Type right;
+    public final Type left;
+    public final Type right;
 
     public TupleType(Type left, Type right){
         this.left = left;
@@ -31,5 +33,10 @@ public class TupleType extends Type{
     public int hashCode() {
 
         return Objects.hash(left, right);
+    }
+
+    @Override
+    public Type applySubstitution(Substitution substitution) {
+        throw new NotImplementedException();
     }
 }

@@ -1,15 +1,23 @@
 package parser.FunType;
 
+import typechecker.Substitution;
 import util.Visitor;
 
 import java.util.Objects;
 
-public class CharType extends BasicType {
+public class CharType extends Type {
 
-    Basic b;
+    private static CharType instance = null;
 
-    public CharType(Basic b){
-        this.b = b;
+    private CharType(){
+
+    }
+
+    public static CharType getInstance(){
+        if(instance == null){
+            instance = new CharType();
+        }
+        return instance;
     }
 
     @Override
@@ -18,16 +26,7 @@ public class CharType extends BasicType {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CharType charType = (CharType) o;
-        return b == charType.b;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(b);
+    public Type applySubstitution(Substitution substitution) {
+        return this;
     }
 }

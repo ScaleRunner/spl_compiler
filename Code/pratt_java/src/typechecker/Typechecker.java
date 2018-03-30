@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import parser.FunType.Type;
+import parser.FunType.Types;
 import parser.expressions.*;
 import parser.statements.*;
 import util.Node;
@@ -13,9 +15,10 @@ import util.Visitor;
 public class Typechecker implements Visitor {
 
 	// These are for convenience.
-	private static final Type typeInt = new TypeInt();
-	private static final Type typeBool = new TypeBool();
-    private static final Type typeChar = new TypeChar();
+	private final Type typeInt = Types.intType;
+	private final Type typeBool = Types.boolType;
+    private final Type typeChar = Types.charType;
+    private final Type typeVoid = Types.voidType;
 
 	private HashMap<String, Type> env;
 
@@ -58,7 +61,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(BooleanExpression e) {
-		e.setType(new TypeBool());
+		e.setType(typeBool);
 	}
 
 	@Override
@@ -68,7 +71,7 @@ public class Typechecker implements Visitor {
 
     @Override
     public void visit(CharacterExpression e) {
-        e.setType(new TypeChar());
+        e.setType(typeChar);
     }
 
 	@Override
@@ -78,7 +81,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(IntegerExpression e) {
-		e.setType(new TypeInt());
+		e.setType(typeInt);
 	}
 
 	@Override

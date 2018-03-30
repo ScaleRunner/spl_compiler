@@ -4,6 +4,8 @@ import lexer.Lexer;
 import org.junit.Before;
 import org.junit.Test;
 
+import parser.FunType.Type;
+import parser.FunType.Types;
 import parser.Parser;
 import parser.expressions.Expression;
 import typechecker.*;
@@ -11,12 +13,18 @@ import util.Node;
 
 public class TypecheckerTest {
 	private Typechecker tc = null;
+	// These are for convenience.
+	private final Type typeInt = Types.intType;
+	private final Type typeBool = Types.boolType;
+	private final Type typeChar = Types.charType;
+	private final Type typeVoid = Types.voidType;
+
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp(){
 		tc = new Typechecker();
 	}
-//
+
 	private void assertTypecheckSuccess() {
 		assertTrue(tc.getAllErrors(), tc.getAllErrors().length() == 0);
 	}
@@ -31,23 +39,23 @@ public class TypecheckerTest {
 
 	@Test
 	public void testCompareTypes() {
-		assertEquals(new TypeInt(), new TypeInt());
-		assertEquals(new TypeBool(), new TypeBool());
-		assertNotEquals(new TypeInt(), new TypeBool());
+		assertEquals(Types.intType, Types.intType);
+		assertEquals(Types.boolType, Types.boolType);
+		assertNotEquals(Types.boolType, Types.intType);
 	}
 
 	@Test
 	public void testIntegerConstant() {
 		Node e = typecheckExpr("5");
 		assertTypecheckSuccess();
-		assertEquals(new TypeInt(), e.getType());
+		assertEquals(typeInt, e.getType());
 	}
 
     @Test
     public void testCharacterConstant() {
         Node e = typecheckExpr("'a'");
         assertTypecheckSuccess();
-        assertEquals(new TypeChar(), e.getType());
+        assertEquals(typeChar, e.getType());
     }
 
     @Test
@@ -55,22 +63,22 @@ public class TypecheckerTest {
 		Node eTrue = typecheckExpr("True");
 		Node eFalse = typecheckExpr("False");
 		assertTypecheckSuccess();
-		assertEquals(new TypeBool(), eTrue.getType());
-		assertEquals(new TypeBool(), eFalse.getType());
+		assertEquals(Types.boolType, eTrue.getType());
+		assertEquals(Types.boolType, eFalse.getType());
 	}
 
 	@Test
 	public void testPlus() {
 		Node e = typecheckExpr("5 + 3");
 		assertTypecheckSuccess();
-		assertEquals(new TypeInt(), e.getType());
+		assertEquals(typeInt, e.getType());
 	}
 
 	@Test
 	public void testLessThan() {
 		Node e = typecheckExpr("5 < 3");
 		assertTypecheckSuccess();
-		assertEquals(new TypeBool(), e.getType());
+		assertEquals(Types.boolType, e.getType());
 	}
 
 	//	@Test

@@ -1,6 +1,6 @@
 package util;
 
-import typechecker.Type;
+import parser.FunType.Type;
 
 public abstract class Node {
 

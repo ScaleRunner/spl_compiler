@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class FunType extends Node {
-    List<Type> argsTypes;
-    Type returnType;
+    public final List<Type> argsTypes;
+    public final Type returnType;
 
     public FunType(List<Type> argsTypes , Type returnType){
         this.argsTypes = argsTypes;

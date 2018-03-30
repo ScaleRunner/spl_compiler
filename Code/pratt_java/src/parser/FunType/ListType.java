@@ -1,19 +1,19 @@
 package parser.FunType;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import typechecker.Substitution;
 import util.Visitor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class ListType extends Type{
-    Type type;
+
+    public final Type type;
 
     public ListType(Type type){
         this.type = type;
-    }
-
-    @Override
-    public void accept(Visitor v) {
-        
     }
 
     @Override
@@ -29,4 +29,15 @@ public class ListType extends Type{
 
         return Objects.hash(type);
     }
+
+    @Override
+    public void accept(Visitor v) {
+
+    }
+
+    @Override
+    public Type applySubstitution(Substitution substitution) {
+        throw new NotImplementedException();
+    }
 }
+

@@ -1,6 +1,6 @@
 package util;
 
-public class TypeError {
+public class TypeError{
     private final String errorMessage;
 
     public String getErrorMessage() {

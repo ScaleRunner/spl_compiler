@@ -1,14 +1,23 @@
 package parser.FunType;
 
+import typechecker.Substitution;
 import util.Visitor;
 
 import java.util.Objects;
 
 public class VoidType extends Type{
-    Return b;
 
-    public VoidType(Return b){
-        this.b = b;
+    private static VoidType instance;
+
+    private VoidType(){
+
+    }
+
+    public static VoidType getInstance(){
+        if(instance == null){
+            instance = new VoidType();
+        }
+        return instance;
     }
 
     @Override
@@ -17,16 +26,8 @@ public class VoidType extends Type{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        VoidType voidType = (VoidType) o;
-        return b == voidType.b;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(b);
+    public Type applySubstitution(Substitution substitution) {
+        return this;
     }
 }
+
