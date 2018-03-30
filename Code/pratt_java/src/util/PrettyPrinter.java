@@ -1,5 +1,8 @@
 package util;
 
+import parser.declarations.Declaration;
+import parser.declarations.FunctionDeclaration;
+import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import lexer.Token;
 import lexer.TokenType;
@@ -90,21 +93,13 @@ public class PrettyPrinter implements Visitor {
     public void visit(Expression e){
         if (e.getClass() == BooleanExpression.class) {
             this.visit((BooleanExpression) e);
-        }
-
-        else if(e.getClass() == CallExpression.class){
+        } else if(e.getClass() == CallExpression.class){
             this.visit((CallExpression) e);
-        }
-
-        else if(e.getClass() == CharacterExpression.class){
+        } else if(e.getClass() == CharacterExpression.class){
             this.visit((CharacterExpression) e);
-        }
-
-        else if(e.getClass() == IdentifierExpression.class){
+        } else if(e.getClass() == IdentifierExpression.class){
             this.visit((IdentifierExpression) e);
-        }
-
-        else if(e.getClass() == IntegerExpression.class){
+        } else if(e.getClass() == IntegerExpression.class){
             this.visit((IntegerExpression) e);
         } else if (e.getClass() == ListExpression.class) {
             this.visit((ListExpression) e);
@@ -237,6 +232,21 @@ public class PrettyPrinter implements Visitor {
         builder.append("return ");
         this.visit(s.arg);
         builder.append(";");
+    }
+
+    @Override
+    public void visit(Declaration d) {
+
+    }
+
+    @Override
+    public void visit(FunctionDeclaration d) {
+
+    }
+
+    @Override
+    public void visit(VariableDeclaration d) {
+
     }
 
     @Override

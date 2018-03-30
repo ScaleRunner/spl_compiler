@@ -1,5 +1,8 @@
 package util;
 
+import parser.declarations.Declaration;
+import parser.declarations.FunctionDeclaration;
+import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 
@@ -12,9 +15,9 @@ public interface Visitor {
 
     void visit(BooleanExpression e);
 
-    void visit(CharacterExpression e);
-
     void visit(CallExpression e);
+
+    void visit(CharacterExpression e);
 
     void visit(IdentifierExpression e);
 
@@ -46,5 +49,12 @@ public interface Visitor {
     void visit(PrintStatement s);
 
     void visit(ReturnStatement s);
+
+    // Declaration
+    void visit(Declaration d);
+
+    void visit(FunctionDeclaration d);
+
+    void visit(VariableDeclaration d);
 
 }

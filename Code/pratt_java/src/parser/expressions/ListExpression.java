@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Identifier Expression: abc
+ * List Expression: []
  */
 public class ListExpression extends Expression {
 

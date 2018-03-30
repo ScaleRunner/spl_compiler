@@ -6,6 +6,9 @@ import java.util.List;
 
 import parser.FunType.Type;
 import parser.FunType.Types;
+import parser.declarations.Declaration;
+import parser.declarations.FunctionDeclaration;
+import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import util.Node;
@@ -66,7 +69,7 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(CallExpression e) {
-
+        e.setType(env.get(e.function_name.name));
 	}
 
     @Override
@@ -86,7 +89,8 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(ListExpression e) {
-
+	    // A list expression starts out as an empty list, so initially its nothing
+        e.setType(null);
 	}
 
 	@Override
@@ -189,6 +193,21 @@ public class Typechecker implements Visitor {
 	public void visit(ReturnStatement s) {
         s.setType(s.arg.getType());
 	}
+
+    @Override
+    public void visit(Declaration d) {
+
+    }
+
+    @Override
+    public void visit(FunctionDeclaration d) {
+
+    }
+
+    @Override
+    public void visit(VariableDeclaration d) {
+
+    }
 
 
 //	@Override
