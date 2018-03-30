@@ -1,35 +1,31 @@
 package parser.declarations;
 
-import parser.expressions.Expression;
+import parser.FunType.FunType;
+import parser.FunType.Type;
 import parser.expressions.IdentifierExpression;
-import lexer.Token;
 import parser.statements.Statement;
 import util.Visitor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import lexer.TokenType;
 
 public class FunctionDeclaration extends Declaration{
     IdentifierExpression funName;
     List<IdentifierExpression> args;
     List<Declaration> decls;
     List<Statement> stats;
-    List<TokenType> fargsTypes;
-    TokenType returnType;
+    FunType funType;
 
     //TODO
-    //FunType?
+    //Type?
 
-    public FunctionDeclaration(IdentifierExpression funName,List<IdentifierExpression> args, List<Declaration> decls, List<Statement> stats, List<TokenType> fargsTypes,
-                               TokenType returnType) {
+    public FunctionDeclaration(IdentifierExpression funName,List<IdentifierExpression> args, List<Declaration> decls,
+                               List<Statement> stats, FunType funType) {
         this.funName = funName;
         this.args = args;
         this.decls = decls;
         this.stats = stats;
-        this.fargsTypes = fargsTypes;
-        this.returnType = returnType;
+        this.funType = funType;
     }
 
     @Override
@@ -46,13 +42,12 @@ public class FunctionDeclaration extends Declaration{
                 Objects.equals(args, that.args) &&
                 Objects.equals(decls, that.decls) &&
                 Objects.equals(stats, that.stats) &&
-                Objects.equals(fargsTypes, that.fargsTypes) &&
-                returnType == that.returnType;
+                Objects.equals(funType, that.funType);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(funName, args, decls, stats, fargsTypes, returnType);
+        return Objects.hash(funName, args, decls, stats, funType);
     }
 }

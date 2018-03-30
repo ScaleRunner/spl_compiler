@@ -1,6 +1,8 @@
+import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
+import parser.declarations.parselets.TypeParselet;
 import parser.expressions.*;
 import lexer.Lexer;
 import lexer.Token;
@@ -912,7 +914,7 @@ public class ParserTest {
 
     @Test
     public void testSPLSingleFunctionDeclaration() {
-        Lexer l = new Lexer("sumOfTwoNumbers(a,b){\n" +
+        Lexer l = new Lexer("sumOfTwoNumbers(a,b)::->Void{\n" +
                                     "a = b;\n" +
                                 "}");
         List<Token> tokens = l.tokenize();
@@ -930,11 +932,26 @@ public class ParserTest {
 
         stats.add(new AssignStatement(new IdentifierExpression("a"), new IdentifierExpression("b")));
 
+        List<Type> fargsType = new ArrayList<>();
 
-        actual.add(new FunctionDeclaration(name,args, decls, stats, new ArrayList<>(), null));
+        Type returnType = new VoidType(Return.VOID);
+
+        FunType funtype = new FunType(fargsType, returnType);
+
+
+        actual.add(new FunctionDeclaration(name,args, decls, stats, funtype));
 
         assertEquals(result, actual);
 
+    }
+
+    @Test
+    public void testParseInt(){
+        List<Token> tokens = new Lexer("Int").tokenize();
+        Parser p = new Parser(tokens);
+        Type expected = new IntType(Basic.INT);
+        Type actual = new TypeParselet().parse(tokens.get(0));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -952,14 +969,16 @@ public class ParserTest {
         List<Declaration> decls = new ArrayList<>();
         List<Statement> stats = new ArrayList<>();
 
-        List<TokenType> fargsType = new ArrayList<>();
+        List<Type> fargsType = new ArrayList<>();
 
-        TokenType returnType = TokenType.TOK_KW_VOID;
+        Type returnType = new VoidType(Return.VOID);
+
+        FunType funType = new FunType(fargsType, returnType);
 
 
         stats.add(new AssignStatement(new IdentifierExpression("a"), new IdentifierExpression("b")));
 
-        actual.add(new FunctionDeclaration(name, args, decls, stats, fargsType, returnType));
+        actual.add(new FunctionDeclaration(name, args, decls, stats, funType));
 
         assertEquals(result, actual);
 
@@ -981,18 +1000,20 @@ public class ParserTest {
         List<Declaration> decls = new ArrayList<>();
         List<Statement> stats = new ArrayList<>();
 
-        List<TokenType> fargsType = new ArrayList<>();
-        fargsType.add(TokenType.TOK_KW_INT);
-        fargsType.add(TokenType.TOK_KW_INT);
+        List<Type> fargsType = new ArrayList<>();
+        fargsType.add(new IntType(Basic.INT));
+        fargsType.add(new IntType(Basic.INT));
 
-        TokenType returnType = TokenType.TOK_KW_VOID;
+        Type returnType = new VoidType(Return.VOID);
+
+        FunType funType = new FunType(fargsType, returnType);
 
         args.add(new IdentifierExpression("a"));
         args.add(new IdentifierExpression("b"));
 
         stats.add(new AssignStatement(new IdentifierExpression("a"), new IdentifierExpression("b")));
 
-        actual.add(new FunctionDeclaration(name, args, decls, stats, fargsType, returnType));
+        actual.add(new FunctionDeclaration(name, args, decls, stats, funType));
 
         assertEquals(result, actual);
 
@@ -1021,11 +1042,12 @@ public class ParserTest {
         List<Declaration> decls = new ArrayList<>();
         List<Statement> stats = new ArrayList<>();
 
-        List<TokenType> fargsType = new ArrayList<>();
-        fargsType.add(TokenType.TOK_KW_INT);
-        fargsType.add(TokenType.TOK_KW_INT);
+        List<Type> fargsType = new ArrayList<>();
+        fargsType.add(new IntType(Basic.INT));
+        fargsType.add(new IntType(Basic.INT));
 
-        TokenType returnType = TokenType.TOK_KW_VOID;
+        Type returnType = new VoidType(Return.VOID);
+        FunType funType = new FunType(fargsType, returnType);
 
         args.add(new IdentifierExpression("a"));
         args.add(new IdentifierExpression("b"));
@@ -1048,7 +1070,7 @@ public class ParserTest {
         temp.add(new IdentifierExpression("c"));
         stats.add(new ReturnStatement(temp));
 
-        actual.add(new FunctionDeclaration(name, args, decls, stats, fargsType, returnType));
+        actual.add(new FunctionDeclaration(name, args, decls, stats, funType));
 
         assertEquals(result, actual);
 
@@ -1294,12 +1316,13 @@ public class ParserTest {
                 elseArm
         ));
 
-        List<TokenType> fargsType = new ArrayList<>();
-        fargsType.add(TokenType.TOK_KW_INT);
+        List<Type> fargsType = new ArrayList<>();
+        fargsType.add(new IntType(Basic.INT));
 
-        TokenType returnType = TokenType.TOK_KW_INT;
+        Type returnType = new IntType(Basic.INT);
+        FunType funType = new FunType(fargsType, returnType);
 
-        actual.add(new FunctionDeclaration(name, args, decls, stats, fargsType, returnType));
+        actual.add(new FunctionDeclaration(name, args, decls, stats, funType));
 
         assertEquals(result, actual);
 
