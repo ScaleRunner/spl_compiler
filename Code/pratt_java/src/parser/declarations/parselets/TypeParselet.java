@@ -17,6 +17,8 @@ public class TypeParselet {
                 return Types.intType;
             case TOK_KW_CHAR:
                 return Types.charType;
+            case TOK_KW_VAR:
+                return Types.varType;
             case TOK_OPEN_PARENTHESIS:
                 next = parser.consume();
                 return new TupleTypeParselet().parse(parser,next);

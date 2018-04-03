@@ -53,7 +53,6 @@ public class FunctionDeclarationParselet {
                 if(parser.match(TokenType.TOK_CLOSE_PARENTHESIS)){
 
                     if(parser.match(TokenType.TOK_FUNC_TYPE_DEF)){
-                        //TODO: TUPLES, LISTS
                         Token tokentype = parser.consume();
                         if( (tokentype.getType() == TokenType.TOK_KW_BOOL)||
                                 (tokentype.getType() == TokenType.TOK_KW_INT)||
@@ -89,7 +88,8 @@ public class FunctionDeclarationParselet {
                         while (parser.lookAhead(0).getType() == TokenType.TOK_KW_VAR ||
                                 parser.lookAhead(0).getType() == TokenType.TOK_KW_CHAR ||
                                 parser.lookAhead(0).getType() == TokenType.TOK_KW_INT ||
-                                parser.lookAhead(0).getType() == TokenType.TOK_KW_BOOL) {
+                                parser.lookAhead(0).getType() == TokenType.TOK_KW_BOOL ||
+                                parser.lookAhead(0).getType() == TokenType.TOK_OPEN_BRACKETS) {
                             //PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
 
                             //if (prefix == null) throw new ParseException(this, token);

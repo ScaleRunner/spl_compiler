@@ -141,7 +141,8 @@ public class Parser {
         if (token.getType() == TokenType.TOK_KW_VAR ||
                 token.getType() == TokenType.TOK_KW_CHAR ||
                 token.getType() == TokenType.TOK_KW_INT ||
-                token.getType() == TokenType.TOK_KW_BOOL) {
+                token.getType() == TokenType.TOK_KW_BOOL ||
+                token.getType() == TokenType.TOK_OPEN_BRACKETS) {
 
             return new VariableDeclarationParselet().parse(this, token);
         }
