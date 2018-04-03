@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class ListType extends Type{
 
-    public final Type listType;
+    public Type listType;
 
     public ListType(Type listType){
         this.listType = listType;
@@ -25,11 +25,6 @@ public class ListType extends Type{
     public int hashCode() {
 
         return Objects.hash(listType);
-    }
-
-    @Override
-    public void accept(Visitor v) {
-
     }
 
     @Override

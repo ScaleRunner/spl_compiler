@@ -19,11 +19,6 @@ public class BoolType extends Type {
     }
 
     @Override
-    public void accept(Visitor v) {
-
-    }
-
-    @Override
     public Type applySubstitution(Substitution substitution) {
         return this;
     }

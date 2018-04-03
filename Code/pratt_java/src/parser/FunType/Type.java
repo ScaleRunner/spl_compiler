@@ -4,7 +4,7 @@ import typechecker.Substitution;
 import util.Node;
 import util.Visitor;
 
-public abstract class Type extends Node {
+public abstract class Type {
     public abstract Type applySubstitution(Substitution substitution);
 
     // This is an alternative implementation of the unification algorithm.

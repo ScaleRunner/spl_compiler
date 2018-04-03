@@ -21,11 +21,6 @@ public class VoidType extends Type{
     }
 
     @Override
-    public void accept(Visitor v) {
-
-    }
-
-    @Override
     public Type applySubstitution(Substitution substitution) {
         return this;
     }

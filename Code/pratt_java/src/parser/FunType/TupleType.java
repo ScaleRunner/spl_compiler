@@ -15,11 +15,6 @@ public class TupleType extends Type{
     }
 
     @Override
-    public void accept(Visitor v) {
-
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

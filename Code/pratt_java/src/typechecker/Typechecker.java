@@ -94,7 +94,7 @@ public class Typechecker implements Visitor {
 	@Override
 	public void visit(ListExpression e) {
 	    // A list expression starts out as an empty list, so initially its nothing
-        e.setType(null);
+        e.setType(Types.listType(null));
 	}
 
 	@Override
@@ -110,9 +110,6 @@ public class Typechecker implements Visitor {
          */
         e.left.accept(this);
 		e.right.accept(this);
-
-
-
 
 		if(e.left.getType() instanceof IntType){
 
@@ -142,22 +139,24 @@ public class Typechecker implements Visitor {
 						e.setType(typeBool);
 					break;
 				case TOK_CONS:
-					if(!(e.right.getType() instanceof ListType) && e.right.getType() != null){
+					if(!(e.right.getType() instanceof ListType)){
 						error("Typechecker: Right hand side of cons expression must have listType list");
 					}
 
-					if((e.right.getType() != null)){
-						if( (e.left.getType() != e.right.getType()) ){
-							error("Typechecker: Left and right side of and expression must have the same listType. "+
-									e.left.getType() + ' ' +e.right.getType() );
-						}
+					ListType listTypeRight = (ListType) e.right.getType();
+
+					if(listTypeRight.listType == null){
+						listTypeRight.listType = e.left.getType();
+						e.right.setType(listTypeRight);
 					}
 
-
-					else{
-						e.setType(Types.listType(e.left.getType()));
-
+					if(e.left.getType() != listTypeRight.listType){
+						error("Typechecker: Left and right side of and expression must have the same listType. "+
+								e.left.getType() + ' ' + e.right.getType() );
 					}
+
+					e.setType(listTypeRight);
+
 					break;
 				default:
 					error("Typechecker: Unknown operator " + e.operator);

@@ -326,7 +326,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void visit(ListType t) {
         builder.append('[');
-        Type.visitType(this, t.type);
+        Type.visitType(this, t.listType);
         builder.append(']');
     }
 
