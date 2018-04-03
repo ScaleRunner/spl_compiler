@@ -1,5 +1,6 @@
 package typechecker;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -330,7 +331,12 @@ public class Typechecker implements Visitor {
 
     }
 
-    @Override
+	@Override
+	public void visit(ArrayList<Declaration> ds) {
+
+	}
+
+	@Override
     public void visit(FunctionDeclaration d) {
 
     }
@@ -339,6 +345,41 @@ public class Typechecker implements Visitor {
     public void visit(VariableDeclaration d) {
 
     }
+
+	@Override
+	public void visit(BoolType t) {
+
+	}
+
+	@Override
+	public void visit(CharType t) {
+
+	}
+
+	@Override
+	public void visit(FunType t) {
+
+	}
+
+	@Override
+	public void visit(IntType t) {
+
+	}
+
+	@Override
+	public void visit(ListType t) {
+
+	}
+
+	@Override
+	public void visit(TupleType t) {
+
+	}
+
+	@Override
+	public void visit(VoidType t) {
+
+	}
 
 
 //	@Override

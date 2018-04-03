@@ -2,6 +2,7 @@ package parser.declarations;
 
 import parser.expressions.Expression;
 import lexer.TokenType;
+import parser.expressions.IdentifierExpression;
 import util.Visitor;
 
 import java.util.Objects;
@@ -9,10 +10,10 @@ import java.util.Objects;
 public class VariableDeclaration extends Declaration{
 
     public final TokenType varType;
-    public final Expression left;
+    public final IdentifierExpression left;
     public final Expression right;
 
-    public VariableDeclaration(TokenType varType, Expression name, Expression right) {
+    public VariableDeclaration(TokenType varType, IdentifierExpression name, Expression right) {
         this.varType = varType;
         this.left = name;
         this.right = right;
@@ -36,6 +37,6 @@ public class VariableDeclaration extends Declaration{
 
     @Override
     public void accept(Visitor v) {
-
+        v.visit(this);
     }
 }

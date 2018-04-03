@@ -52,4 +52,22 @@ public abstract class Type extends Node {
         throw new Error("cannot unify types " + t1.toString() + " and "
                 + t2.toString());
     }
+
+    public static void visitType(Visitor v, Type t){
+        if (t.getClass() == BoolType.class) {
+            v.visit((BoolType) t);
+        } else if(t.getClass() == CharType.class){
+            v.visit((CharType) t);
+        } else if(t.getClass() == IntType.class){
+            v.visit((IntType) t);
+        } else if(t.getClass() == ListType.class){
+            v.visit((ListType) t);
+        } else if (t.getClass() == TupleType.class) {
+            v.visit((TupleType) t);
+        } else if(t.getClass() == VoidType.class){
+            v.visit((VoidType) t);
+        } else throw new UnsupportedOperationException(
+                String.format("Visitation not implemented for Type %s", t.getClass().toString())
+        );
+    }
 }
