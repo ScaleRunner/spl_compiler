@@ -862,7 +862,7 @@ public class ParserTest {
         Parser p = new Parser(tokens);
         List<Declaration> result = p.parseSPL();
         List<Declaration> actual = new ArrayList<>();
-        actual.add(new VariableDeclaration(TokenType.TOK_KW_VAR,
+        actual.add(new VariableDeclaration(Types.varType,
                             new IdentifierExpression("alan"),
                             new OperatorExpression(
                                     new IntegerExpression(5),
@@ -1010,8 +1010,8 @@ public class ParserTest {
         args.add(new IdentifierExpression("a"));
         args.add(new IdentifierExpression("b"));
 
-        decls.add(new VariableDeclaration(TokenType.TOK_KW_INT, new IdentifierExpression("c"), new IntegerExpression(0) ));
-        decls.add(new VariableDeclaration(TokenType.TOK_KW_VAR,new IdentifierExpression("useless"), new IntegerExpression(2) ));
+        decls.add(new VariableDeclaration(Types.intType, new IdentifierExpression("c"), new IntegerExpression(0) ));
+        decls.add(new VariableDeclaration(Types.varType,new IdentifierExpression("useless"), new IntegerExpression(2) ));
 
 
         stats.add(new AssignStatement(
@@ -1032,6 +1032,7 @@ public class ParserTest {
         assertEquals(result, actual);
 
     }
+
 //    @Test
 //    public void testStatementIf() {
 //        Lexer l = new Lexer("if (a>0 && a * 2 < 4){ b = 5 *6 if (a == 2){ c = 3 } } else { a = 3 } ");
@@ -1083,6 +1084,7 @@ public class ParserTest {
 //                        elsee
 //                    )
 //        );
+
     @Test
     public void testParanthesesBomb() {
         // Expected: ((True == (a > ((4 * b) + 5))) && (this == fun))
@@ -1417,4 +1419,66 @@ public class ParserTest {
 
     }
 
+
+    /* ************************
+    *   START OF GIVEN TESTS  *
+    **************************/
+
+    /**
+     * This Test should fail because variables declarations are only allowed before any statements.
+     */
+    @Test(expected = ParseException.class)
+    public void testIfThenElseWithVariables() {
+        Lexer l = new Lexer("main()::->Void\n"+
+                "{\n"+
+                "    if( True )\n"+
+                "    {\n"+
+                "        Int a = 10;\n"+
+                "        print(a);\n"+
+                "    }\n"+
+                "    else\n"+
+                "    {\n"+
+                "        print(100);\n"+
+                "    }\n"+
+                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseSPL();
+    }
+
+    @Test(expected = ParseException.class)
+    public void testKeywords() {
+        Lexer l = new Lexer("main() :: -> Void\n"+
+                "{\n"+
+                "    // This might or might not work, depending on your implementation. Explain why or why not!\n"+
+                "    //Int while = 10;\n"+
+                "    \n"+
+                "    //Bool if = True;\n"+
+                "    //if(if) {} else { }\n"+
+                "    \n"+
+                "\n"+
+                "    // These should be parse errors\n"+
+                "    /*if if(True) {} else {}*/\n"+
+                "    /*if(True) {} else else {}*/\n"+
+                "    /*while;*/\n"+
+                "    /*10;*/\n"+
+                "    /*True;*/\n"+
+                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseSPL();
+    }
+
+    @Test(expected = ParseException.class)
+    public void testMissingCons() {
+        Lexer l = new Lexer("main()::->Void\n" +
+                        "{\n" +
+                        "    // parse error\n" +
+                        "    [Int] a = 7:8:9[];\n" +
+                        "    print(a.hd);\n" +
+                        "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseSPL();
+    }
 }

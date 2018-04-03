@@ -1,5 +1,6 @@
 package parser.declarations.parselets;
 
+import parser.FunType.Type;
 import parser.expressions.Expression;
 import parser.expressions.IdentifierExpression;
 import lexer.Token;
@@ -11,7 +12,7 @@ import parser.declarations.VariableDeclaration;
 public class VariableDeclarationParselet {
 
     public VariableDeclaration parse(Parser parser,  Token token) {
-        TokenType varType = token.getType();
+        Type varType = new TypeParselet().parse(parser, token);
 
         if(parser.lookAhead(0).getType() != TokenType.TOK_IDENTIFIER)
             throw new ParseException(parser, "Identifier in variable declaration is missing");

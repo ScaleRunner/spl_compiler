@@ -152,6 +152,15 @@ public class PrettyPrinter implements Visitor {
         builder.append(")");
     }
 
+    /**
+     * Prints a conditional expression as:
+     *         if(CONDITION) {
+     *              ...
+     *         } else {
+     *              ...
+     *         }
+     * @param e expression
+     */
     @Override
     public void visit(ConditionalStatement e) {
         builder.append("if").append("(");
@@ -161,12 +170,13 @@ public class PrettyPrinter implements Visitor {
         prefix = prefix + '\t';
         this.visit(e.then_expression);
         prefix = prefix.replaceFirst("\t", "");
-        builder.append("\n").append(prefix).append("} else {\n");
-        prefix = prefix + '\t';
-        this.visit(e.else_expression);
-        prefix = prefix.replaceFirst("\t", "");
+        if(e.else_expression.size() > 0) {
+            builder.append('\n').append(prefix).append("} else {\n");
+            prefix = prefix + '\t';
+            this.visit(e.else_expression);
+            prefix = prefix.replaceFirst("\t", "");
+        }
         builder.append('\n').append(prefix).append("}");
-
     }
 
     @Override
@@ -198,7 +208,9 @@ public class PrettyPrinter implements Visitor {
 
     /**
      * Prints a conditional expression as:
-     *         (if (CONDITIONAL) {EXPRESSION} else {EXPRESSION})
+     *         while(CONDITION) {
+     *              ...
+     *         }
      * @param e expression
      */
     @Override
@@ -206,7 +218,9 @@ public class PrettyPrinter implements Visitor {
         builder.append("while").append("(");
         this.visit(e.condition);
         builder.append(") {\n");
+        prefix = prefix + '\t';
         this.visit(e.body);
+        prefix = prefix.replaceFirst("\t", "");
         builder.append("\n").append(prefix).append("}");
     }
 
@@ -280,7 +294,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void visit(VariableDeclaration d) {
         if(d.varType != null){
-            builder.append(d.varType.getValue());
+            Type.visitType(this, d.varType);
         } else {
             builder.append("var");
         }

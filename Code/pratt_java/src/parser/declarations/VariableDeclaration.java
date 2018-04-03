@@ -1,5 +1,6 @@
 package parser.declarations;
 
+import parser.FunType.Type;
 import parser.expressions.Expression;
 import lexer.TokenType;
 import parser.expressions.IdentifierExpression;
@@ -9,11 +10,11 @@ import java.util.Objects;
 
 public class VariableDeclaration extends Declaration{
 
-    public final TokenType varType;
+    public final Type varType;
     public final IdentifierExpression left;
     public final Expression right;
 
-    public VariableDeclaration(TokenType varType, IdentifierExpression name, Expression right) {
+    public VariableDeclaration(Type varType, IdentifierExpression name, Expression right) {
         this.varType = varType;
         this.left = name;
         this.right = right;
