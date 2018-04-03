@@ -98,7 +98,6 @@ public class PrettyPrinter implements Visitor {
         Expression.visitExpression(this, e);
     }
 
-    @Override
     public void visit(List<Statement> es){
         for(int i = 0; i < es.size(); i++) {
             builder.append(prefix);
@@ -245,7 +244,6 @@ public class PrettyPrinter implements Visitor {
         Declaration.visitDeclaration(this, d);
     }
 
-    @Override
     public void visit(ArrayList<Declaration> ds) {
         for(int i = 0; i < ds.size(); i++) {
             Declaration.visitDeclaration(this, ds.get(i));
@@ -308,17 +306,14 @@ public class PrettyPrinter implements Visitor {
         builder.append(";\n");
     }
 
-    @Override
     public void visit(BoolType t) {
         builder.append(TokenType.TOK_KW_BOOL.getValue());
     }
 
-    @Override
     public void visit(CharType t) {
         builder.append(TokenType.TOK_KW_CHAR.getValue());
     }
 
-    @Override
     public void visit(FunType fType) {
         for(int i = 0; i < fType.argsTypes.size(); i++){
             Type.visitType(this, fType.argsTypes.get(i));
@@ -332,19 +327,16 @@ public class PrettyPrinter implements Visitor {
         Type.visitType(this, fType.returnType);
     }
 
-    @Override
     public void visit(IntType t) {
         builder.append(TokenType.TOK_KW_INT.getValue());
     }
 
-    @Override
     public void visit(ListType t) {
         builder.append('[');
         Type.visitType(this, t.listType);
         builder.append(']');
     }
 
-    @Override
     public void visit(TupleType t) {
         builder.append('(');
         Type.visitType(this, t.left);
@@ -353,7 +345,6 @@ public class PrettyPrinter implements Visitor {
         builder.append(')');
     }
 
-    @Override
     public void visit(VoidType t) {
         builder.append(TokenType.TOK_KW_VOID.getValue());
     }
