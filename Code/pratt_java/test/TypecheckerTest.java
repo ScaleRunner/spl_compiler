@@ -102,6 +102,27 @@ public class TypecheckerTest {
 		assertEquals(Types.listType(Types.intType), e.getType());
 	}
 
+	@Test
+	public void testConsCharNotEmpty() {
+		Node e = typecheckExpr("'a':'b':'c':[]");
+		assertTypecheckSuccess();
+		assertEquals(Types.listType(Types.charType), e.getType());
+	}
+
+	@Test
+	public void testConsBoolNotEmpty() {
+		Node e = typecheckExpr("'False':'False':'True':[]");
+		assertTypecheckSuccess();
+		assertEquals(Types.listType(Types.boolType), e.getType());
+	}
+
+	@Test
+	public void testConsTupleNotEmpty() {
+		Node e = typecheckExpr("(1,'a'):(2,'b'):(3,'c'):[]");
+		assertTypecheckSuccess();
+		assertEquals(Types.listType(Types.tupleType(typeInt, typeChar)), e.getType());
+	}
+
 
 
 	//	@Test
