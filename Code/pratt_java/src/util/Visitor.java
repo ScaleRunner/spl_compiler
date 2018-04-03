@@ -38,7 +38,7 @@ public interface Visitor {
     // Statements
     void visit(Statement s);
 
-    void visit(List<Statement> ss);
+//    void visit(List<Statement> ss);
 
     void visit(AssignStatement s);
 
@@ -55,25 +55,25 @@ public interface Visitor {
     // Declaration
     void visit(Declaration d);
 
-    void visit(ArrayList<Declaration> ds);
+//    void visit(ArrayList<Declaration> ds);
 
     void visit(FunctionDeclaration d);
 
     void visit(VariableDeclaration d);
 
     // Types
-    void visit(BoolType t);
-
-    void visit(CharType t);
-
-    void visit(FunType t);
-
-    void visit(IntType t);
-
-    void visit(ListType t);
-
-    void visit(TupleType t);
-
-    void visit(VoidType t);
+//    void visit(BoolType t);
+//
+//    void visit(CharType t);
+//
+//    void visit(FunType t);
+//
+//    void visit(IntType t);
+//
+//    void visit(ListType t);
+//
+//    void visit(TupleType t);
+//
+//    void visit(VoidType t);
 
 }

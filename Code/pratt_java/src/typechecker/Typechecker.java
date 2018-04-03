@@ -254,11 +254,6 @@ public class Typechecker implements Visitor {
 	}
 
 	@Override
-	public void visit(List<Statement> ss) {
-
-	}
-
-	@Override
 	public void visit(AssignStatement s) {
 
 	}
@@ -295,11 +290,6 @@ public class Typechecker implements Visitor {
     }
 
 	@Override
-	public void visit(ArrayList<Declaration> ds) {
-
-	}
-
-	@Override
     public void visit(FunctionDeclaration d) {
 
     }
@@ -308,42 +298,6 @@ public class Typechecker implements Visitor {
     public void visit(VariableDeclaration d) {
 
     }
-
-	@Override
-	public void visit(BoolType t) {
-
-	}
-
-	@Override
-	public void visit(CharType t) {
-
-	}
-
-	@Override
-	public void visit(FunType t) {
-
-	}
-
-	@Override
-	public void visit(IntType t) {
-
-	}
-
-	@Override
-	public void visit(ListType t) {
-
-	}
-
-	@Override
-	public void visit(TupleType t) {
-
-	}
-
-	@Override
-	public void visit(VoidType t) {
-
-	}
-
 
 //	@Override
 //	public void visit(AstAbstraction astLetBinding) {
@@ -360,7 +314,8 @@ public class Typechecker implements Visitor {
 //		astLetBinding.setType(new TypeFunction(astLetBinding.getAstType()
 //				.getType(), astLetBinding.getBody().getType()));
 //	}
-	public void consTypecheckAux(OperatorExpression e){
+
+	private void consTypecheckAux(OperatorExpression e){
 		if(!(e.right.getType() instanceof ListType)){
 			error("Typechecker: Right hand side of cons expression must have listType list");
 		}

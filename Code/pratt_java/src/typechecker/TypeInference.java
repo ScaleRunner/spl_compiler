@@ -150,11 +150,6 @@ public class TypeInference implements Visitor {
 	}
 
 	@Override
-	public void visit(List<Statement> ss) {
-
-	}
-
-	@Override
 	public void visit(AssignStatement s) {
 
 	}
@@ -190,11 +185,6 @@ public class TypeInference implements Visitor {
 	}
 
 	@Override
-	public void visit(ArrayList<Declaration> ds) {
-
-	}
-
-	@Override
 	public void visit(FunctionDeclaration d) {
 
 	}
@@ -204,40 +194,6 @@ public class TypeInference implements Visitor {
 
 	}
 
-	@Override
-	public void visit(BoolType t) {
-
-	}
-
-	@Override
-	public void visit(CharType t) {
-
-	}
-
-	@Override
-	public void visit(FunType t) {
-
-	}
-
-	@Override
-	public void visit(IntType t) {
-
-	}
-
-	@Override
-	public void visit(ListType t) {
-
-	}
-
-	@Override
-	public void visit(TupleType t) {
-
-	}
-
-	@Override
-	public void visit(VoidType t) {
-
-	}
 ////
 ////	@Override
 ////	public void visit(AstExprInteger i) {

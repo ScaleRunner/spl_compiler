@@ -2,6 +2,7 @@ package parser.FunType;
 
 import typechecker.Substitution;
 import util.Node;
+import util.PrettyPrinter;
 import util.Visitor;
 
 public abstract class Type {
@@ -53,19 +54,24 @@ public abstract class Type {
                 + t2.toString());
     }
 
-    public static void visitType(Visitor v, Type t){
+    /**
+     * NOTE: Only works for the PrettyPrinter, not being used by the typechecker
+     * @param pp PrettyPrinter
+     * @param t Type
+     */
+    public static void visitType(PrettyPrinter pp, Type t){
         if (t.getClass() == BoolType.class) {
-            v.visit((BoolType) t);
+            pp.visit((BoolType) t);
         } else if(t.getClass() == CharType.class){
-            v.visit((CharType) t);
+            pp.visit((CharType) t);
         } else if(t.getClass() == IntType.class){
-            v.visit((IntType) t);
+            pp.visit((IntType) t);
         } else if(t.getClass() == ListType.class){
-            v.visit((ListType) t);
+            pp.visit((ListType) t);
         } else if (t.getClass() == TupleType.class) {
-            v.visit((TupleType) t);
+            pp.visit((TupleType) t);
         } else if(t.getClass() == VoidType.class){
-            v.visit((VoidType) t);
+            pp.visit((VoidType) t);
         } else throw new UnsupportedOperationException(
                 String.format("Visitation not implemented for Type %s", t.getClass().toString())
         );
