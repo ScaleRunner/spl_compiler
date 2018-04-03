@@ -7,10 +7,10 @@ import java.util.Objects;
 
 public class ListType extends Type{
 
-    public final Type type;
+    public final Type listType;
 
-    public ListType(Type type){
-        this.type = type;
+    public ListType(Type listType){
+        this.listType = listType;
     }
 
     @Override
@@ -18,13 +18,13 @@ public class ListType extends Type{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ListType listType = (ListType) o;
-        return Objects.equals(type, listType.type);
+        return Objects.equals(this.listType, listType.listType);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(type);
+        return Objects.hash(listType);
     }
 
     @Override

@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import parser.FunType.Type;
-import parser.FunType.Types;
+import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
@@ -15,10 +14,14 @@ import util.Node;
 import util.TypeError;
 import util.Visitor;
 
+import static parser.FunType.Types.charType;
+import static parser.FunType.Types.intType;
+import static parser.FunType.Types.voidType;
+
 public class Typechecker implements Visitor {
 
 	// These are for convenience.
-	private final Type typeInt = Types.intType;
+	private final Type typeInt = intType;
 	private final Type typeBool = Types.boolType;
     private final Type typeChar = Types.charType;
     private final Type typeVoid = Types.voidType;
@@ -107,32 +110,160 @@ public class Typechecker implements Visitor {
         e.left.accept(this);
 		e.right.accept(this);
 
-		switch (e.operator) {
-            case TOK_PLUS:
-            case TOK_MINUS:
-            case TOK_MULT:
-            case TOK_DIV:
-            case TOK_MOD:
-                if (e.left.getType().equals(typeInt) && e.right.getType().equals(typeInt))
-                    e.setType(typeInt);
-                 else
-                    error("Typechecker: Type Mismatch");
-                break;
 
-		    case TOK_LT:
-            case TOK_GT:
-            case TOK_GEQ:
-            case TOK_EQ:
-            case TOK_LEQ:
-            case TOK_NEQ:
-                if (e.left.getType().equals(typeInt) && e.right.getType().equals(typeInt))
-                    e.setType(typeBool);
-                break;
 
-		default:
-			error("Typechecker: Unknown operator " + e.operator);
-			break;
+
+		if(e.left.getType() instanceof IntType){
+
+			switch (e.operator) {
+				case TOK_PLUS:
+				case TOK_MINUS:
+				case TOK_MULT:
+				case TOK_DIV:
+				case TOK_MOD:
+					if(e.left.getType() != e.right.getType()){
+						error("Typechecker: Left and right side of and expression must have the same listType.");
+					}
+					else
+						e.setType(typeInt);
+					break;
+
+				case TOK_LT:
+				case TOK_GT:
+				case TOK_GEQ:
+				case TOK_EQ:
+				case TOK_LEQ:
+				case TOK_NEQ:
+					if(e.left.getType() != e.right.getType()){
+						error("Typechecker: Left and right side of and expression must have the same listType.");
+					}
+					else
+						e.setType(typeBool);
+					break;
+				case TOK_CONS:
+					if(!(e.right.getType() instanceof ListType) && e.right.getType() != null){
+						error("Typechecker: Right hand side of cons expression must have listType list");
+					}
+
+					if((e.right.getType() != null)){
+						if( (e.left.getType() != e.right.getType()) ){
+							error("Typechecker: Left and right side of and expression must have the same listType. "+
+									e.left.getType() + ' ' +e.right.getType() );
+						}
+					}
+
+
+					else{
+						e.setType(Types.listType(e.left.getType()));
+
+					}
+					break;
+				default:
+					error("Typechecker: Unknown operator " + e.operator);
+					break;
+			}
+
 		}
+		else if(e.left.getType() instanceof CharType){
+			switch (e.operator) {
+				case TOK_PLUS:
+				case TOK_MINUS:
+					if(e.left.getType() != e.right.getType()){
+						error("Typechecker: Left and right side of and expression must have the same listType.");
+					}
+					else
+						e.setType(typeChar);
+					break;
+
+				case TOK_LT:
+				case TOK_GT:
+				case TOK_GEQ:
+				case TOK_EQ:
+				case TOK_LEQ:
+				case TOK_NEQ:
+					if(e.left.getType() != e.right.getType()){
+						error("Typechecker: Left and right side of and expression must have the same listType.");
+					}
+					else
+						e.setType(typeBool);
+					break;
+				case TOK_CONS:
+					if(!(e.right.getType() instanceof ListType)){
+						error("Typechecker: Right hand side of cons expression must have listType list");
+					}
+					if( (e.left.getType() != e.right.getType()) && (e.right.getType() != null)){
+						error("Typechecker: Left and right side of and expression must have the same listType.");
+					}
+					else
+						e.setType(Types.listType(e.left.getType()));
+					break;
+				default:
+					error("Typechecker: Unknown operator " + e.operator);
+					break;
+			}
+		}
+		else if(e.left.getType() instanceof BoolType){
+			switch (e.operator) {
+				case TOK_LT:
+				case TOK_GT:
+				case TOK_GEQ:
+				case TOK_EQ:
+				case TOK_LEQ:
+				case TOK_NEQ:
+				case TOK_AND:
+				case TOK_OR:
+					if(e.left.getType() != e.right.getType()){
+						error("Typechecker: Left and right side of and expression must have the same listType.");
+					}
+					else
+						e.setType(typeBool);
+					break;
+				case TOK_CONS:
+					if(!(e.right.getType() instanceof ListType)){
+						error("Typechecker: Right hand side of cons expression must have listType list");
+					}
+					if( (e.left.getType() != e.right.getType()) && (e.right.getType() != null)){
+						error("Typechecker: Left and right side of and expression must have the same listType.");
+					}
+					else
+						e.setType(Types.listType(e.left.getType()));
+					break;
+
+				default:
+					error("Typechecker: Invalid operator " + e.operator + " for listType Bool");
+					break;
+				}
+		}
+//		else if(e.getType() instanceof ListType){
+//
+//		}
+		else if(e.left.getType() instanceof  TupleType){
+			switch (e.operator) {
+				case TOK_CONS:
+					if(!(e.right.getType() instanceof ListType)){
+						error("Typechecker: Right hand side of cons expression must have listType list");
+					}
+					if( (e.left.getType() != e.right.getType()) && (e.right.getType() != null)){
+						error("Typechecker: Left and right side of and expression must have the same listType.");
+					}
+					else
+						e.setType(Types.listType(e.left.getType()));
+					break;
+
+				default:
+					error("Typechecker: Invalid operator " + e.operator + " for listType Bool");
+					break;
+			}
+		}
+		else{
+			error("Invalid listType for expression " + e.operator);
+		}
+
+
+
+
+
+
 	}
 
 	@Override
@@ -147,11 +278,11 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(TupleExpression e) {
-        if(e.left.getType() == e.right.getType()){
-            e.setType(e.left.getType());
-        } else{
-            error("The types of the tuple mismatch.");
-        }
+        if ((e.left.getType() == Types.voidType) ||(e.right.getType() == Types.voidType)) {
+			error("Tuples cannot have listType Void.");
+		}
+		e.setType(Types.tupleType(e.left.getType(), e.right.getType() ));
+
 	}
 
 	@Override

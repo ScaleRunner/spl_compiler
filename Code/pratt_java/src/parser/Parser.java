@@ -242,7 +242,7 @@ public class Parser {
      *********************************************/
 
     /**
-     * Tries to match a token of the given type. If it matches it gets consumed.
+     * Tries to match a token of the given listType. If it matches it gets consumed.
      * @param expected TokenType of the to-be-matched token
      * @return Bool if the Token was there.
      */
@@ -268,7 +268,7 @@ public class Parser {
     }
 
     /**
-     * Consumes the token of given type, if it cannot be found it throws an error.
+     * Consumes the token of given listType, if it cannot be found it throws an error.
      * @param expected TokenType of the to-be-consumed token.
      * @return Token
      */

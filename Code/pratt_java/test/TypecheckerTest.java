@@ -81,6 +81,29 @@ public class TypecheckerTest {
 		assertEquals(Types.boolType, e.getType());
 	}
 
+	@Test
+	public void testLessThanChar() {
+		Node e = typecheckExpr("'5' < '3'");
+		assertTypecheckSuccess();
+		assertEquals(Types.boolType, e.getType());
+	}
+
+	@Test
+	public void testConsIntEmpty() {
+		Node e = typecheckExpr("5 : []");
+		assertTypecheckSuccess();
+		assertEquals(Types.listType(Types.intType), e.getType());
+	}
+
+	@Test
+	public void testConsIntNotEmpty() {
+		Node e = typecheckExpr("1:2:3:[]");
+		assertTypecheckSuccess();
+		assertEquals(Types.listType(Types.intType), e.getType());
+	}
+
+
+
 	//	@Test
 //	public void testLetUnrelated() {
 //		AstNode e = typecheckExpr("fun b : Bool . 5");

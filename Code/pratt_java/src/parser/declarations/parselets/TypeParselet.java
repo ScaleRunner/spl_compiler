@@ -27,10 +27,10 @@ public class TypeParselet {
                 if(parser.match(TokenType.TOK_CLOSE_BRACKETS)){
                     return Types.listType(type);
                 }
-                throw new ParseException(parser, "Invalid argument type");
+                throw new ParseException(parser, "Invalid argument listType");
 
             default:
-                throw new ParseException(parser, "Invalid argument type");
+                throw new ParseException(parser, "Invalid argument listType");
 
         }
     }

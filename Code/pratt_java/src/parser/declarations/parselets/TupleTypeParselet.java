@@ -12,13 +12,13 @@ public class TupleTypeParselet {
         Type left = new TypeParselet().parse(parser, token);
 
         if(!parser.match(TokenType.TOK_COMMA)) {
-            throw new ParseException(parser, "Tuple type with missing comma");
+            throw new ParseException(parser, "Tuple listType with missing comma");
         }
 
         Type right = new TypeParselet().parse(parser, parser.consume());
 
         if(!parser.match(TokenType.TOK_CLOSE_PARENTHESIS)){
-            throw new ParseException(parser, "Tuple type with missing closing parenthesis.");
+            throw new ParseException(parser, "Tuple listType with missing closing parenthesis.");
         }
 
         return new TupleType(left, right);

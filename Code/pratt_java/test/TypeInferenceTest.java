@@ -46,7 +46,7 @@
 //
 //	@Test
 //	public void testUnificationSucceeds() {
-//		// Same as before, but now two different type variables make unification
+//		// Same as before, but now two different listType variables make unification
 //		// succeed
 //		Type t1 = new TypeFunction(new TypeFunction(new TypeVariable("a"),
 //				new TypeInt()), new TypeVariable("b"));
@@ -151,18 +151,18 @@
 ////		AstExpr e = parseExpr("fun x . fun y . x");
 ////		TypeInference tc = new TypeInference(e);
 ////		assertTypecheckSuccess(tc);
-////		// all this bullshit just to check that the type is a -> b -> a
+////		// all this bullshit just to check that the listType is a -> b -> a
 ////		assertTrue("result must be a function",
 ////				e.getType() instanceof TypeFunction);
 ////		TypeFunction t = (TypeFunction) e.getType();
-////		assertTrue("result type must be a function",
+////		assertTrue("result listType must be a function",
 ////				t.getResultType() instanceof TypeFunction);
 ////		TypeFunction t2 = (TypeFunction) t.getResultType();
-////		assertTrue("input must be type variable",
+////		assertTrue("input must be listType variable",
 ////				t.getArgType() instanceof TypeVariable);
-////		assertTrue("second input must be type variable",
+////		assertTrue("second input must be listType variable",
 ////				t2.getArgType() instanceof TypeVariable);
-////		assertTrue("result must be type variable",
+////		assertTrue("result must be listType variable",
 ////				t2.getResultType() instanceof TypeVariable);
 ////		assertEquals(t.getArgType(), t2.getResultType());
 ////		assertNotEquals(t.getArgType(), t2.getArgType());

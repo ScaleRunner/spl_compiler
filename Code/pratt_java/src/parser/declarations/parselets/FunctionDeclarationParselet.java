@@ -74,7 +74,7 @@ public class FunctionDeclarationParselet {
 //                            returnType = new ReturnTypeParselet().parse(parser,rettypetoken);
 //                        }
 //                        else{
-//                            throw new ParseException(parser, "Invalid Return type " + parser.getLine());
+//                            throw new ParseException(parser, "Invalid Return listType " + parser.getLine());
 //                        }
 
 

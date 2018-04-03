@@ -21,7 +21,7 @@ public class TypeInference implements Visitor {
 //	private static final Type intType = new TypeInt();
 //	private static final Type typeBool = TypeBool.getInstance();
 //
-//	// for generating fresh type variables
+//	// for generating fresh listType variables
 //	private int nextTypeVariable;
 //
 //	private Type freshTypeVariable() {
