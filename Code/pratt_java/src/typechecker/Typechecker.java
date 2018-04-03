@@ -371,7 +371,7 @@ public class Typechecker implements Visitor {
 			e.right.setType(listTypeRight);
 		}
 
-		if(e.left.getType() != listTypeRight.listType){
+		if(!e.left.getType().equals(listTypeRight.listType)){
 			error("Typechecker: Left and right side of and expression must have the same listType. "+
 					e.left.getType() + ' ' + listTypeRight.listType );
 		}

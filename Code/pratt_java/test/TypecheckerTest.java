@@ -111,7 +111,7 @@ public class TypecheckerTest {
 
 	@Test
 	public void testConsBoolNotEmpty() {
-		Node e = typecheckExpr("'False':'False':'True':[]");
+		Node e = typecheckExpr("False:False:True:[]");
 		assertTypecheckSuccess();
 		assertEquals(Types.listType(Types.boolType), e.getType());
 	}
