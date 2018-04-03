@@ -15,6 +15,13 @@ public class LexerTest {
     }
 
     @Test
+    public void testCommentRemoval() {
+        Lexer l = new Lexer("// This is a comment \n" +
+                "/* This is a comment block */");
+        assertEquals(TokenType.TOK_EOF, l.nextToken().getType());
+    }
+
+    @Test
     public void testSingleDigitInteger() {
         Lexer l = new Lexer("5");
         Token t = l.nextToken();

@@ -2,6 +2,8 @@ package lexer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Lexer {
     private String input;
@@ -9,6 +11,7 @@ public class Lexer {
 
     public Lexer(String inp) {
         input = inp;
+        removeComments();
     }
 
     public List<Token> tokenize(){
@@ -19,6 +22,21 @@ public class Lexer {
             tokenizedInput.add(tok);
         } while(tok.getType() != TokenType.TOK_EOF);
         return tokenizedInput;
+    }
+
+    /**
+     * Removes comments from the input
+     */
+    private void removeComments(){
+        Pattern inlineComment = Pattern.compile("//[^\\n]*\\n");
+        Pattern blockComment = Pattern.compile("/\\*[^*/]*\\*/");
+
+        //Remove Inline Comments
+        Matcher m = inlineComment.matcher(input);
+        this.input = m.replaceAll("");
+
+        m = blockComment.matcher(input);
+        this.input = m.replaceAll("");
     }
 
     private void skipWhitespace() {
@@ -55,7 +73,7 @@ public class Lexer {
                     return new TokenChar(c);
                 }
             }
-            throw new TokenException("Unfinished Char expression, you probably forgot a '.");
+            throw new TokenException("Unfinished Char expression, you probably forgot an apostrophe.");
         }
 
         if (match('+')) {

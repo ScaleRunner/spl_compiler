@@ -1303,7 +1303,7 @@ public class ParserTest {
         List<IdentifierExpression> args = new ArrayList<>();
         args.add(new IdentifierExpression("n"));
 
-        List<Declaration> decls = new ArrayList<>();
+        List<VariableDeclaration> decls = new ArrayList<>();
 
         List<Statement> stats = new ArrayList<>();
 
@@ -1370,7 +1370,7 @@ public class ParserTest {
         List<IdentifierExpression> args = new ArrayList<>();
         args.add(new IdentifierExpression("n"));
 
-        List<Declaration> decls = new ArrayList<>();
+        List<VariableDeclaration> decls = new ArrayList<>();
 
         List<Statement> stats = new ArrayList<>();
 
