@@ -25,7 +25,6 @@ public class TypeParselet {
                 next = parser.consume();
                 Type type = new TypeParselet().parse(parser, next);
                 if(parser.match(TokenType.TOK_CLOSE_BRACKETS)){
-                    parser.consume();
                     return Types.listType(type);
                 }
                 throw new ParseException(parser, "Invalid argument type");

@@ -1283,4 +1283,138 @@ public class ParserTest {
 
     }
 
+    @Test
+    public void testSPLTupleListFunType() {
+        Lexer l = new Lexer("facR( n ) :: (Int, Char) -> [Char] {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+
+        List<Declaration> actual = new ArrayList<>();
+
+        IdentifierExpression name = new IdentifierExpression("facR");
+
+        List<IdentifierExpression> args = new ArrayList<>();
+        args.add(new IdentifierExpression("n"));
+
+        List<Declaration> decls = new ArrayList<>();
+
+        List<Statement> stats = new ArrayList<>();
+
+        List<Statement> thenArm = new ArrayList<>();
+        thenArm.add(new ReturnStatement(new IntegerExpression(1)));
+
+        List<Statement> elseArm = new ArrayList<>();
+        List<Expression> funArgs = new ArrayList<>();
+        funArgs.add(new OperatorExpression(
+                new IdentifierExpression("n"),
+                TokenType.TOK_MINUS,
+                new IntegerExpression(1)
+        ));
+
+        elseArm.add(new ReturnStatement(
+                new OperatorExpression(
+                        new IdentifierExpression("n"),
+                        TokenType.TOK_MULT,
+                        new CallExpression(
+                                new IdentifierExpression("facR"),
+                                funArgs
+                        )
+                )));
+
+        stats.add(new ConditionalStatement(
+                new OperatorExpression(
+                        new IdentifierExpression("n"),
+                        TokenType.TOK_LT,
+                        new IntegerExpression(2)
+                ),
+                thenArm,
+                elseArm
+        ));
+
+        List<Type> fargsType = new ArrayList<>();
+        fargsType.add(Types.tupleType(Types.intType, Types.charType));
+
+        Type returnType = Types.listType(Types.charType);
+        FunType funType = new FunType(fargsType, returnType);
+
+        actual.add(new FunctionDeclaration(name, args, decls, stats, funType));
+
+        assertEquals(result, actual);
+
+    }
+
+    @Test
+    public void testSPLTupleListFunTypeReturnTuple() {
+        Lexer l = new Lexer("facR( n ) :: [Int] -> (Char, Int) {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        List<Declaration> result = p.parseSPL();
+
+        List<Declaration> actual = new ArrayList<>();
+
+        IdentifierExpression name = new IdentifierExpression("facR");
+
+        List<IdentifierExpression> args = new ArrayList<>();
+        args.add(new IdentifierExpression("n"));
+
+        List<Declaration> decls = new ArrayList<>();
+
+        List<Statement> stats = new ArrayList<>();
+
+        List<Statement> thenArm = new ArrayList<>();
+        thenArm.add(new ReturnStatement(new IntegerExpression(1)));
+
+        List<Statement> elseArm = new ArrayList<>();
+        List<Expression> funArgs = new ArrayList<>();
+        funArgs.add(new OperatorExpression(
+                new IdentifierExpression("n"),
+                TokenType.TOK_MINUS,
+                new IntegerExpression(1)
+        ));
+
+        elseArm.add(new ReturnStatement(
+                new OperatorExpression(
+                        new IdentifierExpression("n"),
+                        TokenType.TOK_MULT,
+                        new CallExpression(
+                                new IdentifierExpression("facR"),
+                                funArgs
+                        )
+                )));
+
+        stats.add(new ConditionalStatement(
+                new OperatorExpression(
+                        new IdentifierExpression("n"),
+                        TokenType.TOK_LT,
+                        new IntegerExpression(2)
+                ),
+                thenArm,
+                elseArm
+        ));
+
+        List<Type> fargsType = new ArrayList<>();
+        fargsType.add(Types.listType(Types.intType));
+
+        Type returnType =Types.tupleType(Types.charType, Types.intType);
+        FunType funType = new FunType(fargsType, returnType);
+
+        actual.add(new FunctionDeclaration(name, args, decls, stats, funType));
+
+        assertEquals(result, actual);
+
+    }
+
 }
