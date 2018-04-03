@@ -1,11 +1,11 @@
 package typechecker;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import parser.FunType.Type;
-import parser.FunType.Types;
+import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
@@ -199,7 +199,12 @@ public class Typechecker implements Visitor {
 
     }
 
-    @Override
+	@Override
+	public void visit(ArrayList<Declaration> ds) {
+
+	}
+
+	@Override
     public void visit(FunctionDeclaration d) {
 
     }
@@ -208,6 +213,41 @@ public class Typechecker implements Visitor {
     public void visit(VariableDeclaration d) {
 
     }
+
+	@Override
+	public void visit(BoolType t) {
+
+	}
+
+	@Override
+	public void visit(CharType t) {
+
+	}
+
+	@Override
+	public void visit(FunType t) {
+
+	}
+
+	@Override
+	public void visit(IntType t) {
+
+	}
+
+	@Override
+	public void visit(ListType t) {
+
+	}
+
+	@Override
+	public void visit(TupleType t) {
+
+	}
+
+	@Override
+	public void visit(VoidType t) {
+
+	}
 
 
 //	@Override

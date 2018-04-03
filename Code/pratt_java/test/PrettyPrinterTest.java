@@ -2,27 +2,29 @@ import lexer.Lexer;
 import lexer.Token;
 import org.junit.Test;
 import parser.Parser;
+import parser.declarations.Declaration;
 import parser.exceptions.ParseException;
 import parser.expressions.*;
 import parser.statements.Statement;
 import util.Node;
 import util.PrettyPrinter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class PrettyPrinterTest {
 
-	@Test
-	public void testInteger() {
-	    Lexer l = new Lexer("42");
-		Parser p = new Parser(l.tokenize());
-		IntegerExpression e = (IntegerExpression) p.parseExpression();
-		PrettyPrinter pp = new PrettyPrinter();
-		e.accept(pp);
-		assertEquals("42", pp.getResultString());
-	}
+    @Test
+    public void testInteger() {
+        Lexer l = new Lexer("42");
+        Parser p = new Parser(l.tokenize());
+        IntegerExpression e = (IntegerExpression) p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        e.accept(pp);
+        assertEquals("42", pp.getResultString());
+    }
 
     @Test
     public void testCharacter() {
@@ -95,13 +97,27 @@ public class PrettyPrinterTest {
     }
 
     @Test
-    public void testConditional() {
+    public void testIfConditional() {
         Lexer l = new Lexer("if(a==b && 1 == 1){\n this=correct\n; this=True;}");
         Parser p = new Parser(l.tokenize());
         Statement s = p.parseStatement();
         PrettyPrinter pp = new PrettyPrinter();
         s.accept(pp);
         assertEquals("if(a == b && 1 == 1) {\n\tthis = correct;\n\tthis = True;\n}", pp.getResultString());
+    }
+
+    @Test
+    public void testFullConditional() {
+        Lexer l = new Lexer("if(a==b){\n this=True\n;} else {this = False;}");
+        Parser p = new Parser(l.tokenize());
+        Statement s = p.parseStatement();
+        PrettyPrinter pp = new PrettyPrinter();
+        s.accept(pp);
+        assertEquals("if(a == b) {\n" +
+                "\tthis = True;\n" +
+                "} else {\n" +
+                "\tthis = False;\n" +
+                "}", pp.getResultString());
     }
 
     @Test
@@ -206,7 +222,7 @@ public class PrettyPrinterTest {
     }
 
     @Test
-    public void testAllOps(){
+    public void testAllOps() {
         Lexer l = new Lexer("res.hd = 1 + 2 - 3 * 4 / 5 % 6 : [] && True || False != c == 2 < 1 > 2 >= 3 <= 4;");
         Parser p = new Parser(l.tokenize());
         Statement result = p.parseStatement();
@@ -222,5 +238,32 @@ public class PrettyPrinterTest {
 
         String reprint = PrettyPrinter.printLine(tokens);
         assertEquals("foo(bar) + 3 + true + field.hd", reprint);
+    }
+
+
+    @Test
+    public void testSPLExample1() {
+        Lexer l = new Lexer("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Declaration> result = p.parseSPL();
+
+        PrettyPrinter pp = new PrettyPrinter();
+        pp.visit(result);
+
+        assertEquals("facR(n) :: Int -> Int {\n" +
+                        "\tif(n < 2) {\n" +
+                        "\t\treturn 1;\n" +
+                        "\t} else {\n" +
+                        "\t\treturn n * facR(n - 1);\n" +
+                        "\t}\n" +
+                        "}"
+        , pp.getResultString());
     }
 }

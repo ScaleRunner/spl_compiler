@@ -3,6 +3,7 @@ package parser.declarations.parselets;
 import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
+import parser.declarations.VariableDeclaration;
 import parser.expressions.Expression;
 import parser.expressions.IdentifierExpression;
 import lexer.Token;
@@ -17,7 +18,7 @@ import java.util.List;
 public class FunctionDeclarationParselet {
     public final IdentifierExpression name;
     public final List<IdentifierExpression> args;
-    public final List<Declaration> funVarDecl;
+    public final List<VariableDeclaration> funVarDecl;
     public List<Statement> stats;
     public FunType funtype;
 

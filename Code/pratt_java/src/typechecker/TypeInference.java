@@ -1,5 +1,6 @@
 package typechecker;
 
+import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
@@ -7,6 +8,7 @@ import parser.expressions.*;
 import parser.statements.*;
 import util.Visitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TypeInference implements Visitor {
@@ -188,12 +190,52 @@ public class TypeInference implements Visitor {
 	}
 
 	@Override
+	public void visit(ArrayList<Declaration> ds) {
+
+	}
+
+	@Override
 	public void visit(FunctionDeclaration d) {
 
 	}
 
 	@Override
 	public void visit(VariableDeclaration d) {
+
+	}
+
+	@Override
+	public void visit(BoolType t) {
+
+	}
+
+	@Override
+	public void visit(CharType t) {
+
+	}
+
+	@Override
+	public void visit(FunType t) {
+
+	}
+
+	@Override
+	public void visit(IntType t) {
+
+	}
+
+	@Override
+	public void visit(ListType t) {
+
+	}
+
+	@Override
+	public void visit(TupleType t) {
+
+	}
+
+	@Override
+	public void visit(VoidType t) {
 
 	}
 ////

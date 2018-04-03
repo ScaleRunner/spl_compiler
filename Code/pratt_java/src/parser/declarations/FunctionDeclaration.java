@@ -10,16 +10,16 @@ import java.util.List;
 import java.util.Objects;
 
 public class FunctionDeclaration extends Declaration{
-    IdentifierExpression funName;
-    List<IdentifierExpression> args;
-    List<Declaration> decls;
-    List<Statement> stats;
-    FunType funType;
+    public final IdentifierExpression funName;
+    public final List<IdentifierExpression> args;
+    public final List<VariableDeclaration> decls;
+    public final List<Statement> stats;
+    public final FunType funType;
 
     //TODO
     //Type?
 
-    public FunctionDeclaration(IdentifierExpression funName,List<IdentifierExpression> args, List<Declaration> decls,
+    public FunctionDeclaration(IdentifierExpression funName,List<IdentifierExpression> args, List<VariableDeclaration> decls,
                                List<Statement> stats, FunType funType) {
         this.funName = funName;
         this.args = args;
@@ -30,7 +30,7 @@ public class FunctionDeclaration extends Declaration{
 
     @Override
     public void accept(Visitor v) {
-
+        v.visit(this);
     }
 
     @Override

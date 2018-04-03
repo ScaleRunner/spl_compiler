@@ -2,12 +2,14 @@ package util;
 
 import lexer.Token;
 import lexer.TokenType;
+import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PrettyPrinter implements Visitor {
@@ -78,6 +80,9 @@ public class PrettyPrinter implements Visitor {
                 break;
             case TOK_EOF:
                 break;
+            case TOK_EOL:
+                builder.append(";");
+                break;
             default:
                 throw new Error("PrettyPrinter: cannot print token " + t);
         }
@@ -95,15 +100,13 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(List<Statement> es){
-        prefix = prefix + "\t";
-        for (int i = 0; i < es.size(); i++) {
+        for(int i = 0; i < es.size(); i++) {
             builder.append(prefix);
             this.visit(es.get(i));
-            if (i < es.size() - 1) {
+            if(i < es.size() - 1) {
                 builder.append("\n");
             }
         }
-        prefix = prefix.replaceFirst("\t", "");
     }
 
     @Override
@@ -155,8 +158,15 @@ public class PrettyPrinter implements Visitor {
         this.visit(e.condition);
         builder.append(") ");
         builder.append("{\n");
+        prefix = prefix + '\t';
         this.visit(e.then_expression);
-        builder.append("\n").append(prefix).append("}");
+        prefix = prefix.replaceFirst("\t", "");
+        builder.append("\n").append(prefix).append("} else {\n");
+        prefix = prefix + '\t';
+        this.visit(e.else_expression);
+        prefix = prefix.replaceFirst("\t", "");
+        builder.append('\n').append(prefix).append("}");
+
     }
 
     @Override
@@ -218,17 +228,120 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(Declaration d) {
-
+        Declaration.visitDeclaration(this, d);
     }
 
+    @Override
+    public void visit(ArrayList<Declaration> ds) {
+        for(int i = 0; i < ds.size(); i++) {
+            Declaration.visitDeclaration(this, ds.get(i));
+            if(i < ds.size() - 1){
+                builder.append("\n");
+            }
+        }
+    }
+
+    /**
+     * Print a declaration as: fib(i) :: Int -> Int { ... }
+     * @param d
+     */
     @Override
     public void visit(FunctionDeclaration d) {
+        this.visit(d.funName);
+        builder.append("(");
+        for(int i = 0; i < d.args.size(); i++){
+            this.visit(d.args.get(i));
+            if (i < d.args.size() - 1) {
+                builder.append(", ");
+            }
+        }
+        builder.append(")");
 
+        if(d.funType != null){
+            builder.append(" :: ");
+            this.visit(d.funType);
+        }
+
+        builder.append(" {\n");
+        prefix = prefix + "\t";
+        for(VariableDeclaration varDecl : d.decls){
+            builder.append(prefix);
+            this.visit(varDecl);
+        }
+        this.visit(d.stats);
+        prefix = prefix.replaceFirst("\t", "");
+        builder.append("\n}");
+    }
+
+    /**
+     * Print VariableDeclaration as ('var' | Type) id = Expression;
+     * @param d decl
+     */
+    @Override
+    public void visit(VariableDeclaration d) {
+        if(d.varType != null){
+            builder.append(d.varType.getValue());
+        } else {
+            builder.append("var");
+        }
+        builder.append(" ");
+        this.visit(d.left);
+
+        builder.append(" = ");
+
+        this.visit(d.right);
+
+        builder.append(";\n");
     }
 
     @Override
-    public void visit(VariableDeclaration d) {
+    public void visit(BoolType t) {
+        builder.append(TokenType.TOK_KW_BOOL.getValue());
+    }
 
+    @Override
+    public void visit(CharType t) {
+        builder.append(TokenType.TOK_KW_CHAR.getValue());
+    }
+
+    @Override
+    public void visit(FunType fType) {
+        for(int i = 0; i < fType.argsTypes.size(); i++){
+            Type.visitType(this, fType.argsTypes.get(i));
+            if (i < fType.argsTypes.size() - 1) {
+                builder.append(", ");
+            }
+        }
+
+        builder.append(" -> ");
+
+        Type.visitType(this, fType.returnType);
+    }
+
+    @Override
+    public void visit(IntType t) {
+        builder.append(TokenType.TOK_KW_INT.getValue());
+    }
+
+    @Override
+    public void visit(ListType t) {
+        builder.append('[');
+        Type.visitType(this, t.type);
+        builder.append(']');
+    }
+
+    @Override
+    public void visit(TupleType t) {
+        builder.append('(');
+        Type.visitType(this, t.left);
+        builder.append(", ");
+        Type.visitType(this, t.right);
+        builder.append(')');
+    }
+
+    @Override
+    public void visit(VoidType t) {
+        builder.append(TokenType.TOK_KW_VOID.getValue());
     }
 
     @Override
