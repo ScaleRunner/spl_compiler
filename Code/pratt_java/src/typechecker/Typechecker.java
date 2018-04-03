@@ -194,6 +194,7 @@ public class Typechecker implements Visitor {
 					break;
 				case TOK_CONS:
 					consTypecheckAux(e);
+					break;
 
 				default:
 					error("Typechecker: Invalid operator " + e.operator + " for listType Bool");
