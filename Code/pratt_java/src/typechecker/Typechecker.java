@@ -28,11 +28,13 @@ public class Typechecker implements Visitor {
 
 	private HashMap<String, Type> env;
 
-	private List<TypeError> errors = null;
+	private List<TypeError> errors;
 
+	public Typechecker(){
+        this.errors = new LinkedList<>();
+        this.env = new HashMap<>();
+    }
 	public boolean typecheck(Node ast) {
-		errors = new LinkedList<>();
-		env = new HashMap<>();
 		ast.accept(this);
 		return errors.isEmpty();
 	}
@@ -118,8 +120,8 @@ public class Typechecker implements Visitor {
 				case TOK_MULT:
 				case TOK_DIV:
 				case TOK_MOD:
-					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same listType.");
+					if(!e.left.getType().equals(e.right.getType())){
+						error("Typechecker: Left and right side of an expression must have the same listType.");
 					}
 					else
 						e.setType(typeInt);
@@ -281,7 +283,9 @@ public class Typechecker implements Visitor {
 	@Override
 	public void visit(AssignStatement s) {
 		this.visit(s.right);
-		if(env.get(s.name) != s.right.getType())
+        IdentifierExpression id = (IdentifierExpression) s.name;
+
+        if(!env.get(id.name).equals(s.right.getType()))
 			error("Type "+env.get(s.name)+ " cannot be assigned using type "+ s.right.getType() );
 		s.setType(Types.voidType);
 	}
@@ -375,9 +379,10 @@ public class Typechecker implements Visitor {
 			}
 		}
 
-		for(Statement stmt : d.stats){
-			this.visit(stmt);
-		}
+		Type returnType = this.visit(d.stats);
+		if(!returnType.equals(d.funType.returnType))
+		    error("Return type should be " + d.funType.returnType + " instead of " + returnType);
+
 
 
     }
