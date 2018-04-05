@@ -241,6 +241,12 @@ public class TypecheckerTest {
         assertEquals(Types.listType(Types.intType), e.getType());
     }
 
+    @Test
+    public void testWhileInvalidCondition() {
+        typecheckStmt("if(1){return 1:[];}");
+        assertTypecheckFailure();
+    }
+
 	//	@Test
 //	public void testLetUnrelated() {
 //		AstNode e = typecheckExpr("fun b : Bool . 5");
