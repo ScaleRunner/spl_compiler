@@ -70,13 +70,13 @@ public class TypecheckerTest {
 		return nodes;
 	}
 
-
-
 	@Test
 	public void testCompareTypes() {
 		assertEquals(Types.intType, Types.intType);
 		assertEquals(Types.boolType, Types.boolType);
 		assertNotEquals(Types.boolType, Types.intType);
+		assertEquals(Types.listType(Types.intType), Types.listType(Types.intType));
+		assertNotEquals(Types.listType(Types.intType), Types.tupleType(Types.intType, Types.intType));
 	}
 
 	@Test
@@ -101,6 +101,13 @@ public class TypecheckerTest {
 		assertEquals(Types.boolType, eTrue.getType());
 		assertEquals(Types.boolType, eFalse.getType());
 	}
+
+    @Test
+    public void testTuple() {
+        Node e = typecheckExpr("(True, 1)");
+        assertTypecheckSuccess();
+        assertEquals(Types.tupleType(Types.boolType, Types.intType), e.getType());
+    }
 
 	@Test
 	public void testPlus() {
@@ -200,9 +207,34 @@ public class TypecheckerTest {
 		for(Node n : nodes){
 			assertEquals(Types.voidType, n.getType());
 		}
-
 	}
 
+    @Test
+    public void testEmptyReturn() {
+        Node e = typecheckStmt("return;");
+        assertTypecheckSuccess();
+        assertEquals(Types.voidType, e.getType());
+    }
+
+    @Test
+    public void testNonEmptyReturn() {
+        Node e = typecheckStmt("return 1+3;");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testPrintInt() {
+        Node e = typecheckStmt("print(1);");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testPrintList() {
+        typecheckStmt("print(1:[]);");
+        assertTypecheckFailure();
+    }
 
     @Test
     public void testSimpleConditional() {

@@ -327,8 +327,8 @@ public class Parser {
     }
 
     /**
-     * Helper function to identify what the line number is of the current token.
-     * @return current line number.
+     * Helper function to identify what the line is of the current token.
+     * @return current line.
      */
     public String getLine() {
         List<Token> currentList = new ArrayList<>(input);

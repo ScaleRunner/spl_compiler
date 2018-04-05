@@ -249,12 +249,12 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(TupleExpression e) {
-        if ((e.left.getType() == Types.voidType) ||(e.right.getType() == Types.voidType)) {
-			error("Tuples cannot have listType Void.");
-		}
-		this.visit(e.left);
+        this.visit(e.left);
         this.visit(e.right);
-		e.setType(Types.tupleType(e.left.getType(), e.right.getType() ));
+        if ((e.left.getType() == Types.voidType) ||(e.right.getType() == Types.voidType)) {
+            error("Tuples cannot have listType Void.");
+        }
+        e.setType(Types.tupleType(e.left.getType(), e.right.getType() ));
 
 	}
 
@@ -322,14 +322,22 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PrintStatement s) {
+	    this.visit(s.arg);
+	    if(s.arg.getType() instanceof ListType || s.arg.getType() instanceof TupleType){
+	        error("Print statements cannot handle lists or tuples.");
+        }
         s.setType(s.arg.getType());
 	}
 
 	@Override
 	public void visit(ReturnStatement s) {
-        this.visit(s.arg);
-	    s.setType(s.arg.getType());
-	}
+	    if(s.arg == null){
+	        s.setType(Types.voidType);
+        } else {
+            this.visit(s.arg);
+            s.setType(s.arg.getType());
+        }
+    }
 
     @Override
     public void visit(Declaration d) {
