@@ -363,37 +363,4 @@ public class TypecheckerTest {
 				"}");
 		assertTypecheckFailure();
 	}
-
-	//	@Test
-//	public void testLetUnrelated() {
-//		AstNode e = typecheckExpr("fun b : Bool . 5");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeFunction(new TypeBool(), new TypeInt()),
-//				e.getType());
-//	}
-//
-//	@Test
-//	public void testLambdaBool() {
-//		AstNode e = typecheckExpr("fun x : Bool. x");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeFunction(new TypeBool(), new TypeBool()),
-//				e.getType());
-//	}
-//
-//	@Test
-//	public void testLetInt() {
-//		AstNode e = typecheckExpr("fun x : Int . x + 1");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeFunction(new TypeInt(), new TypeInt()),
-//				e.getType());
-//	}
-//
-//	@Test
-//	public void testNestedLet() {
-//		AstNode e = typecheckExpr("fun x : Int . fun y : Int . x + y");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeFunction(new TypeInt(), new TypeFunction(
-//				new TypeInt(), new TypeInt())), e.getType());
-//	}
-
 }
