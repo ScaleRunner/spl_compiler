@@ -334,7 +334,6 @@ public class Typechecker implements Visitor {
     @Override
     public void visit(Declaration d) {
 		Declaration.visitDeclaration(this, d);
-
     }
 
 	@Override
@@ -348,12 +347,10 @@ public class Typechecker implements Visitor {
 		if(d.varType.equals(d.right.getType())) {
 			env.put(d.left.name, d.varType);
 
-		}
-		else
-			error("Type " + d.varType.toString() + "cannot receive type " + d.right.getType().toString());
+		} else
+			error(String.format("Variable %s, of type %s cannot have an assignment of type %s.",
+                    d.left, d.varType, d.right.getType()));
 		d.setType(Types.voidType);
-
-
     }
 
 //	@Override
