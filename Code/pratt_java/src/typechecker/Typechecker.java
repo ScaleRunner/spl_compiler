@@ -312,7 +312,12 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(LoopStatement s) {
-
+        this.visit(s.condition);
+        if(s.condition.getType() != Types.boolType){
+            error(String.format("The condition should be of type Boolean, is of type '%s' in condition %s",
+                    s.condition.getType(), s.condition));
+        }
+        s.setType(this.visit(s.body));
 	}
 
 	@Override
