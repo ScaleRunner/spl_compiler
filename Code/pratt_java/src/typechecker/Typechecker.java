@@ -26,7 +26,7 @@ public class Typechecker implements Visitor {
     private final Type typeChar = Types.charType;
     private final Type typeVoid = Types.voidType;
 
-	private HashMap<String, Type> env;
+	private Environment env;
 
 	private List<TypeError> errors;
 
@@ -234,7 +234,34 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PostfixExpression e) {
-        e.setType(e.left.getType());
+	    this.visit(e.left);
+        if(e.left.getType() instanceof ListType){
+            ListType t = (ListType) e.left.getType();
+            switch (e.operator){
+                case TOK_HD:
+                    e.setType(t.listType);
+                    break;
+                case TOK_TL:
+                    e.setType(t);
+                    break;
+                default:
+                    error(String.format("Operator %s is undefined for type %s", e.operator, t));
+            }
+        } else if(e.left.getType() instanceof TupleType){
+            TupleType t = (TupleType) e.left.getType();
+            switch (e.operator){
+                case TOK_FST:
+                    e.setType(t.left);
+                    break;
+                case TOK_SND:
+                    e.setType(t.right);
+                    break;
+                default:
+                    error(String.format("Operator %s is undefined for type %s", e.operator, t));
+            }
+        } else {
+            error(String.format("Operator %s is undefined for type %s", e.operator, e.left.getType()));
+        }
 	}
 
 	@Override
@@ -294,8 +321,13 @@ public class Typechecker implements Visitor {
 		this.visit(s.right);
         IdentifierExpression id = (IdentifierExpression) s.name;
 
-        if(!env.get(id.name).equals(s.right.getType()))
-			error("Type "+env.get(s.name)+ " cannot be assigned using type "+ s.right.getType() );
+        Type variableType = env.get(id.name);
+
+        if(variableType == null){
+            error(String.format("Variable %s is not defined", id.name));
+        } else if(variableType != s.right.getType())
+			error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
+                    s.right.getType(), id.name, variableType, s.right.getType()));
 		s.setType(Types.voidType);
 	}
 
@@ -376,9 +408,12 @@ public class Typechecker implements Visitor {
 
 	@Override
     public void visit(FunctionDeclaration d) {
+	    //Backup original environment to fix let binding
+	    Environment backup = Environment.deepCopy(env);
+
 		//counter to aux argtypes
 		int argsCount = 0;
-		//Not sure if I've test return type void. Probably did.
+		//Not sure if I've tested return type void. Probably did.
 
 		//set functiontype
 		d.setType(d.funType.returnType);
@@ -411,6 +446,8 @@ public class Typechecker implements Visitor {
 		    error(String.format("The return type of the function is not equal to the actual return type. " +
                     "\n\tExpected: %s \n\t Actual: %s", d.funType.returnType, returnType));
         }
+
+        env = backup;
     }
 
     @Override
@@ -424,22 +461,6 @@ public class Typechecker implements Visitor {
                     d.left, d.varType, d.right.getType()));
 		d.setType(Types.voidType);
     }
-
-//	@Override
-//	public void visit(AstAbstraction astLetBinding) {
-//		// TODO: make a deep copy of the current environment and restore it at
-//		// the end of the function! Otherwise the added definition will leak to
-//		// outside the let binding.
-//		if (astLetBinding.getAstType() == null) {
-//			error("Typechecker: Function arguments must have types");
-//		}
-//		astLetBinding.getAstType().accept(this);
-//		env.put(astLetBinding.getIdentifier(), astLetBinding.getAstType()
-//				.getType());
-//		astLetBinding.getBody().accept(this);
-//		astLetBinding.setType(new TypeFunction(astLetBinding.getAstType()
-//				.getType(), astLetBinding.getBody().getType()));
-//	}
 
 	private void consTypecheckAux(OperatorExpression e){
 		if(!(e.right.getType() instanceof ListType)){

@@ -64,7 +64,6 @@ public class TypecheckerTest {
 
 		for(Declaration d : decls) {
 			tc.typecheck(d);
-			assertTypecheckSuccess();
 			nodes.add(d);
 		}
 		return nodes;
@@ -107,6 +106,40 @@ public class TypecheckerTest {
         Node e = typecheckExpr("(True, 1)");
         assertTypecheckSuccess();
         assertEquals(Types.tupleType(Types.boolType, Types.intType), e.getType());
+    }
+
+    @Test
+    public void testTuplePostfixFst() {
+        Node e = typecheckExpr("(True, 1).fst");
+        assertTypecheckSuccess();
+        assertEquals(Types.boolType, e.getType());
+    }
+
+    @Test
+    public void testTuplePostfixSnd() {
+        Node e = typecheckExpr("(True, (2, 'a')).snd");
+        assertTypecheckSuccess();
+        assertEquals(Types.tupleType(Types.intType, Types.charType), e.getType());
+    }
+
+    @Test
+    public void testTuplePostfixHd() {
+        typecheckExpr("(True, (2, 'a')).hd");
+        assertTypecheckFailure();
+    }
+
+    @Test
+    public void testListHd() {
+        Node e = typecheckExpr("((2, 'a') : []).hd");
+        assertTypecheckSuccess();
+        assertEquals(Types.tupleType(Types.intType, Types.charType), e.getType());
+    }
+
+    @Test
+    public void testListTl() {
+        Node e = typecheckExpr("((2, 'a') : []).tl");
+        assertTypecheckSuccess();
+        assertEquals(Types.listType(Types.tupleType(Types.intType, Types.charType)), e.getType());
     }
 
 	@Test
@@ -299,13 +332,32 @@ public class TypecheckerTest {
 				"return n * facR ( n - 1 );\n" +
 				"}\n" +
 				"}");
+		assertTypecheckSuccess();
 		for(Node n: nodes)
 			assertEquals(Types.intType, n.getType());
 	}
 
+    @Test
+    public void testTwoFuncDecl() {
+        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}\n" +
+                "id(a) :: Int -> Int {\n" +
+                "a = 3;"+
+                "return a+1;\n" +
+                "}");
+        assertTypecheckSuccess();
+        for(Node n: nodes)
+            assertEquals(Types.intType, n.getType());
+    }
+
 	@Test
-	public void testTwoFuncDecl() {
-		List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+	public void testTwoFuncDeclWrongScoping() {
+		typecheckSPL("facR( n ) :: Int -> Int {\n" +
 				"if (n < 2 ) {\n " +
 				"return 1;\n " +
 				"} else {\n" +
@@ -316,40 +368,6 @@ public class TypecheckerTest {
 				"a = 3;"+
 				"return a+n;\n" +
 				"}");
-		for(Node n: nodes)
-			assertEquals(Types.intType, n.getType());
+		assertTypecheckFailure();
 	}
-
-	//	@Test
-//	public void testLetUnrelated() {
-//		AstNode e = typecheckExpr("fun b : Bool . 5");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeFunction(new TypeBool(), new TypeInt()),
-//				e.getType());
-//	}
-//
-//	@Test
-//	public void testLambdaBool() {
-//		AstNode e = typecheckExpr("fun x : Bool. x");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeFunction(new TypeBool(), new TypeBool()),
-//				e.getType());
-//	}
-//
-//	@Test
-//	public void testLetInt() {
-//		AstNode e = typecheckExpr("fun x : Int . x + 1");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeFunction(new TypeInt(), new TypeInt()),
-//				e.getType());
-//	}
-//
-//	@Test
-//	public void testNestedLet() {
-//		AstNode e = typecheckExpr("fun x : Int . fun y : Int . x + y");
-//		assertTypecheckSuccess();
-//		assertEquals(new TypeFunction(new TypeInt(), new TypeFunction(
-//				new TypeInt(), new TypeInt())), e.getType());
-//	}
-
 }
