@@ -266,4 +266,31 @@ public class PrettyPrinterTest {
                         "}"
         , pp.getResultString());
     }
+
+    @Test
+    public void testToString() {
+        Lexer l = new Lexer("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Declaration> result = p.parseSPL();
+
+        PrettyPrinter pp = new PrettyPrinter();
+        pp.visit(result);
+
+        assertEquals("facR(n) :: Int -> Int {\n" +
+                        "\tif(n < 2) {\n" +
+                        "\t\treturn 1;\n" +
+                        "\t} else {\n" +
+                        "\t\treturn n * facR(n - 1);\n" +
+                        "\t}\n" +
+                        "}"
+                , pp.getResultString());
+        assertEquals(pp.getResultString(), result.get(0).toString());
+    }
 }
