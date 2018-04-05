@@ -184,7 +184,9 @@ public class TypecheckerTest {
 
 	@Test
 	public void testValidVarDecl() {
-		List<Node> nodes = typecheckSPL("Int a = True;\n");
+		List<Node> nodes = typecheckSPL("Int a = True;\n" +
+				"Bool a = True;\n" +
+						"Char c = 'a';");
 		assertTypecheckSuccess();
 		for(Node n: nodes)
 			assertEquals(Types.voidType, n.getType());
