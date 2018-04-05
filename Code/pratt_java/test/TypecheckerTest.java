@@ -70,13 +70,13 @@ public class TypecheckerTest {
 		return nodes;
 	}
 
-
-
 	@Test
 	public void testCompareTypes() {
 		assertEquals(Types.intType, Types.intType);
 		assertEquals(Types.boolType, Types.boolType);
 		assertNotEquals(Types.boolType, Types.intType);
+		assertEquals(Types.listType(Types.intType), Types.listType(Types.intType));
+		assertNotEquals(Types.listType(Types.intType), Types.tupleType(Types.intType, Types.intType));
 	}
 
 	@Test
@@ -101,6 +101,13 @@ public class TypecheckerTest {
 		assertEquals(Types.boolType, eTrue.getType());
 		assertEquals(Types.boolType, eFalse.getType());
 	}
+
+    @Test
+    public void testTuple() {
+        Node e = typecheckExpr("(True, 1)");
+        assertTypecheckSuccess();
+        assertEquals(Types.tupleType(Types.boolType, Types.intType), e.getType());
+    }
 
 	@Test
 	public void testPlus() {

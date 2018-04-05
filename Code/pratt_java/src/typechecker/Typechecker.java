@@ -249,12 +249,12 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(TupleExpression e) {
-        if ((e.left.getType() == Types.voidType) ||(e.right.getType() == Types.voidType)) {
-			error("Tuples cannot have listType Void.");
-		}
-		this.visit(e.left);
+        this.visit(e.left);
         this.visit(e.right);
-		e.setType(Types.tupleType(e.left.getType(), e.right.getType() ));
+        if ((e.left.getType() == Types.voidType) ||(e.right.getType() == Types.voidType)) {
+            error("Tuples cannot have listType Void.");
+        }
+        e.setType(Types.tupleType(e.left.getType(), e.right.getType() ));
 
 	}
 
