@@ -1,6 +1,6 @@
 package typechecker;
 
-import parser.FunType.Type;
+import parser.types.Type;
 
 import java.util.HashMap;
 

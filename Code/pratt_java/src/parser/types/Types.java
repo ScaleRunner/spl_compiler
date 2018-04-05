@@ -1,4 +1,4 @@
-package parser.FunType;
+package parser.types;
 
 public class Types {
 

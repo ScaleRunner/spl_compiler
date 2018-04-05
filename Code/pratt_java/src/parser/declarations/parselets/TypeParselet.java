@@ -2,7 +2,7 @@ package parser.declarations.parselets;
 
 import lexer.Token;
 import lexer.TokenType;
-import parser.FunType.*;
+import parser.types.*;
 import parser.Parser;
 import parser.exceptions.ParseException;
 

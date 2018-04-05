@@ -1,12 +1,12 @@
 package typechecker;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import compiler.CompileException;
 import lexer.TokenType;
-import parser.FunType.*;
+import parser.types.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
@@ -16,7 +16,7 @@ import util.Node;
 import util.TypeError;
 import util.Visitor;
 
-import static parser.FunType.Types.intType;
+import static parser.types.Types.intType;
 
 public class Typechecker implements Visitor {
 
@@ -219,12 +219,6 @@ public class Typechecker implements Visitor {
 		else{
 			error("Invalid listType for expression " + e.operator);
 		}
-
-
-
-
-
-
 	}
 
 	@Override
@@ -267,8 +261,22 @@ public class Typechecker implements Visitor {
 	@Override
 	public void visit(Statement s) {
 		Statement.visitStatement(this, s);
-
 	}
+
+	public Type visit(List<Statement> statementBlock){
+	    Type blockType = Types.voidType;
+        for(Statement s : statementBlock){
+            this.visit(s);
+            if(s instanceof ReturnStatement){
+                if(blockType != Types.voidType){ // i.e. you already saw a return statement
+                    throw new CompileException("Having two return statements is not allowed.");
+                }
+                ReturnStatement ret = (ReturnStatement) s;
+                blockType = ret.arg.getType();
+            }
+        }
+        return blockType;
+    }
 
 	@Override
 	public void visit(AssignStatement s) {
@@ -284,8 +292,22 @@ public class Typechecker implements Visitor {
 	}
 
 	@Override
-	public void visit(ConditionalStatement s) {
+	public void visit(ConditionalStatement conditionalStatement) {
+        this.visit(conditionalStatement.condition);
+        if(conditionalStatement.condition.getType() != Types.boolType){
+            error(String.format("The condition should be of type Boolean, is of type '%s' in condition %s",
+                    conditionalStatement.condition.getType(), conditionalStatement.condition));
+        }
+        Type thenBranchType = this.visit(conditionalStatement.then_expression);
+        conditionalStatement.setType(thenBranchType);
 
+        if(conditionalStatement.else_expression.size() != 0){
+            Type elseBranchType = this.visit(conditionalStatement.else_expression);
+            if(thenBranchType != elseBranchType){
+                error(String.format("The return statements of both conditional branches should be of the same type. \n" +
+                        "\tActual: (then) %s, (else) %s", thenBranchType, elseBranchType));
+            }
+        }
 	}
 
 	@Override
@@ -300,7 +322,8 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(ReturnStatement s) {
-        s.setType(s.arg.getType());
+        this.visit(s.arg);
+	    s.setType(s.arg.getType());
 	}
 
     @Override

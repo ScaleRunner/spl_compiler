@@ -1,14 +1,10 @@
 package util;
 
-import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public interface Visitor {
 
@@ -66,7 +62,7 @@ public interface Visitor {
 //
 //    void visit(CharType t);
 //
-//    void visit(FunType t);
+//    void visit(types t);
 //
 //    void visit(IntType t);
 //

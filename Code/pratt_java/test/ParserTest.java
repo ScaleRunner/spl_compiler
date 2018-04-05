@@ -1,4 +1,4 @@
-import parser.FunType.*;
+import parser.types.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;

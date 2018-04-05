@@ -1,7 +1,6 @@
-package parser.FunType;
+package parser.types;
 
 import typechecker.Substitution;
-import util.Visitor;
 
 import java.util.Objects;
 
