@@ -197,6 +197,9 @@ public class TypecheckerTest {
 		List<Node> nodes = typecheckSPL("Int a = 3;\n" +
 				"Bool a = True;\n" +
 						"Char c = 'a';");
+		for(Node n : nodes){
+			assertEquals(Types.voidType, n.getType());
+		}
 
 	}
 
