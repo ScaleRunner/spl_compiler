@@ -108,6 +108,40 @@ public class TypecheckerTest {
         assertEquals(Types.tupleType(Types.boolType, Types.intType), e.getType());
     }
 
+    @Test
+    public void testTuplePostfixFst() {
+        Node e = typecheckExpr("(True, 1).fst");
+        assertTypecheckSuccess();
+        assertEquals(Types.boolType, e.getType());
+    }
+
+    @Test
+    public void testTuplePostfixSnd() {
+        Node e = typecheckExpr("(True, (2, 'a')).snd");
+        assertTypecheckSuccess();
+        assertEquals(Types.tupleType(Types.intType, Types.charType), e.getType());
+    }
+
+    @Test
+    public void testTuplePostfixHd() {
+        typecheckExpr("(True, (2, 'a')).hd");
+        assertTypecheckFailure();
+    }
+
+    @Test
+    public void testListHd() {
+        Node e = typecheckExpr("((2, 'a') : []).hd");
+        assertTypecheckSuccess();
+        assertEquals(Types.tupleType(Types.intType, Types.charType), e.getType());
+    }
+
+    @Test
+    public void testListTl() {
+        Node e = typecheckExpr("((2, 'a') : []).tl");
+        assertTypecheckSuccess();
+        assertEquals(Types.listType(Types.tupleType(Types.intType, Types.charType)), e.getType());
+    }
+
 	@Test
 	public void testPlus() {
 		Node e = typecheckExpr("5 + 3");

@@ -225,7 +225,34 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PostfixExpression e) {
-        e.setType(e.left.getType());
+	    this.visit(e.left);
+        if(e.left.getType() instanceof ListType){
+            ListType t = (ListType) e.left.getType();
+            switch (e.operator){
+                case TOK_HD:
+                    e.setType(t.listType);
+                    break;
+                case TOK_TL:
+                    e.setType(t);
+                    break;
+                default:
+                    error(String.format("Operator %s is undefined for type %s", e.operator, t));
+            }
+        } else if(e.left.getType() instanceof TupleType){
+            TupleType t = (TupleType) e.left.getType();
+            switch (e.operator){
+                case TOK_FST:
+                    e.setType(t.left);
+                    break;
+                case TOK_SND:
+                    e.setType(t.right);
+                    break;
+                default:
+                    error(String.format("Operator %s is undefined for type %s", e.operator, t));
+            }
+        } else {
+            error(String.format("Operator %s is undefined for type %s", e.operator, e.left.getType()));
+        }
 	}
 
 	@Override
@@ -289,7 +316,7 @@ public class Typechecker implements Visitor {
 
         if(variableType == null){
             error(String.format("Variable %s is not defined", id.name));
-        } else if(variableType == s.right.getType())
+        } else if(variableType != s.right.getType())
 			error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
                     s.right.getType(), id.name, variableType, s.right.getType()));
 		s.setType(Types.voidType);
