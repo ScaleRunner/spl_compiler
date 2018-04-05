@@ -3,7 +3,7 @@ package parser.types;
 import typechecker.Substitution;
 import util.PrettyPrinter;
 
-public abstract class Type {
+public abstract class Type implements Cloneable{
     public abstract Type applySubstitution(Substitution substitution);
 
     // This is an alternative implementation of the unification algorithm.
@@ -73,5 +73,10 @@ public abstract class Type {
         } else throw new UnsupportedOperationException(
                 String.format("Visitation not implemented for Type %s", t.getClass().toString())
         );
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

@@ -32,7 +32,7 @@ public class Typechecker implements Visitor {
 
 	public Typechecker(){
         this.errors = new LinkedList<>();
-        this.env = new HashMap<>();
+        this.env = new Environment();
     }
 	public boolean typecheck(Node ast) {
 		ast.accept(this);
@@ -379,12 +379,9 @@ public class Typechecker implements Visitor {
 			}
 		}
 
-		Type returnType = this.visit(d.stats);
-		if(!returnType.equals(d.funType.returnType))
-		    error("Return type should be " + d.funType.returnType + " instead of " + returnType);
-
-
-
+		for(Statement stmt : d.stats){
+			this.visit(stmt);
+		}
     }
 
     @Override
