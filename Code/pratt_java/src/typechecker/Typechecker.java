@@ -322,14 +322,22 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PrintStatement s) {
+	    this.visit(s.arg);
+	    if(s.arg.getType() instanceof ListType || s.arg.getType() instanceof TupleType){
+	        error("Print statements cannot handle lists or tuples.");
+        }
         s.setType(s.arg.getType());
 	}
 
 	@Override
 	public void visit(ReturnStatement s) {
-        this.visit(s.arg);
-	    s.setType(s.arg.getType());
-	}
+	    if(s.arg == null){
+	        s.setType(Types.voidType);
+        } else {
+            this.visit(s.arg);
+            s.setType(s.arg.getType());
+        }
+    }
 
     @Override
     public void visit(Declaration d) {

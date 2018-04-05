@@ -200,9 +200,34 @@ public class TypecheckerTest {
 		for(Node n : nodes){
 			assertEquals(Types.voidType, n.getType());
 		}
-
 	}
 
+    @Test
+    public void testEmptyReturn() {
+        Node e = typecheckStmt("return;");
+        assertTypecheckSuccess();
+        assertEquals(Types.voidType, e.getType());
+    }
+
+    @Test
+    public void testNonEmptyReturn() {
+        Node e = typecheckStmt("return 1+3;");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testPrintInt() {
+        Node e = typecheckStmt("print(1);");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testPrintList() {
+        typecheckStmt("print(1:[]);");
+        assertTypecheckFailure();
+    }
 
     @Test
     public void testSimpleConditional() {
