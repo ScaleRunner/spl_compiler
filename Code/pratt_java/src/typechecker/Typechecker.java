@@ -338,6 +338,39 @@ public class Typechecker implements Visitor {
 
 	@Override
     public void visit(FunctionDeclaration d) {
+		//counter to aux argtypes
+		int argsCount = 0;
+		//Not sure if I've test return type void. Probably did.
+
+		//set functiontype
+		d.setType(d.funType.returnType);
+		env.put(d.funName.name, d.funType.returnType);
+
+		//check if arguments and argument types match
+		if(d.args.size() != d.funType.argsTypes.size()){
+			if(d.args.size() < d.funType.argsTypes.size())
+				error("There are missing types for some function arguments");
+			else
+				error("There are too many argument types for the function arguments");
+		}
+
+		//set argument types if there are any
+		if(!d.args.isEmpty()){
+			for(IdentifierExpression id: d.args){
+				env.put(id.name, d.funType.argsTypes.get(argsCount++));
+			}
+		}
+
+		if(!d.decls.isEmpty()){
+			for(VariableDeclaration varDecl : d.decls){
+				this.visit(varDecl);
+			}
+		}
+
+		for(Statement stmt : d.stats){
+			this.visit(stmt);
+		}
+
 
     }
 
