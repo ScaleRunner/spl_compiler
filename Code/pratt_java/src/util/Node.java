@@ -1,6 +1,6 @@
 package util;
 
-import parser.FunType.Type;
+import parser.types.Type;
 
 public abstract class Node {
 

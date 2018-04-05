@@ -1,7 +1,6 @@
 package parser.declarations.parselets;
 
-import parser.FunType.*;
-import parser.declarations.Declaration;
+import parser.types.*;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.Expression;

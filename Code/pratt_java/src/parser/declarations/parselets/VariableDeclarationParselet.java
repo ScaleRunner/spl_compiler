@@ -1,6 +1,6 @@
 package parser.declarations.parselets;
 
-import parser.FunType.Type;
+import parser.types.Type;
 import parser.expressions.Expression;
 import parser.expressions.IdentifierExpression;
 import lexer.Token;

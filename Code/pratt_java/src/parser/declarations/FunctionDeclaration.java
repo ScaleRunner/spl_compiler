@@ -1,7 +1,6 @@
 package parser.declarations;
 
-import parser.FunType.FunType;
-import parser.FunType.Type;
+import parser.types.FunType;
 import parser.expressions.IdentifierExpression;
 import parser.statements.Statement;
 import util.Visitor;

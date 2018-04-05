@@ -2,12 +2,8 @@ package parser.declarations.parselets;
 
 import lexer.Token;
 import lexer.TokenType;
-import parser.FunType.BoolType;
-import parser.FunType.CharType;
-import parser.FunType.IntType;
-import parser.FunType.Type;
+import parser.types.Type;
 import parser.Parser;
-import parser.exceptions.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;

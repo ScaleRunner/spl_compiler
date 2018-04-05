@@ -1,8 +1,7 @@
 package parser.declarations;
 
-import parser.FunType.Type;
+import parser.types.Type;
 import parser.expressions.Expression;
-import lexer.TokenType;
 import parser.expressions.IdentifierExpression;
 import util.Visitor;
 

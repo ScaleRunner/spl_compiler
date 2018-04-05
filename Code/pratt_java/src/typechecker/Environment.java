@@ -1,10 +1,8 @@
 package typechecker;
 
-import parser.FunType.Type;
+import parser.types.Type;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public class Environment extends HashMap<String, Type> {
 	// just shut up, okay?

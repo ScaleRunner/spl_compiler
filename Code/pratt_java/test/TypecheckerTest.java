@@ -4,8 +4,9 @@ import lexer.Lexer;
 import org.junit.Before;
 import org.junit.Test;
 
-import parser.FunType.Type;
-import parser.FunType.Types;
+import parser.statements.Statement;
+import parser.types.Type;
+import parser.types.Types;
 import parser.Parser;
 import parser.expressions.Expression;
 import typechecker.*;
@@ -31,6 +32,14 @@ public class TypecheckerTest {
 
     private void assertTypecheckFailure() {
         assertFalse(tc.getAllErrors(), tc.getAllErrors().length() == 0);
+    }
+
+    private Node typecheckStmt(String input) {
+        Lexer l = new Lexer(input);
+        Parser p = new Parser(l.tokenize());
+        Statement stmt = p.parseStatement();
+        tc.typecheck(stmt);
+        return stmt;
     }
 
 	private Node typecheckExpr(String input) {
@@ -159,6 +168,27 @@ public class TypecheckerTest {
         Node e = typecheckExpr("-(4 * 3) % 5");
         assertTypecheckSuccess();
         assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testSimpleConditional() {
+        Node e = typecheckStmt("if(True){}");
+        assertTypecheckSuccess();
+        assertEquals(Types.voidType, e.getType());
+    }
+
+    @Test
+    public void testSimpleConditionalReturn() {
+        Node e = typecheckStmt("if(True){return True;} else {return False;}");
+        assertTypecheckSuccess();
+        assertEquals(Types.boolType, e.getType());
+    }
+
+    @Test
+    public void testConditionalReturn() {
+        Node e = typecheckStmt("if(1 > 3 && True){return True;} else {return False;}");
+        assertTypecheckSuccess();
+        assertEquals(Types.boolType, e.getType());
     }
 
 	//	@Test

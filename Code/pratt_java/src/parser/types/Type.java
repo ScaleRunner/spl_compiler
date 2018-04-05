@@ -1,9 +1,7 @@
-package parser.FunType;
+package parser.types;
 
 import typechecker.Substitution;
-import util.Node;
 import util.PrettyPrinter;
-import util.Visitor;
 
 public abstract class Type {
     public abstract Type applySubstitution(Substitution substitution);

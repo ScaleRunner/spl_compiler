@@ -1,6 +1,5 @@
-package parser.FunType;
+package parser.types;
 
-import parser.declarations.parselets.TypesParselet;
 import util.Node;
 import util.Visitor;
 
