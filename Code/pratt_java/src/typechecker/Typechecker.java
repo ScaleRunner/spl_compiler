@@ -348,6 +348,23 @@ public class Typechecker implements Visitor {
 		Declaration.visitDeclaration(this, d);
     }
 
+    private Type returnType(List<Statement> statements){
+	    Type returnType = null;
+	    for(Statement s : statements){
+	        if(s instanceof ReturnStatement){
+	            ReturnStatement returnStmt = (ReturnStatement) s;
+	            returnType = returnStmt.getType();
+            } else if(s instanceof ConditionalStatement){
+	            ConditionalStatement condStmt = (ConditionalStatement) s;
+	            returnType = returnType(condStmt.then_expression);
+            } else if(s instanceof LoopStatement){
+	            LoopStatement loopStmt = (LoopStatement) s;
+	            returnType = returnType(loopStmt.body);
+            }
+        }
+        return returnType;
+    }
+
 	@Override
     public void visit(FunctionDeclaration d) {
 		//counter to aux argtypes
@@ -379,9 +396,12 @@ public class Typechecker implements Visitor {
 			}
 		}
 
-		for(Statement stmt : d.stats){
-			this.visit(stmt);
-		}
+		this.visit(d.stats);
+		Type returnType = returnType(d.stats);
+		if(returnType != d.funType.returnType){
+		    error(String.format("The return type of the function is not equal to the actual return type. " +
+                    "\n\tExpected: %s \n\t Actual: %s", d.funType.returnType, returnType));
+        }
     }
 
     @Override

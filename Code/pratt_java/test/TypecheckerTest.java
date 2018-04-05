@@ -294,7 +294,6 @@ public class TypecheckerTest {
 				"}");
 		for(Node n: nodes)
 			assertEquals(Types.intType, n.getType());
-
 	}
 
 	@Test
@@ -312,7 +311,6 @@ public class TypecheckerTest {
 				"}");
 		for(Node n: nodes)
 			assertEquals(Types.intType, n.getType());
-
 	}
 
 	//	@Test
