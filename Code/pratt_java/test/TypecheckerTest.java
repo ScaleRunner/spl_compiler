@@ -218,9 +218,29 @@ public class TypecheckerTest {
 
     @Test
     public void testConditionalReturn() {
-        Node e = typecheckStmt("if(1 > 3 && True){return True;} else {return False;}");
+        Node e = typecheckStmt("if(1 > 3 && True){return True == False;} else {return 1==2;}");
         assertTypecheckSuccess();
         assertEquals(Types.boolType, e.getType());
+    }
+
+    @Test
+    public void testConditionalReturnMismatch() {
+        typecheckStmt("if(1 > 3 && True){return 1;} else {return 1==2;}");
+        assertTypecheckFailure();
+    }
+
+    @Test
+    public void testWhile() {
+        Node e = typecheckStmt("if(1 > 3){}");
+        assertTypecheckSuccess();
+        assertEquals(Types.voidType, e.getType());
+    }
+
+    @Test
+    public void testWhileReturn() {
+        Node e = typecheckStmt("if(1 > 3 && True){return 1:[];}");
+        assertTypecheckSuccess();
+        assertEquals(Types.listType(Types.intType), e.getType());
     }
 
 	//	@Test
