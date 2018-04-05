@@ -32,7 +32,7 @@ public class Typechecker implements Visitor {
 
 	public boolean typecheck(Node ast) {
 		errors = new LinkedList<>();
-		env = new HashMap<>();
+		env = new Environment();
 		ast.accept(this);
 		return errors.isEmpty();
 	}
@@ -378,8 +378,6 @@ public class Typechecker implements Visitor {
 		for(Statement stmt : d.stats){
 			this.visit(stmt);
 		}
-
-
     }
 
     @Override
