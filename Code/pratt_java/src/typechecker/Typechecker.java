@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import lexer.TokenType;
 import parser.FunType.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
@@ -233,7 +234,23 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PrefixExpression e) {
-        e.setType(e.right.getType());
+	    this.visit(e.right);
+        if(e.operator == TokenType.TOK_NOT){
+            if(e.right.getType() == Types.boolType) {
+                e.setType(Types.boolType);
+            } else{
+                error("You can only negate boolean expressions");
+            }
+        }
+	    else if(e.operator == TokenType.TOK_MINUS){
+            if(e.right.getType() == Types.intType){
+                e.setType(Types.intType);
+            } else {
+                error("The minus is only allowed for integer expressions");
+            }
+        } else {
+            error(String.format("Unsupported prefix operator '%s' for type '%s'",e.operator.getValue(), e.right.getType()));
+        }
 	}
 
 	@Override

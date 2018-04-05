@@ -29,6 +29,10 @@ public class TypecheckerTest {
 		assertTrue(tc.getAllErrors(), tc.getAllErrors().length() == 0);
 	}
 
+    private void assertTypecheckFailure() {
+        assertFalse(tc.getAllErrors(), tc.getAllErrors().length() == 0);
+    }
+
 	private Node typecheckExpr(String input) {
 		Lexer l = new Lexer(input);
 		Parser p = new Parser(l.tokenize());
@@ -123,7 +127,39 @@ public class TypecheckerTest {
 		assertEquals(Types.listType(Types.tupleType(typeInt, typeChar)), e.getType());
 	}
 
+    @Test
+    public void testPrefixNegation() {
+        Node e = typecheckExpr("!True");
+        assertTypecheckSuccess();
+        assertEquals(Types.boolType, e.getType());
+    }
 
+    @Test
+    public void testPrefixNegationOverComparison() {
+        Node e = typecheckExpr("!(1 > 2)");
+        assertTypecheckSuccess();
+        assertEquals(Types.boolType, e.getType());
+    }
+
+    @Test
+    public void testPrefixNegationError() {
+        typecheckExpr("!1");
+        assertTypecheckFailure();
+    }
+
+    @Test
+    public void testPrefixMinus() {
+        Node e = typecheckExpr("-10");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testPrefixMinusGrouped() {
+        Node e = typecheckExpr("-(4 * 3) % 5");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, e.getType());
+    }
 
 	//	@Test
 //	public void testLetUnrelated() {
