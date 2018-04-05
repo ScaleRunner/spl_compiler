@@ -194,6 +194,13 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void visit(isEmptyExpression e) {
+        builder.append("isEmpty(");
+        this.visit(e.arg);
+        builder.append(")");
+    }
+
+    @Override
     public void visit(ListExpression e) {
         builder.append('[');
         for (int i = 0; i < e.items.size(); i++) {

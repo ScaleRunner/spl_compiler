@@ -15,9 +15,6 @@ public class FunctionDeclaration extends Declaration{
     public final List<Statement> stats;
     public final FunType funType;
 
-    //TODO
-    //Type?
-
     public FunctionDeclaration(IdentifierExpression funName,List<IdentifierExpression> args, List<VariableDeclaration> decls,
                                List<Statement> stats, FunType funType) {
         this.funName = funName;

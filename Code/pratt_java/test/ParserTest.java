@@ -581,6 +581,18 @@ public class ParserTest {
     }
 
     @Test
+    public void testIsEmptyCall() {
+        Lexer l = new Lexer("isEmpty(a)");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new isEmptyExpression(new IdentifierExpression("a"));
+
+        assertEquals(result, actual);
+    }
+
+    @Test
     public void testFunCallStatement() {
         Lexer l = new Lexer("a();");
         List<Token> tokens = l.tokenize();

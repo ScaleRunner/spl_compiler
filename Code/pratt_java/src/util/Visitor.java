@@ -21,6 +21,8 @@ public interface Visitor {
 
     void visit(IntegerExpression e);
 
+    void visit(isEmptyExpression e);
+
     void visit(ListExpression e);
 
     void visit(OperatorExpression e);

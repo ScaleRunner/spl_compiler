@@ -93,6 +93,15 @@ public class Typechecker implements Visitor {
 	}
 
 	@Override
+	public void visit(isEmptyExpression e) {
+		this.visit(e.arg);
+		if(! (e.arg.getType() instanceof ListType))
+			error("isEmpty function needs argument of type List not " +e.arg.getType());
+		e.setType(Types.boolType);
+
+	}
+
+	@Override
 	public void visit(ListExpression e) {
 	    // A list expression starts out as an empty list, so initially its nothing
         e.setType(Types.listType(null));

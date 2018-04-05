@@ -89,6 +89,7 @@ public class Parser {
         // Register Types
         registerPrefixExpression(TokenType.TOK_INT, new IntegerParselet());
         registerPrefixExpression(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
+        registerPrefixExpression(TokenType.TOK_KW_IS_EMPTY, new isEmptyParselet());
         registerPrefixExpression(TokenType.TOK_BOOL, new BooleanParselet());
         registerPrefixExpression(TokenType.TOK_CHAR, new CharacterParselet());
         registerPrefixExpression(TokenType.TOK_OPEN_BRACKETS, new ListParselet());
@@ -100,7 +101,6 @@ public class Parser {
 
         // Register Functions
         //TODO: read()
-        //TODO: isEmpty()
 
         // Register Fields
         registerInfixExpression(TokenType.TOK_HD, new PostfixOperatorParselet(Precedence.POSTFIX));

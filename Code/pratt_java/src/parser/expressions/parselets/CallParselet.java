@@ -1,5 +1,6 @@
 package parser.expressions.parselets;
 
+import parser.exceptions.ParseException;
 import parser.expressions.CallExpression;
 import parser.expressions.Expression;
 import lexer.Token;
@@ -23,7 +24,9 @@ public class CallParselet implements InfixParseletExpression {
             do {
                 args.add(parser.parseExpression());
             } while (parser.match(TokenType.TOK_COMMA));
-            parser.consume(TokenType.TOK_CLOSE_PARENTHESIS);
+            if(!parser.match(TokenType.TOK_CLOSE_PARENTHESIS)){
+                throw new ParseException(parser,"Expected ')' after function arguments");
+            }
         }
 
         return new CallExpression(left, args);

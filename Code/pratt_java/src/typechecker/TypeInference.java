@@ -116,6 +116,11 @@ public class TypeInference implements Visitor {
 	}
 
 	@Override
+	public void visit(isEmptyExpression e) {
+
+	}
+
+	@Override
 	public void visit(ListExpression e) {
 
 	}

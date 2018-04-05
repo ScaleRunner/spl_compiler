@@ -57,6 +57,16 @@ public class PrettyPrinterTest {
     }
 
     @Test
+    public void testIsEmpty() {
+        Lexer l = new Lexer("isEmpty(a)");
+        Parser p = new Parser(l.tokenize());
+        Expression e =  p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        e.accept(pp);
+        assertEquals("isEmpty(a)", pp.getResultString());
+    }
+
+    @Test
     public void testTuple() {
         Lexer l = new Lexer("(1,2)");
         Parser p = new Parser(l.tokenize());

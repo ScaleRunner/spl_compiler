@@ -19,6 +19,8 @@ public abstract class Expression extends Node {
             v.visit((IdentifierExpression) e);
         } else if(e.getClass() == IntegerExpression.class){
             v.visit((IntegerExpression) e);
+        } else if(e.getClass() == isEmptyExpression.class){
+            v.visit((isEmptyExpression) e);
         } else if (e.getClass() == ListExpression.class) {
             v.visit((ListExpression) e);
         } else if(e.getClass() == OperatorExpression.class){

@@ -284,6 +284,13 @@ public class TypecheckerTest {
     }
 
 	@Test
+	public void testisEmptyExpr() {
+		Node e = typecheckExpr("isEmpty(1:2:[])");
+		assertTypecheckSuccess();
+		assertEquals(Types.boolType, e.getType());
+	}
+
+	@Test
 	public void testFuncDecl() {
 		List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
 				"if (n < 2 ) {\n " +
