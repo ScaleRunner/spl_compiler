@@ -8,9 +8,15 @@ import parser.statements.Statement;
 import parser.types.Type;
 import parser.types.Types;
 import parser.Parser;
+import parser.declarations.Declaration;
+import parser.declarations.VariableDeclaration;
 import parser.expressions.Expression;
+import parser.statements.Statement;
 import typechecker.*;
 import util.Node;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TypecheckerTest {
 	private Typechecker tc = null;
@@ -49,6 +55,21 @@ public class TypecheckerTest {
 		tc.typecheck(expr);
 		return expr;
 	}
+
+	private List<Node> typecheckSPL(String input) {
+		Lexer l = new Lexer(input);
+		Parser p = new Parser(l.tokenize());
+		List<Declaration> decls = p.parseSPL();
+		List<Boolean> resultNodes = new ArrayList<>();
+		List<Node> nodes = new ArrayList<>();
+		for(Declaration d : decls) {
+			resultNodes.add(tc.typecheck(d));
+			nodes.add(d);
+		}
+		return nodes;
+	}
+
+
 
 	@Test
 	public void testCompareTypes() {
@@ -169,6 +190,15 @@ public class TypecheckerTest {
         assertTypecheckSuccess();
         assertEquals(Types.intType, e.getType());
     }
+
+	@Test
+	public void testValidVarDecl() {
+		List<Node> nodes = typecheckSPL("Int a = True;\n");
+		assertTypecheckSuccess();
+		for(Node n: nodes)
+			assertEquals(Types.voidType, n.getType());
+	}
+
 
     @Test
     public void testSimpleConditional() {
