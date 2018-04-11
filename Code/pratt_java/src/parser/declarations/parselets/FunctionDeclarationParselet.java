@@ -88,7 +88,8 @@ public class FunctionDeclarationParselet {
                                 parser.lookAhead(0).getType() == TokenType.TOK_KW_CHAR ||
                                 parser.lookAhead(0).getType() == TokenType.TOK_KW_INT ||
                                 parser.lookAhead(0).getType() == TokenType.TOK_KW_BOOL ||
-                                parser.lookAhead(0).getType() == TokenType.TOK_OPEN_BRACKETS) {
+                                parser.lookAhead(0).getType() == TokenType.TOK_OPEN_BRACKETS||
+                                parser.lookAhead(0).getType() == TokenType.TOK_OPEN_PARENTHESIS) {
                             //PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
 
                             //if (prefix == null) throw new ParseException(this, token);

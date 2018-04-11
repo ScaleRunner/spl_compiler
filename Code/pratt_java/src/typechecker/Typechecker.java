@@ -26,6 +26,7 @@ public class Typechecker implements Visitor {
     private final Type typeChar = Types.charType;
     private final Type typeVoid = Types.voidType;
 
+
 	private Environment env;
 	private HashMap<String, List<Type>> functionSignatures;
 
@@ -347,38 +348,54 @@ public class Typechecker implements Visitor {
 	@Override
 	public void visit(AssignStatement s) {
 		this.visit(s.right);
-        IdentifierExpression id = (IdentifierExpression) s.name;
+		if(s.name.getClass() == IdentifierExpression.class){
+        	IdentifierExpression id = (IdentifierExpression) s.name;
 
-        Type variableType = env.get(id.name);
+			Type variableType = env.get(id.name);
 
-        if(variableType == null){
-            error(String.format("Variable %s is not defined", id.name));
-        } else if(variableType != s.right.getType())
-			error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
-                    s.right.getType(), id.name, variableType, s.right.getType()));
-		s.setType(Types.voidType);
+
+
+			if(variableType == null){
+				error(String.format("Variable %s is not defined", id.name));
+			} else if(!variableType.equals(s.right.getType()))
+				error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
+						s.right.getType(), id.name, variableType, s.right.getType()));
+			s.setType(Types.voidType);
+		}
+
+		//need a different check, due to id.field.
+		else if(s.name.getClass() == PostfixExpression.class){
+			this.visit((PostfixExpression)s.name);
+			if(!s.name.getType().equals(s.right.getType()))
+				error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
+						s.right.getType(), (PostfixExpression)s.name , s.name.getType(), s.right.getType()));
+			s.setType(Types.voidType);
+		}
 	}
 
 	@Override
 	public void visit(CallStatement s) {
-		for(Expression e : s.args)
-			this.visit(e);
+		for(Expression exp : s.args)
+			this.visit(exp);
 		List<Type> funArgs = functionSignatures.get(s.function_name.name);
-        if(funArgs.size() != s.args.size()) {
-			error("Number of arguments in function call does not match.\nExpected: " +
-					functionSignatures.get(s.function_name.name).size() +
-					" parameter and received: " + s.args.size() + "parameters");
-		}
-		else{
-        	for(int i = 0; i < funArgs.size(); i++){
-        		if(!funArgs.get(i).equals(s.args.get(i))){
-					error("Incompatible types in function call.\n In argument "+ (i+1) +"expected type: " +
-							funArgs.get(i) +
-							"and received: " + s.args.get(i));
-        		}
+		if(funArgs == null)
+			error("Function "+ s.function_name.name + " was not defined.");
+		else {
+			if (funArgs.size() != s.args.size()) {
+				error("Number of arguments in function call do not match.\nExpected: " +
+						functionSignatures.get(s.function_name.name).size() +
+						" and received: " + s.args.size());
+			} else {
+				for (int i = 0; i < funArgs.size(); i++) {
+					if (!funArgs.get(i).equals(s.args.get(i).getType())) {
+						error("Incompatible types in function call.\n In argument " + (i + 1) + " expected type: " +
+								funArgs.get(i) +
+								" and received: " + s.args.get(i).getType());
+					}
+
+				}
 
 			}
-
 		}
 		s.setType(env.get(s.function_name.name));
 	}
@@ -478,9 +495,12 @@ public class Typechecker implements Visitor {
 		//set argument types if there are any
 		if(!d.args.isEmpty()){
 			for(IdentifierExpression id: d.args){
-				env.put(id.name, d.funType.argsTypes.get(argsCount++));
+				if(argsCount < d.funType.argsTypes.size())
+					env.put(id.name, d.funType.argsTypes.get(argsCount++));
+
 			}
 		}
+
 
 		if(!d.decls.isEmpty()){
 			for(VariableDeclaration varDecl : d.decls){
@@ -506,6 +526,10 @@ public class Typechecker implements Visitor {
     @Override
     public void visit(VariableDeclaration d) {
 		this.visit(d.right);
+		if(d.right.getType() instanceof ListType){
+			if(((ListType) d.right.getType()).listType == null)
+				d.right.setType(d.varType);
+		}
 		if(d.varType.equals(d.right.getType())) {
 			env.put(d.left.name, d.varType);
 

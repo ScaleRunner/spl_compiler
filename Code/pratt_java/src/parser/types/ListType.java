@@ -12,6 +12,7 @@ public class ListType extends Type{
         this.listType = listType;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

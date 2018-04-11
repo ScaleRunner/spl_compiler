@@ -142,7 +142,8 @@ public class Parser {
                 token.getType() == TokenType.TOK_KW_CHAR ||
                 token.getType() == TokenType.TOK_KW_INT ||
                 token.getType() == TokenType.TOK_KW_BOOL ||
-                token.getType() == TokenType.TOK_OPEN_BRACKETS) {
+                token.getType() == TokenType.TOK_OPEN_BRACKETS ||
+                token.getType() == TokenType.TOK_OPEN_PARENTHESIS) {
 
             return new VariableDeclarationParselet().parse(this, token);
         }
