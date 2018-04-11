@@ -21,16 +21,18 @@ import static parser.types.Types.intType;
 public class Typechecker implements Visitor {
 
 	// These are for convenience.
-	private final Type typeInt = intType;
+	private final Type typeInt = Types.intType;
 	private final Type typeBool = Types.boolType;
     private final Type typeChar = Types.charType;
     private final Type typeVoid = Types.voidType;
 
 	private Environment env;
+	private HashMap<String, List<Type>> functionSignatures;
 
 	private List<TypeError> errors;
 
 	public Typechecker(){
+		this.functionSignatures = new HashMap<>();
         this.errors = new LinkedList<>();
         this.env = new Environment();
     }
@@ -74,7 +76,29 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(CallExpression e) {
-        e.setType(env.get(e.function_name.name));
+		for(Expression exp : e.args)
+			this.visit(exp);
+		List<Type> funArgs = functionSignatures.get(e.function_name.name);
+		if(funArgs == null)
+			error("Function "+ e.function_name.name + " was not defined.");
+		else {
+			if (funArgs.size() != e.args.size()) {
+				error("Number of arguments in function call do not match.\nExpected: " +
+						functionSignatures.get(e.function_name.name).size() +
+						" and received: " + e.args.size());
+			} else {
+				for (int i = 0; i < funArgs.size(); i++) {
+					if (!funArgs.get(i).equals(e.args.get(i).getType())) {
+						error("Incompatible types in function call.\n In argument " + (i + 1) + " expected type: " +
+								funArgs.get(i) +
+								" and received: " + e.args.get(i).getType());
+					}
+
+				}
+
+			}
+		}
+		e.setType(env.get(e.function_name.name));
 	}
 
     @Override
@@ -84,6 +108,10 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(IdentifierExpression e) {
+		Type idType = env.get(e.name);
+		if(idType == null)
+			error("Variable "+ e.name+" out of scope or undefined.");
+		else
         e.setType(env.get(e.name));
 	}
 
@@ -130,7 +158,7 @@ public class Typechecker implements Visitor {
 				case TOK_DIV:
 				case TOK_MOD:
 					if(!e.left.getType().equals(e.right.getType())){
-						error("Typechecker: Left and right side of an expression must have the same listType.");
+						error("Typechecker: Left and right side of an expression must have the same Type.");
 					}
 					else
 						e.setType(typeInt);
@@ -143,7 +171,7 @@ public class Typechecker implements Visitor {
 				case TOK_LEQ:
 				case TOK_NEQ:
 					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same listType.");
+						error("Typechecker: Left and right side of and expression must have the same Type.");
 					}
 					else
 						e.setType(typeBool);
@@ -162,7 +190,7 @@ public class Typechecker implements Visitor {
 				case TOK_PLUS:
 				case TOK_MINUS:
 					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same listType.");
+						error("Typechecker: Left and right side of and expression must have the same Type.");
 					}
 					else
 						e.setType(typeChar);
@@ -175,7 +203,7 @@ public class Typechecker implements Visitor {
 				case TOK_LEQ:
 				case TOK_NEQ:
 					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same listType.");
+						error("Typechecker: Left and right side of and expression must have the same Type.");
 					}
 					else
 						e.setType(typeBool);
@@ -199,7 +227,7 @@ public class Typechecker implements Visitor {
 				case TOK_AND:
 				case TOK_OR:
 					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same listType.");
+						error("Typechecker: Left and right side of and expression must have the same Type.");
 					}
 					else
 						e.setType(typeBool);
@@ -223,12 +251,12 @@ public class Typechecker implements Visitor {
 					break;
 
 				default:
-					error("Typechecker: Invalid operator " + e.operator + " for listType Bool");
+					error("Typechecker: Invalid operator " + e.operator + " for Type Bool");
 					break;
 			}
 		}
 		else{
-			error("Invalid listType for expression " + e.operator);
+			error("Invalid operator Type "+ e.left.getType()+" for expression " + e.operator);
 		}
 	}
 
@@ -333,7 +361,26 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(CallStatement s) {
-        s.setType(env.get(s.function_name.name));
+		for(Expression e : s.args)
+			this.visit(e);
+		List<Type> funArgs = functionSignatures.get(s.function_name.name);
+        if(funArgs.size() != s.args.size()) {
+			error("Number of arguments in function call does not match.\nExpected: " +
+					functionSignatures.get(s.function_name.name).size() +
+					" parameter and received: " + s.args.size() + "parameters");
+		}
+		else{
+        	for(int i = 0; i < funArgs.size(); i++){
+        		if(!funArgs.get(i).equals(s.args.get(i))){
+					error("Incompatible types in function call.\n In argument "+ (i+1) +"expected type: " +
+							funArgs.get(i) +
+							"and received: " + s.args.get(i));
+        		}
+
+			}
+
+		}
+		s.setType(env.get(s.function_name.name));
 	}
 
 	@Override
@@ -418,6 +465,7 @@ public class Typechecker implements Visitor {
 		//set functiontype
 		d.setType(d.funType.returnType);
 		env.put(d.funName.name, d.funType.returnType);
+		functionSignatures.put(d.funName.name, d.funType.argsTypes);
 
 		//check if arguments and argument types match
 		if(d.args.size() != d.funType.argsTypes.size()){
@@ -442,12 +490,17 @@ public class Typechecker implements Visitor {
 
 		this.visit(d.stats);
 		Type returnType = returnType(d.stats);
-		if(returnType != d.funType.returnType){
-		    error(String.format("The return type of the function is not equal to the actual return type. " +
+		//Had to add equals method for IntType, it seems like the instance system is not working as it should.
+		if(!d.funType.returnType.equals(returnType) ){
+			if(returnType != null)
+		    	error(String.format("The return type of the function is not equal to the actual return type. " +
                     "\n\tExpected: %s \n\t Actual: %s", d.funType.returnType, returnType));
         }
 
         env = backup;
+		//add function signature to environment, so other functions below it can still use it.
+		env.put(d.funName.name, d.funType.returnType);
+
     }
 
     @Override

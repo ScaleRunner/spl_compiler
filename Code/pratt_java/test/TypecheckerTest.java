@@ -356,7 +356,7 @@ public class TypecheckerTest {
     }
 
 	@Test
-	public void testTwoFuncDeclWrongScoping() {
+	public void testTwoFuncDeclWrongVariableScope() {
 		typecheckSPL("facR( n ) :: Int -> Int {\n" +
 				"if (n < 2 ) {\n " +
 				"return 1;\n " +
@@ -370,4 +370,107 @@ public class TypecheckerTest {
 				"}");
 		assertTypecheckFailure();
 	}
+
+    @Test
+    public void testFunctionUse() {
+        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}\n" +
+                "fun(a) :: Int -> Int {\n" +
+                "a = 3;\n"+
+                "return facR(a+1);\n" +
+                "}");
+        assertTypecheckSuccess();
+        for(Node n: nodes)
+            assertEquals(Types.intType, n.getType());
+    }
+
+    @Test
+    public void testFunctionUseVariableOutOfScore() {
+        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}\n" +
+                "fun(a) :: Int -> Int {\n" +
+                "a = 3;\n"+
+                "return facR(n+1);\n" +
+                "}\n"+
+                "get2() :: -> Int {\n" +
+                "return 2;\n" +
+                "}");
+        assertTypecheckFailure();
+    }
+
+    @Test
+    public void testFunctionUseValidType() {
+        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}\n" +
+                "fun(a) :: Int -> Int {\n" +
+                "a = 3;\n"+
+                "return facR(a+1);\n" +
+                "}\n"+
+                "get2() :: -> Int {\n" +
+                "return 2;\n" +
+                "}\n"+
+                "myfun() :: -> Int {\n" +
+                "return get2();\n" +
+                "}");
+        assertTypecheckSuccess();
+        for(Node n: nodes)
+            assertEquals(Types.intType, n.getType());
+    }
+
+    @Test
+    public void testFunctionOutOfScope() {
+        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}\n" +
+                "fun(a) :: Int -> Int {\n" +
+                "a = 3;\n"+
+                "return facR(a+1);\n" +
+                "}\n"+
+                "get2() :: -> Int {\n" +
+                "return myfun();\n" +
+                "}\n"+
+                "myfun() :: -> Int {\n" +
+                "return get2();\n" +
+                "}");
+        assertTypecheckFailure();
+    }
+
+    @Test
+    public void testFunctionTooLessArguments() {
+        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}\n" +
+                "fun(a) :: Int -> Int {\n" +
+                "a = 3;\n"+
+                "return facR();\n" +
+                "}\n"+
+                "get2() :: -> Int {\n" +
+                "return 2;\n" +
+                "}");
+        assertTypecheckFailure();
+    }
+
 }
