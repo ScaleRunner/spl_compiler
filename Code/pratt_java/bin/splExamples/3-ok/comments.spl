@@ -19,15 +19,15 @@ main () :: -> Void
 
   print(4);
 
-  // tricky /* example
+  // tricky example
 
   print(5);
 
-  // end of tricky */ example
+  // end of tricky example
 
   print(6);
 
-  /* another tricky example // */
+  /* another tricky example */
 
   print(7);
 }

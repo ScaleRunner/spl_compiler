@@ -29,14 +29,16 @@ public class Lexer {
      */
     private void removeComments(){
         Pattern inlineComment = Pattern.compile("//[^\\n]*\\n");
-        Pattern blockComment = Pattern.compile("/\\*[^*/]*\\*/");
+        Pattern blockComment = Pattern.compile("/\\*[\\S\\s]+?\\*/");
 
         //Remove Inline Comments
         Matcher m = inlineComment.matcher(input);
         this.input = m.replaceAll("");
 
+        //Remove Block Comments
         m = blockComment.matcher(input);
         this.input = m.replaceAll("");
+
     }
 
     private void skipWhitespace() {
