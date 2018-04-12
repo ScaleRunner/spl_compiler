@@ -424,9 +424,6 @@ acs-*.bib
 # cprotect
 *.cpt
 
-# elsarticle (documentclass of Elsevier journals)
-*.spl
-
 # endnotes
 *.ent
 
