@@ -4,6 +4,7 @@ import lexer.Lexer;
 import org.junit.Before;
 import org.junit.Test;
 
+import parser.exceptions.ParseException;
 import parser.statements.Statement;
 import parser.types.Type;
 import parser.types.Types;
@@ -16,8 +17,13 @@ import typechecker.*;
 import util.Node;
 import util.ReadSPL;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TypecheckerTest {
 	private Typechecker tc = null;
@@ -39,6 +45,7 @@ public class TypecheckerTest {
 	}
 
     private void assertTypecheckFailure() {
+        System.out.println(tc.getAllErrors());
         assertFalse(tc.getAllErrors(), tc.getAllErrors().length() == 0);
     }
 
@@ -527,12 +534,46 @@ public class TypecheckerTest {
     public void testFunctionsSimpleOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = reader.readLineByLineJava8(".\\splExamples\\3-ok\\functionsSimple.spl");
+        String s = ReadSPL.readLineByLineJava8(".\\splExamples\\3-ok\\functionsSimple.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
+    @Test
+    public void testAllTestsByMarkus() {
+        try (Stream<Path> paths = Files.walk(Paths.get("./test/splExamples"))) {
+            paths.forEach(path ->{
+                if(Files.isRegularFile(path)){
+                    try {
+                        // To not mess up printing
+                        Thread.sleep( 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(path.toString());
+                    String s = ReadSPL.readLineByLineJava8(path.toString());
+
+                    try {
+                        List<Node> nodes = typecheckSPL(s);
+                        if(path.toString().contains("ok")){
+                            assertTypecheckSuccess();
+                        } else {
+                            assertTypecheckFailure();
+                        }
+                    } catch (ParseException e){
+                        if(path.toString().contains("parse")){
+                            System.err.println("Parse Exception Found!");
+                        } else {
+                            throw e;
+                        }
+                    }
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }
