@@ -874,7 +874,7 @@ public class ParserTest {
         Parser p = new Parser(tokens);
         List<Declaration> result = p.parseSPL();
         List<Declaration> actual = new ArrayList<>();
-        actual.add(new VariableDeclaration(Types.varType,
+        actual.add(new VariableDeclaration(Types.varType(),
                             new IdentifierExpression("alan"),
                             new OperatorExpression(
                                     new IntegerExpression(5),
@@ -1023,7 +1023,7 @@ public class ParserTest {
         args.add(new IdentifierExpression("b"));
 
         decls.add(new VariableDeclaration(Types.intType, new IdentifierExpression("c"), new IntegerExpression(0) ));
-        decls.add(new VariableDeclaration(Types.varType,new IdentifierExpression("useless"), new IntegerExpression(2) ));
+        decls.add(new VariableDeclaration(Types.varType(),new IdentifierExpression("useless"), new IntegerExpression(2) ));
 
 
         stats.add(new AssignStatement(
