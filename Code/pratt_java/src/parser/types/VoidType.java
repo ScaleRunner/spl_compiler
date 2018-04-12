@@ -21,5 +21,10 @@ public class VoidType extends Type{
     public Type applySubstitution(Substitution substitution) {
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "Void";
+    }
 }
 

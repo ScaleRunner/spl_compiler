@@ -32,4 +32,9 @@ public class CharType extends Type {
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "Char";
+    }
 }

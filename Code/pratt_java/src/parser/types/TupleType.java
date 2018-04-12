@@ -32,4 +32,9 @@ public class TupleType extends Type{
     public Type applySubstitution(Substitution substitution) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String toString() {
+        return String.format("Tuple(%s, %s)", left, right);
+    }
 }
