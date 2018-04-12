@@ -107,7 +107,7 @@ public class Typechecker implements Visitor {
 	public void visit(IdentifierExpression e) {
 		Type idType = env.get(e.name);
 		if(idType == null)
-			error("Variable "+ e.name+" out of scope or undefined.");
+			error(String.format("Variable %s out of scope or undefined.", e.name), e);
 		else
         e.setType(env.get(e.name));
 	}
@@ -121,7 +121,7 @@ public class Typechecker implements Visitor {
 	public void visit(isEmptyExpression e) {
 		this.visit(e.arg);
 		if(! (e.arg.getType() instanceof ListType))
-			error("isEmpty function needs argument of type List not " +e.arg.getType());
+			error(String.format("isEmpty function needs argument of type List not %s", e.arg.getType()), e);
 		e.setType(Types.boolType);
 
 	}
@@ -155,7 +155,7 @@ public class Typechecker implements Visitor {
 				case TOK_DIV:
 				case TOK_MOD:
 					if(!e.left.getType().equals(e.right.getType())){
-						error("Typechecker: Left and right side of an expression must have the same Type.");
+						error("Left and right side of an expression must have the same Type.", e);
 					}
 					else
 						e.setType(typeInt);
@@ -168,7 +168,7 @@ public class Typechecker implements Visitor {
 				case TOK_LEQ:
 				case TOK_NEQ:
 					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same Type.");
+						error("Left and right side of and expression must have the same Type.", e);
 					}
 					else
 						e.setType(typeBool);
@@ -177,7 +177,7 @@ public class Typechecker implements Visitor {
 					consTypecheckAux(e);
 					break;
 				default:
-					error("Typechecker: Unknown operator " + e.operator);
+					error(String.format("Unknown operator: %s", e.operator), e);
 					break;
 			}
 
@@ -187,7 +187,7 @@ public class Typechecker implements Visitor {
 				case TOK_PLUS:
 				case TOK_MINUS:
 					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same Type.");
+						error("Left and right side of and expression must have the same Type.", e);
 					}
 					else
 						e.setType(typeChar);
@@ -200,7 +200,7 @@ public class Typechecker implements Visitor {
 				case TOK_LEQ:
 				case TOK_NEQ:
 					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same Type.");
+						error("Left and right side of and expression must have the same Type.", e);
 					}
 					else
 						e.setType(typeBool);
@@ -209,7 +209,7 @@ public class Typechecker implements Visitor {
 					consTypecheckAux(e);
 					break;
 				default:
-					error("Typechecker: Unknown operator " + e.operator);
+					error(String.format("Unknown operator: %s", e.operator), e);
 					break;
 			}
 		}
@@ -224,7 +224,7 @@ public class Typechecker implements Visitor {
 				case TOK_AND:
 				case TOK_OR:
 					if(e.left.getType() != e.right.getType()){
-						error("Typechecker: Left and right side of and expression must have the same Type.");
+						error("Left and right side of and expression must have the same Type.", e);
 					}
 					else
 						e.setType(typeBool);
@@ -234,7 +234,7 @@ public class Typechecker implements Visitor {
 					break;
 
 				default:
-					error("Typechecker: Invalid operator " + e.operator + " for listType Bool");
+					error(String.format("Invalid operator %s for listType Bool", e.operator), e);
 					break;
 				}
 		}
@@ -248,12 +248,12 @@ public class Typechecker implements Visitor {
 					break;
 
 				default:
-					error("Typechecker: Invalid operator " + e.operator + " for Type Bool");
+					error(String.format("Invalid operator %s for Type Bool", e.operator), e);
 					break;
 			}
 		}
 		else{
-			error("Invalid operator Type "+ e.left.getType()+" for expression " + e.operator);
+			error(String.format("Invalid operator Type %s for expression %s", e.left.getType(), e.operator), e);
 		}
 	}
 
@@ -270,7 +270,7 @@ public class Typechecker implements Visitor {
                     e.setType(t);
                     break;
                 default:
-                    error(String.format("Operator %s is undefined for type %s", e.operator, t));
+                    error(String.format("Operator %s is undefined for type %s", e.operator, t), e);
             }
         } else if(e.left.getType() instanceof TupleType){
             TupleType t = (TupleType) e.left.getType();
@@ -282,10 +282,10 @@ public class Typechecker implements Visitor {
                     e.setType(t.right);
                     break;
                 default:
-                    error(String.format("Operator %s is undefined for type %s", e.operator, t));
+                    error(String.format("Operator %s is undefined for type %s", e.operator, t), e);
             }
         } else {
-            error(String.format("Operator %s is undefined for type %s", e.operator, e.left.getType()));
+            error(String.format("Operator %s is undefined for type %s", e.operator, e.left.getType()), e);
         }
 	}
 
