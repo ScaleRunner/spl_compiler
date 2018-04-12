@@ -1,0 +1,23 @@
+main()::->Void
+{
+    /* 42 */
+    if( True )
+    {
+        print(42);
+    }
+    else
+    {
+        print(100);
+    }
+
+
+    /* 20 */
+    if( False )
+    {
+        print(13);
+    }
+    else
+    {
+        print(20);
+    }
+}
