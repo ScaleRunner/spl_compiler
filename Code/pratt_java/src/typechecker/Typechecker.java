@@ -23,8 +23,8 @@ public class Typechecker implements Visitor {
 	// These are for convenience.
 	private final Type typeInt = Types.intType;
 	private final Type typeBool = Types.boolType;
-    private final Type typeChar = Types.charType;
-    private final Type typeVoid = Types.voidType;
+	private final Type typeChar = Types.charType;
+	private final Type typeVoid = Types.voidType;
 
 
 	private Environment env;
@@ -34,9 +34,9 @@ public class Typechecker implements Visitor {
 
 	public Typechecker(){
 		this.functionSignatures = new HashMap<>();
-        this.errors = new LinkedList<>();
-        this.env = new Environment();
-    }
+		this.errors = new LinkedList<>();
+		this.env = new Environment();
+	}
 	public boolean typecheck(Node ast) {
 		ast.accept(this);
 		return errors.isEmpty();
@@ -85,12 +85,12 @@ public class Typechecker implements Visitor {
 		else {
 			if (funArgs.size() != e.args.size()) {
 				error(String.format("Number of arguments in function call do not match. \n\tExpected: %s\n\tActual: %s",
-                        functionSignatures.get(e.function_name.name).size(), e.args.size()), e);
+						functionSignatures.get(e.function_name.name).size(), e.args.size()), e);
 			} else {
 				for (int i = 0; i < funArgs.size(); i++) {
 					if (!funArgs.get(i).equals(e.args.get(i).getType())) {
-						error(String.format("Incompatible types in function call in argument %s\n\tExpected type: %s\n\tActual Type %s",
-                                i + 1, funArgs.get(i), e.args.get(i).getType()), e);
+						error(String.format("Incompatible types in function call in argument %s\n\tExpected type: %s\n\tActual type: %s",
+								i + 1, funArgs.get(i), e.args.get(i).getType()), e);
 					}
 				}
 			}
@@ -98,10 +98,10 @@ public class Typechecker implements Visitor {
 		e.setType(env.get(e.function_name.name));
 	}
 
-    @Override
-    public void visit(CharacterExpression e) {
-        e.setType(typeChar);
-    }
+	@Override
+	public void visit(CharacterExpression e) {
+		e.setType(typeChar);
+	}
 
 	@Override
 	public void visit(IdentifierExpression e) {
@@ -109,7 +109,7 @@ public class Typechecker implements Visitor {
 		if(idType == null)
 			error(String.format("Variable %s out of scope or undefined.", e.name), e);
 		else
-        e.setType(env.get(e.name));
+			e.setType(env.get(e.name));
 	}
 
 	@Override
@@ -128,22 +128,22 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(ListExpression e) {
-	    // A list expression starts out as an empty list, so initially its nothing
-        e.setType(Types.listType(null));
+		// A list expression starts out as an empty list, so initially its nothing
+		e.setType(Types.listType(null));
 	}
 
 	@Override
 	public void visit(OperatorExpression e) {
-        /*
-         * + : char, int
-         * - : char, int
-         * * : int
-         * / : int
-         * % : int
-         * ==: int, char, bool
-         * comperators
-         */
-        e.left.accept(this);
+		/*
+		 * + : char, int
+		 * - : char, int
+		 * * : int
+		 * / : int
+		 * % : int
+		 * ==: int, char, bool
+		 * comperators
+		 */
+		e.left.accept(this);
 		e.right.accept(this);
 
 		if(e.left.getType() instanceof IntType){
@@ -215,8 +215,8 @@ public class Typechecker implements Visitor {
 		}
 		else if(e.left.getType() instanceof BoolType){
 			switch (e.operator) {
-                case TOK_NEQ:
-                case TOK_EQ:
+				case TOK_NEQ:
+				case TOK_EQ:
 				case TOK_AND:
 				case TOK_OR:
 					if(e.left.getType() != e.right.getType()){
@@ -232,11 +232,19 @@ public class Typechecker implements Visitor {
 				default:
 					error(String.format("Invalid operator %s for Type Bool", e.operator), e);
 					break;
-				}
+			}
 		}
-//		else if(e.getType() instanceof ListType){
-//
-//		}
+		else if(e.left.getType() instanceof ListType){
+			switch (e.operator) {
+				case TOK_CONS:
+					consTypecheckAux(e);
+					break;
+
+				default:
+					error(String.format("Invalid operator %s for Type Bool", e.operator), e);
+					break;
+			}
+		}
 		else if(e.left.getType() instanceof  TupleType){
 			switch (e.operator) {
 				case TOK_CONS:
@@ -255,65 +263,65 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(PostfixExpression e) {
-	    this.visit(e.left);
-        if(e.left.getType() instanceof ListType){
-            ListType t = (ListType) e.left.getType();
-            switch (e.operator){
-                case TOK_HD:
-                    e.setType(t.listType);
-                    break;
-                case TOK_TL:
-                    e.setType(t);
-                    break;
-                default:
-                    error(String.format("Operator %s is undefined for type %s", e.operator, t), e);
-            }
-        } else if(e.left.getType() instanceof TupleType){
-            TupleType t = (TupleType) e.left.getType();
-            switch (e.operator){
-                case TOK_FST:
-                    e.setType(t.left);
-                    break;
-                case TOK_SND:
-                    e.setType(t.right);
-                    break;
-                default:
-                    error(String.format("Operator %s is undefined for type %s", e.operator, t), e);
-            }
-        } else {
-            error(String.format("Operator %s is undefined for type %s", e.operator, e.left.getType()), e);
-        }
+		this.visit(e.left);
+		if(e.left.getType() instanceof ListType){
+			ListType t = (ListType) e.left.getType();
+			switch (e.operator){
+				case TOK_HD:
+					e.setType(t.listType);
+					break;
+				case TOK_TL:
+					e.setType(t);
+					break;
+				default:
+					error(String.format("Operator %s is undefined for type %s", e.operator, t), e);
+			}
+		} else if(e.left.getType() instanceof TupleType){
+			TupleType t = (TupleType) e.left.getType();
+			switch (e.operator){
+				case TOK_FST:
+					e.setType(t.left);
+					break;
+				case TOK_SND:
+					e.setType(t.right);
+					break;
+				default:
+					error(String.format("Operator %s is undefined for type %s", e.operator, t), e);
+			}
+		} else {
+			error(String.format("Operator %s is undefined for type %s", e.operator, e.left.getType()), e);
+		}
 	}
 
 	@Override
 	public void visit(PrefixExpression e) {
-	    this.visit(e.right);
-        if(e.operator == TokenType.TOK_NOT){
-            if(e.right.getType() == Types.boolType) {
-                e.setType(Types.boolType);
-            } else{
-                error("You can only negate boolean expressions", e);
-            }
-        }
-	    else if(e.operator == TokenType.TOK_MINUS){
-            if(e.right.getType() == Types.intType){
-                e.setType(Types.intType);
-            } else {
-                error("The minus is only allowed for integer expressions", e);
-            }
-        } else {
-            error(String.format("Unsupported prefix operator '%s' for type '%s'",e.operator.getValue(), e.right.getType()), e);
-        }
+		this.visit(e.right);
+		if(e.operator == TokenType.TOK_NOT){
+			if(e.right.getType() == Types.boolType) {
+				e.setType(Types.boolType);
+			} else{
+				error("You can only negate boolean expressions", e);
+			}
+		}
+		else if(e.operator == TokenType.TOK_MINUS){
+			if(e.right.getType() == Types.intType){
+				e.setType(Types.intType);
+			} else {
+				error("The minus is only allowed for integer expressions", e);
+			}
+		} else {
+			error(String.format("Unsupported prefix operator '%s' for type '%s'",e.operator.getValue(), e.right.getType()), e);
+		}
 	}
 
 	@Override
 	public void visit(TupleExpression e) {
-        this.visit(e.left);
-        this.visit(e.right);
-        if ((e.left.getType() == Types.voidType) ||(e.right.getType() == Types.voidType)) {
-            error("Tuples cannot have listType Void.", e);
-        }
-        e.setType(Types.tupleType(e.left.getType(), e.right.getType() ));
+		this.visit(e.left);
+		this.visit(e.right);
+		if ((e.left.getType() == Types.voidType) ||(e.right.getType() == Types.voidType)) {
+			error("Tuples cannot have listType Void.", e);
+		}
+		e.setType(Types.tupleType(e.left.getType(), e.right.getType() ));
 
 	}
 
@@ -323,25 +331,25 @@ public class Typechecker implements Visitor {
 	}
 
 	public Type visit(List<Statement> statementBlock){
-	    Type blockType = Types.voidType;
-        for(Statement s : statementBlock){
-            this.visit(s);
-            if(s instanceof ReturnStatement){
-                if(blockType != Types.voidType){ // i.e. you already saw a return statement
-                    throw new CompileException("Having two return statements is not allowed.");
-                }
-                ReturnStatement ret = (ReturnStatement) s;
-                blockType = ret.arg.getType();
-            }
-        }
-        return blockType;
-    }
+		Type blockType = Types.voidType;
+		for(Statement s : statementBlock){
+			this.visit(s);
+			if(s instanceof ReturnStatement){
+				if(blockType != Types.voidType){ // i.e. you already saw a return statement
+					throw new CompileException("Having two return statements is not allowed.");
+				}
+				ReturnStatement ret = (ReturnStatement) s;
+				blockType = ret.arg.getType();
+			}
+		}
+		return blockType;
+	}
 
 	@Override
 	public void visit(AssignStatement s) {
 		this.visit(s.right);
 		if(s.name.getClass() == IdentifierExpression.class){
-        	IdentifierExpression id = (IdentifierExpression) s.name;
+			IdentifierExpression id = (IdentifierExpression) s.name;
 
 			Type variableType = env.get(id.name);
 
@@ -394,78 +402,78 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(ConditionalStatement conditionalStatement) {
-        this.visit(conditionalStatement.condition);
-        if(conditionalStatement.condition.getType() != Types.boolType){
-            error(String.format("The condition should be of type Boolean, but it has type '%s' in condition %s",
-                    conditionalStatement.condition.getType(), conditionalStatement.condition), conditionalStatement);
-        }
-        Type thenBranchType = this.visit(conditionalStatement.then_expression);
-        conditionalStatement.setType(thenBranchType);
+		this.visit(conditionalStatement.condition);
+		if(conditionalStatement.condition.getType() != Types.boolType){
+			error(String.format("The condition should be of type Boolean, but it has type '%s' in condition %s",
+					conditionalStatement.condition.getType(), conditionalStatement.condition), conditionalStatement);
+		}
+		Type thenBranchType = this.visit(conditionalStatement.then_expression);
+		conditionalStatement.setType(thenBranchType);
 
-        if(conditionalStatement.else_expression.size() != 0){
-            Type elseBranchType = this.visit(conditionalStatement.else_expression);
-            if(thenBranchType != elseBranchType){
-                error(String.format("The return statements of both conditional branches should be of the same type. \n" +
-                        "\tActual: (then) %s, (else) %s", thenBranchType, elseBranchType), conditionalStatement);
-            }
-        }
+		if(conditionalStatement.else_expression.size() != 0){
+			Type elseBranchType = this.visit(conditionalStatement.else_expression);
+			if(thenBranchType != elseBranchType){
+				error(String.format("The return statements of both conditional branches should be of the same type. \n" +
+						"\tActual: (then) %s, (else) %s", thenBranchType, elseBranchType), conditionalStatement);
+			}
+		}
 	}
 
 	@Override
 	public void visit(LoopStatement s) {
-        this.visit(s.condition);
-        if(s.condition.getType() != Types.boolType){
-            error(String.format("The condition should be of type Boolean, is of type '%s' in condition %s",
-                    s.condition.getType(), s.condition), s);
-        }
-        s.setType(this.visit(s.body));
+		this.visit(s.condition);
+		if(s.condition.getType() != Types.boolType){
+			error(String.format("The condition should be of type Boolean, is of type '%s' in condition %s",
+					s.condition.getType(), s.condition), s);
+		}
+		s.setType(this.visit(s.body));
 	}
 
 	@Override
 	public void visit(PrintStatement s) {
-	    this.visit(s.arg);
-	    if(s.arg.getType() instanceof ListType || s.arg.getType() instanceof TupleType){
-	        error("Print statements cannot handle lists or tuples.", s);
-        }
-        s.setType(s.arg.getType());
+		this.visit(s.arg);
+		if(s.arg.getType() instanceof ListType || s.arg.getType() instanceof TupleType){
+			error("Print statements cannot handle lists or tuples.", s);
+		}
+		s.setType(s.arg.getType());
 	}
 
 	@Override
 	public void visit(ReturnStatement s) {
-	    if(s.arg == null){
-	        s.setType(Types.voidType);
-        } else {
-            this.visit(s.arg);
-            s.setType(s.arg.getType());
-        }
-    }
-
-    @Override
-    public void visit(Declaration d) {
-		Declaration.visitDeclaration(this, d);
-    }
-
-    private Type returnType(List<Statement> statements){
-	    Type returnType = null;
-	    for(Statement s : statements){
-	        if(s instanceof ReturnStatement){
-	            ReturnStatement returnStmt = (ReturnStatement) s;
-	            returnType = returnStmt.getType();
-            } else if(s instanceof ConditionalStatement){
-	            ConditionalStatement condStmt = (ConditionalStatement) s;
-	            returnType = returnType(condStmt.then_expression);
-            } else if(s instanceof LoopStatement){
-	            LoopStatement loopStmt = (LoopStatement) s;
-	            returnType = returnType(loopStmt.body);
-            }
-        }
-        return returnType;
-    }
+		if(s.arg == null){
+			s.setType(Types.voidType);
+		} else {
+			this.visit(s.arg);
+			s.setType(s.arg.getType());
+		}
+	}
 
 	@Override
-    public void visit(FunctionDeclaration d) {
-	    //Backup original environment to fix let binding
-	    Environment backup = Environment.deepCopy(env);
+	public void visit(Declaration d) {
+		Declaration.visitDeclaration(this, d);
+	}
+
+	private Type returnType(List<Statement> statements){
+		Type returnType = null;
+		for(Statement s : statements){
+			if(s instanceof ReturnStatement){
+				ReturnStatement returnStmt = (ReturnStatement) s;
+				returnType = returnStmt.getType();
+			} else if(s instanceof ConditionalStatement){
+				ConditionalStatement condStmt = (ConditionalStatement) s;
+				returnType = returnType(condStmt.then_expression);
+			} else if(s instanceof LoopStatement){
+				LoopStatement loopStmt = (LoopStatement) s;
+				returnType = returnType(loopStmt.body);
+			}
+		}
+		return returnType;
+	}
+
+	@Override
+	public void visit(FunctionDeclaration d) {
+		//Backup original environment to fix let binding
+		Environment backup = Environment.deepCopy(env);
 
 		//counter to aux argtypes
 		int argsCount = 0;
@@ -490,7 +498,7 @@ public class Typechecker implements Visitor {
 				if(argsCount < d.funType.argsTypes.size())
 					env.put(id.name, d.funType.argsTypes.get(argsCount++));
 				else
-                    env.put(id.name, null);
+					env.put(id.name, null);
 			}
 		}
 
@@ -506,18 +514,18 @@ public class Typechecker implements Visitor {
 		//Had to add equals method for IntType, it seems like the instance system is not working as it should.
 		if(!d.funType.returnType.equals(returnType) ){
 			if(returnType != null)
-		    	error(String.format("The return type of the function is not equal to the actual return type. " +
-                    "\n\tExpected: %s \n\t Actual: %s", d.funType.returnType, returnType), d);
-        }
+				error(String.format("The return type of the function is not equal to the actual return type. " +
+						"\n\tExpected: %s \n\t Actual: %s", d.funType.returnType, returnType), d);
+		}
 
-        env = backup;
+		env = backup;
 		//add function signature to environment, so other functions below it can still use it.
 		env.put(d.funName.name, d.funType.returnType);
 
-    }
+	}
 
-    @Override
-    public void visit(VariableDeclaration d) {
+	@Override
+	public void visit(VariableDeclaration d) {
 		this.visit(d.right);
 		if(d.right.getType() instanceof ListType){
 			if(((ListType) d.right.getType()).listType == null)
@@ -528,9 +536,9 @@ public class Typechecker implements Visitor {
 
 		} else
 			error(String.format("Variable %s, of type %s cannot have an assignment of type %s.",
-                    d.left, d.varType, d.right.getType()), d);
+					d.left, d.varType, d.right.getType()), d);
 		d.setType(Types.voidType);
-    }
+	}
 
 	private void consTypecheckAux(OperatorExpression e){
 		if(!(e.right.getType() instanceof ListType)){
@@ -540,17 +548,62 @@ public class Typechecker implements Visitor {
 		ListType listTypeRight = (ListType) e.right.getType();
 
 		if(listTypeRight.listType == null){
-			listTypeRight.listType = e.left.getType();
+			if(e.left.getType() instanceof ListType)
+				listTypeRight.listType = ((ListType) e.left.getType()).listType;
+			else
+				listTypeRight.listType = e.left.getType();
 			e.right.setType(listTypeRight);
 		}
 
-		if(!e.left.getType().equals(listTypeRight.listType)){
+//		if(listTypeRight.listType instanceof TupleType){
+//
+//			TupleType t = (TupleType) listTypeRight.listType;
+//			if(t.right instanceof ListType){
+//				ListType lr = (ListType) t.right;
+//				//ListType ll = (ListType) t.left;
+//				ListType listTypeleft = (ListType) e.left.getType();
+//
+//				if(lr.listType == null)
+//					lr.listType = listTypeleft.listType;
+//
+//			}
+//			else if(t.left instanceof ListType){
+//				ListType lr = (ListType) t.right;
+//				ListType ll = (ListType) t.left;
+//
+//				if(ll.listType == null)
+//					ll.listType = lr.listType;
+//
+//				lr.listType = ll.listType;
+//			}
+//
+//
+//			if(t.right. == null){
+//				t.right = e.left.getType();
+//			}
+//
+//
+//		}
+		if(e.left.getType() instanceof ListType){
+			if(e.left.getType().equals(((ListType) e.right.getType()).listType))
+				e.left.setType(e.right.getType());
+			if(!e.left.getType().equals(e.right.getType())){
+				error("Typechecker: Left and right side of and expression must have the same listType. "+
+						e.left.getType() + ' ' + listTypeRight.listType,e );
+
+			}
+		}
+		else if(!e.left.getType().equals(listTypeRight.listType)){
 			error("Typechecker: Left and right side of and expression must have the same listType. "+
 					e.left.getType() + ' ' + listTypeRight.listType,e );
 
 		}
 
-		e.setType(listTypeRight);
+		if((e.left.getType() instanceof ListType) && (e.right.getType() instanceof ListType))
+			e.setType(new ListType(listTypeRight));
+		else
+			e.setType(listTypeRight);
+
 	}
 
 }

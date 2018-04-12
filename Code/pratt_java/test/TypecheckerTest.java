@@ -581,7 +581,7 @@ public class TypecheckerTest {
     public void testlistFunction3OkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/listFunction3.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/lists.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
