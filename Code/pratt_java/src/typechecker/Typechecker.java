@@ -296,17 +296,17 @@ public class Typechecker implements Visitor {
             if(e.right.getType() == Types.boolType) {
                 e.setType(Types.boolType);
             } else{
-                error("You can only negate boolean expressions");
+                error("You can only negate boolean expressions", e);
             }
         }
 	    else if(e.operator == TokenType.TOK_MINUS){
             if(e.right.getType() == Types.intType){
                 e.setType(Types.intType);
             } else {
-                error("The minus is only allowed for integer expressions");
+                error("The minus is only allowed for integer expressions", e);
             }
         } else {
-            error(String.format("Unsupported prefix operator '%s' for type '%s'",e.operator.getValue(), e.right.getType()));
+            error(String.format("Unsupported prefix operator '%s' for type '%s'",e.operator.getValue(), e.right.getType()), e);
         }
 	}
 
@@ -315,7 +315,7 @@ public class Typechecker implements Visitor {
         this.visit(e.left);
         this.visit(e.right);
         if ((e.left.getType() == Types.voidType) ||(e.right.getType() == Types.voidType)) {
-            error("Tuples cannot have listType Void.");
+            error("Tuples cannot have listType Void.", e);
         }
         e.setType(Types.tupleType(e.left.getType(), e.right.getType() ));
 
@@ -352,10 +352,10 @@ public class Typechecker implements Visitor {
 
 
 			if(variableType == null){
-				error(String.format("Variable %s is not defined", id.name));
+				error(String.format("Variable %s is not defined", id.name), s);
 			} else if(!variableType.equals(s.right.getType()))
 				error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
-						s.right.getType(), id.name, variableType, s.right.getType()));
+						s.right.getType(), id.name, variableType, s.right.getType()),s);
 			s.setType(Types.voidType);
 		}
 
@@ -364,7 +364,7 @@ public class Typechecker implements Visitor {
 			this.visit((PostfixExpression)s.name);
 			if(!s.name.getType().equals(s.right.getType()))
 				error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
-						s.right.getType(), (PostfixExpression)s.name , s.name.getType(), s.right.getType()));
+						s.right.getType(), (PostfixExpression)s.name , s.name.getType(), s.right.getType()),s);
 			s.setType(Types.voidType);
 		}
 	}
@@ -375,18 +375,18 @@ public class Typechecker implements Visitor {
 			this.visit(exp);
 		List<Type> funArgs = functionSignatures.get(s.function_name.name);
 		if(funArgs == null)
-			error("Function "+ s.function_name.name + " was not defined.");
+			error("Function "+ s.function_name.name + " was not defined.",s);
 		else {
 			if (funArgs.size() != s.args.size()) {
 				error("Number of arguments in function call do not match.\nExpected: " +
 						functionSignatures.get(s.function_name.name).size() +
-						" and received: " + s.args.size());
+						" and received: " + s.args.size(),s);
 			} else {
 				for (int i = 0; i < funArgs.size(); i++) {
 					if (!funArgs.get(i).equals(s.args.get(i).getType())) {
 						error("Incompatible types in function call.\n In argument " + (i + 1) + " expected type: " +
 								funArgs.get(i) +
-								" and received: " + s.args.get(i).getType());
+								" and received: " + s.args.get(i).getType(), s);
 					}
 
 				}
@@ -401,7 +401,7 @@ public class Typechecker implements Visitor {
         this.visit(conditionalStatement.condition);
         if(conditionalStatement.condition.getType() != Types.boolType){
             error(String.format("The condition should be of type Boolean, is of type '%s' in condition %s",
-                    conditionalStatement.condition.getType(), conditionalStatement.condition));
+                    conditionalStatement.condition.getType(), conditionalStatement.condition), conditionalStatement);
         }
         Type thenBranchType = this.visit(conditionalStatement.then_expression);
         conditionalStatement.setType(thenBranchType);
@@ -410,7 +410,7 @@ public class Typechecker implements Visitor {
             Type elseBranchType = this.visit(conditionalStatement.else_expression);
             if(thenBranchType != elseBranchType){
                 error(String.format("The return statements of both conditional branches should be of the same type. \n" +
-                        "\tActual: (then) %s, (else) %s", thenBranchType, elseBranchType));
+                        "\tActual: (then) %s, (else) %s", thenBranchType, elseBranchType), conditionalStatement);
             }
         }
 	}
@@ -420,7 +420,7 @@ public class Typechecker implements Visitor {
         this.visit(s.condition);
         if(s.condition.getType() != Types.boolType){
             error(String.format("The condition should be of type Boolean, is of type '%s' in condition %s",
-                    s.condition.getType(), s.condition));
+                    s.condition.getType(), s.condition), s);
         }
         s.setType(this.visit(s.body));
 	}
@@ -429,7 +429,7 @@ public class Typechecker implements Visitor {
 	public void visit(PrintStatement s) {
 	    this.visit(s.arg);
 	    if(s.arg.getType() instanceof ListType || s.arg.getType() instanceof TupleType){
-	        error("Print statements cannot handle lists or tuples.");
+	        error("Print statements cannot handle lists or tuples.", s);
         }
         s.setType(s.arg.getType());
 	}
@@ -483,9 +483,9 @@ public class Typechecker implements Visitor {
 		//check if arguments and argument types match
 		if(d.args.size() != d.funType.argsTypes.size()){
 			if(d.args.size() < d.funType.argsTypes.size())
-				error("There are missing types for some function arguments");
+				error("There are missing types for some function arguments", d);
 			else
-				error("There are too many argument types for the function arguments");
+				error("There are too many argument types for the function arguments", d);
 		}
 
 		//set argument types if there are any
@@ -510,7 +510,7 @@ public class Typechecker implements Visitor {
 		if(!d.funType.returnType.equals(returnType) ){
 			if(returnType != null)
 		    	error(String.format("The return type of the function is not equal to the actual return type. " +
-                    "\n\tExpected: %s \n\t Actual: %s", d.funType.returnType, returnType));
+                    "\n\tExpected: %s \n\t Actual: %s", d.funType.returnType, returnType), d);
         }
 
         env = backup;
@@ -531,13 +531,13 @@ public class Typechecker implements Visitor {
 
 		} else
 			error(String.format("Variable %s, of type %s cannot have an assignment of type %s.",
-                    d.left, d.varType, d.right.getType()));
+                    d.left, d.varType, d.right.getType()), d);
 		d.setType(Types.voidType);
     }
 
 	private void consTypecheckAux(OperatorExpression e){
 		if(!(e.right.getType() instanceof ListType)){
-			error("Typechecker: Right hand side of cons expression must have listType list");
+			error("Typechecker: Right hand side of cons expression must have listType list", e);
 		}
 
 		ListType listTypeRight = (ListType) e.right.getType();
@@ -549,7 +549,8 @@ public class Typechecker implements Visitor {
 
 		if(!e.left.getType().equals(listTypeRight.listType)){
 			error("Typechecker: Left and right side of and expression must have the same listType. "+
-					e.left.getType() + ' ' + listTypeRight.listType );
+					e.left.getType() + ' ' + listTypeRight.listType,e );
+
 		}
 
 		e.setType(listTypeRight);

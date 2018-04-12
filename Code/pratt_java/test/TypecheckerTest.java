@@ -603,6 +603,7 @@ public class TypecheckerTest {
                     String s = ReadSPL.readLineByLineJava8(path.toString());
 
                     try {
+                        setUp();
                         List<Node> nodes = typecheckSPL(s);
                         if(path.toString().contains("ok")){
                             assertTypecheckSuccess();
