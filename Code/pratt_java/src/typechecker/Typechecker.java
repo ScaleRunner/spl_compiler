@@ -46,8 +46,8 @@ public class Typechecker implements Visitor {
 		return errors;
 	}
 
-	private void error(String errorMessage) {
-		errors.add(new TypeError(errorMessage));
+	private void error(String errorMessage, Node n) {
+		errors.add(new TypeError(String.format("%s \n\t Error occurred in:\n%s",errorMessage, n)));
 	}
 
 	public void printErrors() {
@@ -81,22 +81,18 @@ public class Typechecker implements Visitor {
 			this.visit(exp);
 		List<Type> funArgs = functionSignatures.get(e.function_name.name);
 		if(funArgs == null)
-			error("Function "+ e.function_name.name + " was not defined.");
+			error(String.format("Function %s was not defined.", e.function_name.name), e);
 		else {
 			if (funArgs.size() != e.args.size()) {
-				error("Number of arguments in function call do not match.\nExpected: " +
-						functionSignatures.get(e.function_name.name).size() +
-						" and received: " + e.args.size());
+				error(String.format("Number of arguments in function call do not match. \n\tExpected: %s\n\tActual: %s",
+                        functionSignatures.get(e.function_name.name).size(), e.args.size()), e);
 			} else {
 				for (int i = 0; i < funArgs.size(); i++) {
 					if (!funArgs.get(i).equals(e.args.get(i).getType())) {
-						error("Incompatible types in function call.\n In argument " + (i + 1) + " expected type: " +
-								funArgs.get(i) +
-								" and received: " + e.args.get(i).getType());
+						error(String.format("Incompatible types in function call in argument %s\n\tExpected type: %s\n\tActual Type %s",
+                                i + 1, funArgs.get(i), e.args.get(i).getType()), e);
 					}
-
 				}
-
 			}
 		}
 		e.setType(env.get(e.function_name.name));
