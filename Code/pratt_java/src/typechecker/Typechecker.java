@@ -215,12 +215,8 @@ public class Typechecker implements Visitor {
 		}
 		else if(e.left.getType() instanceof BoolType){
 			switch (e.operator) {
-				case TOK_LT:
-				case TOK_GT:
-				case TOK_GEQ:
-				case TOK_EQ:
-				case TOK_LEQ:
-				case TOK_NEQ:
+                case TOK_NEQ:
+                case TOK_EQ:
 				case TOK_AND:
 				case TOK_OR:
 					if(e.left.getType() != e.right.getType()){
@@ -234,7 +230,7 @@ public class Typechecker implements Visitor {
 					break;
 
 				default:
-					error(String.format("Invalid operator %s for listType Bool", e.operator), e);
+					error(String.format("Invalid operator %s for Type Bool", e.operator), e);
 					break;
 				}
 		}
@@ -400,7 +396,7 @@ public class Typechecker implements Visitor {
 	public void visit(ConditionalStatement conditionalStatement) {
         this.visit(conditionalStatement.condition);
         if(conditionalStatement.condition.getType() != Types.boolType){
-            error(String.format("The condition should be of type Boolean, is of type '%s' in condition %s",
+            error(String.format("The condition should be of type Boolean, but it has type '%s' in condition %s",
                     conditionalStatement.condition.getType(), conditionalStatement.condition), conditionalStatement);
         }
         Type thenBranchType = this.visit(conditionalStatement.then_expression);
@@ -493,7 +489,8 @@ public class Typechecker implements Visitor {
 			for(IdentifierExpression id: d.args){
 				if(argsCount < d.funType.argsTypes.size())
 					env.put(id.name, d.funType.argsTypes.get(argsCount++));
-
+				else
+                    env.put(id.name, null);
 			}
 		}
 
