@@ -14,8 +14,8 @@ main() :: -> Void
 
     print( a.fst );
     print( a.snd );
-    print( a . fst );
-    print( a . snd );
+    print( a.fst );
+    print( a.snd );
 
     print( b.fst );
     print( b.snd );
