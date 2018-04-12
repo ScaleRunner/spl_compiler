@@ -477,7 +477,7 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionsExampleMarkus() {
-	    String s = reader.readLineByLineJava8(".\\splExamples\\2-compile-errors\\functions.spl");
+	    String s = reader.readLineByLineJava8(".\\test\\splExamples\\2-compile-errors\\functions.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckFailure();
@@ -487,7 +487,7 @@ public class TypecheckerTest {
     public void testListsExampleMarkus() {
 	    //This test has a lot of funny things we did not take into account...
 
-        String s = reader.readLineByLineJava8(".\\splExamples\\2-compile-errors\\lists.spl");
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\2-compile-errors\\lists.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckFailure();
@@ -496,7 +496,7 @@ public class TypecheckerTest {
     @Test
     public void testAssociativityOkExampleMarkus() {
 
-        String s = reader.readLineByLineJava8(".\\splExamples\\3-ok\\associativity.spl");
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\associativity.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
@@ -506,18 +506,18 @@ public class TypecheckerTest {
     public void testAssignmentsOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = reader.readLineByLineJava8(".\\splExamples\\3-ok\\assignments.spl");
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\assignments.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
-    
+
     @Test
     public void testFunctionsOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = reader.readLineByLineJava8(".\\splExamples\\3-ok\\functions.spl");
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\functions.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
@@ -527,11 +527,67 @@ public class TypecheckerTest {
     public void testFunctionsSimpleOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = reader.readLineByLineJava8(".\\splExamples\\3-ok\\functionsSimple.spl");
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\functionsSimple.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
     }
+
+    @Test
+    public void testfunctionArgumentsSimpleOkExampleMarkus() {
+        //This test has a lot of funny things we did not take into account...
+
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\functionArgumentsSimple.spl");
+
+        List<Node> nodes = typecheckSPL(s);
+        assertTypecheckSuccess();
+    }
+
+    @Test
+    public void testglobalVariablesOkExampleMarkus() {
+        //This test has a lot of funny things we did not take into account...
+
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\globalVariables.spl");
+
+        List<Node> nodes = typecheckSPL(s);
+        assertTypecheckSuccess();
+    }
+
+    @Test
+    public void testglobalVariablesSimpleOkExampleMarkus() {
+        //This test has a lot of funny things we did not take into account...
+
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\globalVariablesSimple.spl");
+
+        List<Node> nodes = typecheckSPL(s);
+        assertTypecheckSuccess();
+    }
+
+    //TODO: Do we want to keep .field dependent on absence of spaces?
+//    @Test
+//    public void testtuplesOkExampleMarkus() {
+//        //This test has a lot of funny things we did not take into account...
+//
+//        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\tuples.spl");
+//
+//        List<Node> nodes = typecheckSPL(s);
+//        assertTypecheckSuccess();
+//    }
+
+    @Test
+    public void testlistFunction3OkExampleMarkus() {
+        //This test has a lot of funny things we did not take into account...
+
+        String s = reader.readLineByLineJava8(".\\test\\splExamples\\3-ok\\listFunction3.spl");
+
+        List<Node> nodes = typecheckSPL(s);
+        assertTypecheckSuccess();
+    }
+
+
+
+
+
 
 
 
