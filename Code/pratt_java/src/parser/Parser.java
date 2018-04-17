@@ -90,6 +90,7 @@ public class Parser {
         registerPrefixExpression(TokenType.TOK_INT, new IntegerParselet());
         registerPrefixExpression(TokenType.TOK_IDENTIFIER, new IdentifierParselet());
         registerPrefixExpression(TokenType.TOK_KW_IS_EMPTY, new isEmptyParselet());
+        registerPrefixExpression(TokenType.TOK_KW_READ, new ReadParselet());
         registerPrefixExpression(TokenType.TOK_BOOL, new BooleanParselet());
         registerPrefixExpression(TokenType.TOK_CHAR, new CharacterParselet());
         registerPrefixExpression(TokenType.TOK_OPEN_BRACKETS, new ListParselet());

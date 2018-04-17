@@ -10,7 +10,6 @@ public enum TokenType {
     TOK_MULT("*"),
     TOK_DIV("/"),
     TOK_MOD("%"),
-    TOK_PLUS_EQUALS("+="),
     TOK_IDENTIFIER("Char[]"),
     TOK_KW_IF("if"),
     TOK_BOOL("Bool"),
@@ -32,6 +31,8 @@ public enum TokenType {
     TOK_KW_BOOL("Bool"),
     TOK_KW_CHAR("Char"),
     TOK_KW_RETURN("return"),
+    TOK_KW_READ("read"),
+    TOK_KW_IS_EMPTY("isEmpty"),
     TOK_KW_PRINT("print"),
     TOK_KW_VAR("var"),
     TOK_OPEN_PARENTHESIS("("),
@@ -47,8 +48,7 @@ public enum TokenType {
     TOK_TL(".tl"),
     TOK_FST(".fst"),
     TOK_SND(".snd"),
-    TOK_CHAR("Char"),
-    TOK_KW_IS_EMPTY("isEmpty");
+    TOK_CHAR("Char");
 
     private final String value;
 

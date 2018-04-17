@@ -328,6 +328,10 @@ public class Lexer {
             return new TokenOther(TokenType.TOK_KW_PRINT);
         }
 
+        if (result.equals("read")) {
+            return new TokenOther(TokenType.TOK_KW_READ);
+        }
+
         if (result.equals("isEmpty")) {
             return new TokenOther(TokenType.TOK_KW_IS_EMPTY);
         }
