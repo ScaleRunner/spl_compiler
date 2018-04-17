@@ -7,7 +7,7 @@ import java.util.Objects;
 public class VarType extends Type {
 
     private static VarType instance = null;
-    private Type type = null;
+    public Type type = null;
 
     public VarType(Type type){
         this.type = type;

@@ -68,8 +68,10 @@ public abstract class Type implements Cloneable{
             pp.visit((ListType) t);
         } else if (t.getClass() == TupleType.class) {
             pp.visit((TupleType) t);
-        } else if(t.getClass() == VoidType.class){
+        } else if(t.getClass() == VoidType.class) {
             pp.visit((VoidType) t);
+        } else if(t instanceof VarType){
+            pp.visit((VarType) t);
         } else throw new UnsupportedOperationException(
                 String.format("Visitation not implemented for Type %s", t.getClass().toString())
         );

@@ -4,15 +4,13 @@ import lexer.Lexer;
 import org.junit.Before;
 import org.junit.Test;
 
+import parser.declarations.VariableDeclaration;
 import parser.exceptions.ParseException;
 import parser.statements.Statement;
-import parser.types.Type;
 import parser.types.Types;
 import parser.Parser;
 import parser.declarations.Declaration;
-import parser.declarations.VariableDeclaration;
 import parser.expressions.Expression;
-import parser.statements.Statement;
 import typechecker.*;
 import util.Node;
 import util.ReadSPL;
@@ -233,6 +231,27 @@ public class TypecheckerTest {
         Node e = typecheckExpr("-(4 * 3) % 5");
         assertTypecheckSuccess();
         assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testVar() {
+        typecheckSPL("var a = 3;\n");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, tc.getVariableType("a"));
+    }
+
+    @Test
+    public void testVarInExpr() {
+        typecheckSPL("var a = 3; Int b = a + 5; Bool c = a < b;");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, tc.getVariableType("a"));
+    }
+
+    @Test
+    public void testVarInExprFaulty() {
+        typecheckSPL("var a = False; Int b = a + 5; Char c = a == False;");
+        assertTypecheckFailure();
+        assertEquals(Types.boolType, tc.getVariableType("a"));
     }
 
 	@Test
@@ -458,7 +477,7 @@ public class TypecheckerTest {
     }
 
     @Test
-    public void testFunctionTooLessArguments() {
+    public void testFunctionTooFewArguments() {
         typecheckSPL("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
                 "return 1;\n " +
@@ -475,6 +494,15 @@ public class TypecheckerTest {
                 "}");
         assertTypecheckFailure();
     }
+
+    @Test
+    public void testHandmade() {
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/handmade.spl");
+
+        typecheckSPL(s);
+        assertTypecheckSuccess();
+    }
+
 
     @Test
     public void testFunctionsExampleMarkus() {

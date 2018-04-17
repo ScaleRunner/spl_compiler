@@ -88,7 +88,8 @@ public class Typechecker implements Visitor {
 						functionSignatures.get(e.function_name.name).size(), e.args.size()), e);
 			} else {
 				for (int i = 0; i < funArgs.size(); i++) {
-					if (!funArgs.get(i).equals(e.args.get(i).getType())) {
+					if (!funArgs.get(i).equals(e.args.get(i).getType()) &&
+                            !(funArgs.get(i) instanceof ListType && e.args.get(i).getType() instanceof ListType)) {
 						error(String.format("Incompatible types in function call in argument %s\n\tExpected type: %s\n\tActual type: %s",
 								i + 1, funArgs.get(i), e.args.get(i).getType()), e);
 					}
@@ -177,7 +178,7 @@ public class Typechecker implements Visitor {
 					consTypecheckAux(e);
 					break;
 				default:
-					error(String.format("Unknown operator: %s", e.operator), e);
+                    error(String.format("Invalid operator %s for Type Int and Type %s", e.operator.getValue(), e.right.getType()), e);
 					break;
 			}
 
@@ -187,7 +188,7 @@ public class Typechecker implements Visitor {
 				case TOK_PLUS:
 				case TOK_MINUS:
 					if(e.left.getType() != e.right.getType()){
-						error("Left and right side of and expression must have the same Type.", e);
+						error("Left and right side of an expression must have the same Type.", e);
 					}
 					else
 						e.setType(typeChar);
@@ -200,7 +201,7 @@ public class Typechecker implements Visitor {
 				case TOK_LEQ:
 				case TOK_NEQ:
 					if(e.left.getType() != e.right.getType()){
-						error("Left and right side of and expression must have the same Type.", e);
+						error("Left and right side of an expression must have the same Type.", e);
 					}
 					else
 						e.setType(typeBool);
@@ -209,7 +210,7 @@ public class Typechecker implements Visitor {
 					consTypecheckAux(e);
 					break;
 				default:
-					error(String.format("Unknown operator: %s", e.operator), e);
+                    error(String.format("Invalid operator %s for Type Char and Type %s", e.operator.getValue(), e.right.getType()), e);
 					break;
 			}
 		}
@@ -220,7 +221,7 @@ public class Typechecker implements Visitor {
 				case TOK_AND:
 				case TOK_OR:
 					if(e.left.getType() != e.right.getType()){
-						error("Left and right side of and expression must have the same Type.", e);
+						error("Left and right side of an expression must have the same Type.", e);
 					}
 					else
 						e.setType(typeBool);
@@ -230,7 +231,7 @@ public class Typechecker implements Visitor {
 					break;
 
 				default:
-					error(String.format("Invalid operator %s for Type Bool", e.operator), e);
+					error(String.format("Invalid operator %s for Type Bool and Type %s", e.operator.getValue(), e.right.getType()), e);
 					break;
 			}
 		}
@@ -239,9 +240,8 @@ public class Typechecker implements Visitor {
 				case TOK_CONS:
 					consTypecheckAux(e);
 					break;
-
 				default:
-					error(String.format("Invalid operator %s for Type Bool", e.operator), e);
+					error(String.format("Invalid operator %s for ListType %s and Type %s", e.operator.getValue(), e.left.getType(), e.right.getType()), e);
 					break;
 			}
 		}
@@ -252,12 +252,12 @@ public class Typechecker implements Visitor {
 					break;
 
 				default:
-					error(String.format("Invalid operator %s for Type Bool", e.operator), e);
+					error(String.format("Invalid operator %s for TupleType %s and Type %s", e.operator.getValue(), e.left.getType(), e.right.getType()), e);
 					break;
 			}
 		}
 		else{
-			error(String.format("Invalid operator Type %s for expression %s", e.left.getType(), e.operator), e);
+			error(String.format("Type %s is not defined for TypeChecking in expressions.", e.left.getType()), e);
 		}
 	}
 
@@ -274,7 +274,7 @@ public class Typechecker implements Visitor {
 					e.setType(t);
 					break;
 				default:
-					error(String.format("Operator %s is undefined for type %s", e.operator, t), e);
+					error(String.format("Operator %s is undefined for type %s", e.operator.getValue(), t), e);
 			}
 		} else if(e.left.getType() instanceof TupleType){
 			TupleType t = (TupleType) e.left.getType();
@@ -286,10 +286,10 @@ public class Typechecker implements Visitor {
 					e.setType(t.right);
 					break;
 				default:
-					error(String.format("Operator %s is undefined for type %s", e.operator, t), e);
+					error(String.format("Operator %s is undefined for type %s", e.operator.getValue(), t), e);
 			}
 		} else {
-			error(String.format("Operator %s is undefined for type %s", e.operator, e.left.getType()), e);
+			error(String.format("Operator %s is undefined for Type %s", e.operator.getValue(), e.left.getType()), e);
 		}
 	}
 
@@ -368,7 +368,7 @@ public class Typechecker implements Visitor {
 			this.visit((PostfixExpression)s.name);
 			if(!s.name.getType().equals(s.right.getType()))
 				error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
-						s.right.getType(), (PostfixExpression)s.name , s.name.getType(), s.right.getType()),s);
+						s.right.getType(), s.name , s.name.getType(), s.right.getType()),s);
 			s.setType(Types.voidType);
 		}
 	}
@@ -531,18 +531,22 @@ public class Typechecker implements Visitor {
 			if(((ListType) d.right.getType()).listType == null)
 				d.right.setType(d.varType);
 		}
-		if(d.varType.equals(d.right.getType())) {
-			env.put(d.left.name, d.varType);
-
+		if(d.varType.equals(d.right.getType()) || d.varType instanceof VarType) {
+            if(env.get(d.left.name) != null){
+                error(String.format("Variable %s is already defined!", d.left.name), d);
+            } else {
+                env.put(d.left.name, d.right.getType());
+            }
 		} else
-			error(String.format("Variable %s, of type %s cannot have an assignment of type %s.",
-					d.left, d.varType, d.right.getType()), d);
-		d.setType(Types.voidType);
+            error(String.format("Variable %s, of type %s cannot have an assignment of type %s.",
+                    d.left, d.varType, d.right.getType()), d);
+        d.setType(Types.voidType);
 	}
 
 	private void consTypecheckAux(OperatorExpression e){
 		if(!(e.right.getType() instanceof ListType)){
-			error("Typechecker: Right hand side of cons expression must have listType list", e);
+			error("Right hand side of cons expression must have listType list", e);
+			return;
 		}
 
 		ListType listTypeRight = (ListType) e.right.getType();
@@ -605,6 +609,10 @@ public class Typechecker implements Visitor {
 			e.setType(listTypeRight);
 
 	}
+
+	public Type getVariableType(String name){
+	    return env.get(name);
+    }
 
 }
 

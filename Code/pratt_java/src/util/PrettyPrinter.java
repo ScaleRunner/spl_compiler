@@ -352,6 +352,10 @@ public class PrettyPrinter implements Visitor {
         builder.append(')');
     }
 
+    public void visit(VarType t) {
+        builder.append(TokenType.TOK_KW_VAR.getValue());
+    }
+
     public void visit(VoidType t) {
         builder.append(TokenType.TOK_KW_VOID.getValue());
     }
