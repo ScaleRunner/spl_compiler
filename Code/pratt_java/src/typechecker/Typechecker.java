@@ -47,7 +47,7 @@ public class Typechecker implements Visitor {
 	}
 
 	private void error(String errorMessage, Node n) {
-		errors.add(new TypeError(String.format("%s \n\t Error occurred in:\n%s",errorMessage, n)));
+		errors.add(new TypeError(String.format("%s \n\tError occurred in:\n%s",errorMessage, n)));
 	}
 
 	public void printErrors() {
@@ -358,7 +358,7 @@ public class Typechecker implements Visitor {
 			if(variableType == null){
 				error(String.format("Variable %s is not defined", id.name), s);
 			} else if(!variableType.equals(s.right.getType()))
-				error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
+				error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
 						s.right.getType(), id.name, variableType, s.right.getType()),s);
 			s.setType(Types.voidType);
 		}
@@ -367,7 +367,7 @@ public class Typechecker implements Visitor {
 		else if(s.name.getClass() == PostfixExpression.class){
 			this.visit((PostfixExpression)s.name);
 			if(!s.name.getType().equals(s.right.getType()))
-				error(String.format("Type %s cannot be assigned to variable %s.\n\t Expected: %s \n\t Actual: %s",
+				error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
 						s.right.getType(), s.name , s.name.getType(), s.right.getType()),s);
 			s.setType(Types.voidType);
 		}
@@ -423,7 +423,7 @@ public class Typechecker implements Visitor {
 	public void visit(LoopStatement s) {
 		this.visit(s.condition);
 		if(s.condition.getType() != Types.boolType){
-			error(String.format("The condition should be of type Boolean, is of type '%s' in condition %s",
+			error(String.format("The condition should be of type Boolean and is of type '%s' in condition %s",
 					s.condition.getType(), s.condition), s);
 		}
 		s.setType(this.visit(s.body));
@@ -486,10 +486,10 @@ public class Typechecker implements Visitor {
 
 		//check if arguments and argument types match
 		if(d.args.size() != d.funType.argsTypes.size()){
-			if(d.args.size() < d.funType.argsTypes.size())
-				error("There are missing types for some function arguments", d);
+			if(d.args.size() > d.funType.argsTypes.size())
+				error("There are more argument types than function arguments", d);
 			else
-				error("There are too many argument types for the function arguments", d);
+				error("There are more function arguments than argument types", d);
 		}
 
 		//set argument types if there are any
@@ -515,7 +515,7 @@ public class Typechecker implements Visitor {
 		if(!d.funType.returnType.equals(returnType) ){
 			if(returnType != null)
 				error(String.format("The return type of the function is not equal to the actual return type. " +
-						"\n\tExpected: %s \n\t Actual: %s", d.funType.returnType, returnType), d);
+						"\n\tExpected: %s \n\tActual: %s", d.funType.returnType, returnType), d);
 		}
 
 		env = backup;
@@ -611,7 +611,7 @@ public class Typechecker implements Visitor {
 	}
 
 	public Type getVariableType(String name){
-	    return env.get(name);
+        return env.get(name);
     }
 
 }

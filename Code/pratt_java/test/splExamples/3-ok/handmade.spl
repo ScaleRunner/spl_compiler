@@ -7,7 +7,7 @@ sum(x) :: [Int] -> Int
     var result = 0;
     if( ! isEmpty(x) )
     {
-        result = x.hd;
+        result = x.hd + sum(x.tl);
     }
     return result;
 }
