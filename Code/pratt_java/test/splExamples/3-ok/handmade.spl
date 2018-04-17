@@ -1,0 +1,29 @@
+var one = 1;
+
+[Int] list = 3 : one : [];
+
+sum(x) :: [Int] -> Int
+{
+    var result = 0;
+    if( ! isEmpty(x) )
+    {
+        result = x.hd;
+    }
+    return result;
+}
+
+main()::->Void
+{
+    var list2 = one : list;
+
+    /* 0 */
+    print(sum([]));
+    /* 1 */
+    print(sum(1 : []));
+    // 1
+    print(sum(one : []));
+    /* 4 */
+    print(sum(list));
+    /* 5 */
+    print(sum(list2));
+}
