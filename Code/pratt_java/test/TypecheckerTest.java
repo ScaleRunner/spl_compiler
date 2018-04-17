@@ -28,10 +28,6 @@ import java.util.stream.Stream;
 public class TypecheckerTest {
 	private Typechecker tc = null;
 	// These are for convenience.
-	private final Type typeInt = Types.intType;
-	private final Type typeBool = Types.boolType;
-	private final Type typeChar = Types.charType;
-	private final Type typeVoid = Types.voidType;
 
 	@Before
 	public void setUp(){
@@ -89,14 +85,14 @@ public class TypecheckerTest {
 	public void testIntegerConstant() {
 		Node e = typecheckExpr("5");
 		assertTypecheckSuccess();
-		assertEquals(typeInt, e.getType());
+		assertEquals(Types.intType, e.getType());
 	}
 
     @Test
     public void testCharacterConstant() {
         Node e = typecheckExpr("'a'");
         assertTypecheckSuccess();
-        assertEquals(typeChar, e.getType());
+        assertEquals(Types.charType, e.getType());
     }
 
     @Test
@@ -153,7 +149,7 @@ public class TypecheckerTest {
 	public void testPlus() {
 		Node e = typecheckExpr("5 + 3");
 		assertTypecheckSuccess();
-		assertEquals(typeInt, e.getType());
+		assertEquals(Types.intType, e.getType());
 	}
 
 	@Test
@@ -202,7 +198,7 @@ public class TypecheckerTest {
 	public void testConsTupleNotEmpty() {
 		Node e = typecheckExpr("(1,'a'):(2,'b'):(3,'c'):[]");
 		assertTypecheckSuccess();
-		assertEquals(Types.listType(Types.tupleType(typeInt, typeChar)), e.getType());
+		assertEquals(Types.listType(Types.tupleType(Types.intType, Types.charType)), e.getType());
 	}
 
     @Test
@@ -398,7 +394,7 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionUseVariableOutOfScore() {
-        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+        typecheckSPL("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
                 "return 1;\n " +
                 "} else {\n" +
@@ -441,7 +437,7 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionOutOfScope() {
-        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+        typecheckSPL("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
                 "return 1;\n " +
                 "} else {\n" +
@@ -463,7 +459,7 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionTooLessArguments() {
-        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+        typecheckSPL("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
                 "return 1;\n " +
                 "} else {\n" +
@@ -484,7 +480,7 @@ public class TypecheckerTest {
     public void testFunctionsExampleMarkus() {
 	    String s = ReadSPL.readLineByLineJava8("./test/splExamples/2-compile-errors/functions.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckFailure();
     }
 
@@ -494,7 +490,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/2-compile-errors/lists.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckFailure();
     }
 
@@ -503,7 +499,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/associativity.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -513,7 +509,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/assignments.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -524,7 +520,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functions.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -533,7 +529,7 @@ public class TypecheckerTest {
         //This test has a lot of funny things we did not take into account...
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functionsSimple.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -543,7 +539,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functionArgumentsSimple.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -553,7 +549,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariables.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -563,7 +559,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariablesSimple.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -573,7 +569,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/tuples.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -583,7 +579,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/listFunction3.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -593,7 +589,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/comments.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -613,7 +609,7 @@ public class TypecheckerTest {
 
                     try {
                         setUp();
-                        List<Node> nodes = typecheckSPL(s);
+                        typecheckSPL(s);
                         if(path.toString().contains("ok")){
                             assertTypecheckSuccess();
                         } else {
