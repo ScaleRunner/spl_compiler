@@ -1,17 +1,54 @@
 package lexer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
     private String input;
     private int currentPosition = 0;
+    private final Map<String, Token> keywordMap;
 
     public Lexer(String inp) {
-        input = inp;
+        this.input = inp;
+        this.keywordMap = setupKeywordMap();
         removeComments();
+    }
+
+    private Map<String, Token> setupKeywordMap(){
+        Map<String, Token> keywordMap = new HashMap<>();
+
+        // Statement Keywords
+        keywordMap.put("if", new TokenOther(TokenType.TOK_KW_IF));
+        keywordMap.put("else", new TokenOther(TokenType.TOK_KW_ELSE));
+        keywordMap.put("while", new TokenOther(TokenType.TOK_KW_WHILE));
+        keywordMap.put("return", new TokenOther(TokenType.TOK_KW_RETURN));
+
+        // Type Keywords
+        keywordMap.put("Int", new TokenOther(TokenType.TOK_KW_INT));
+        keywordMap.put("Bool", new TokenOther(TokenType.TOK_KW_BOOL));
+        keywordMap.put("Char", new TokenOther(TokenType.TOK_KW_CHAR));
+        keywordMap.put("var", new TokenOther(TokenType.TOK_KW_VAR));
+        keywordMap.put("Void", new TokenOther(TokenType.TOK_KW_VOID));
+
+        keywordMap.put("True", new TokenBool(true));
+        keywordMap.put("False", new TokenBool(false));
+
+        // Expression Keywords
+        keywordMap.put("print", new TokenOther(TokenType.TOK_KW_PRINT));
+        keywordMap.put("read", new TokenOther(TokenType.TOK_KW_READ));
+        keywordMap.put("isEmpty", new TokenOther(TokenType.TOK_KW_IS_EMPTY));
+
+        // Field Keywords
+        keywordMap.put(".hd", new TokenOther(TokenType.TOK_HD));
+        keywordMap.put(".tl", new TokenOther(TokenType.TOK_TL));
+        keywordMap.put(".fst", new TokenOther(TokenType.TOK_FST));
+        keywordMap.put(".snd", new TokenOther(TokenType.TOK_SND));
+
+        return keywordMap;
     }
 
     public List<Token> tokenize(){
@@ -25,14 +62,16 @@ public class Lexer {
     }
 
     /**
-     * Removes comments from the input
+     * Removes comments from the input using regex
      */
     private void removeComments(){
+        Matcher m;
+
         Pattern inlineComment = Pattern.compile("//[^\\n]*\\n");
         Pattern blockComment = Pattern.compile("/\\*[\\S\\s]+?\\*/");
 
         //Remove Inline Comments
-        Matcher m = inlineComment.matcher(input);
+        m = inlineComment.matcher(input);
         this.input = m.replaceAll("");
 
         //Remove Block Comments
@@ -58,8 +97,6 @@ public class Lexer {
         if (currentPosition >= input.length()) {
             return new TokenOther(TokenType.TOK_EOF);
         }
-
-        // From here on, we have at least one character in the input
 
         if (Character.isDigit(input.charAt(currentPosition))) {
             return lexInteger();
@@ -109,98 +146,69 @@ public class Lexer {
 
         if (match('=')) {
             currentPosition++;
-            // Just an example how to lex operators that consist of two
-            // characters.
             if (match('=')) {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_EQ);
             }
-
-            // Otherwise, we've seen nothing.
             return new TokenOther(TokenType.TOK_ASSIGN);
         }
 
         if (match('>')) {
             currentPosition++;
-            // Just an example how to lex operators that consist of two
-            // characters.
             if (match('=')) {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_GEQ);
             }
-
-            // Otherwise, we've seen nothing.
             return new TokenOther(TokenType.TOK_GT);
         }
 
         if (match('<')) {
             currentPosition++;
-            // Just an example how to lex operators that consist of two
-            // characters.
             if (match('=')) {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_LEQ);
             }
-
-            // Otherwise, we've seen nothing.
             return new TokenOther(TokenType.TOK_LT);
         }
 
         if (match('!')) {
             currentPosition++;
-            // Just an example how to lex operators that consist of two
-            // characters.
             if (match('=')) {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_NEQ);
             }
-
-            // Otherwise, we've seen nothing.
             return new TokenOther(TokenType.TOK_NOT);
         }
 
         if (match('&')) {
             currentPosition++;
-            // Just an example how to lex operators that consist of two
-            // characters.
             if (match('&')) {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_AND);
             }
-
-            // Otherwise, we've seen nothing.
             return new TokenOther(TokenType.TOK_ERR);
         }
 
         if (match(':')) {
             currentPosition++;
-            // Just an example how to lex operators that consist of two
-            // characters.
             if (match(':')) {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_FUNC_TYPE_DEF);
             }
-
-            // Otherwise, we've seen nothing.
             return new TokenOther(TokenType.TOK_CONS);
         }
 
         if (match('|')) {
             currentPosition++;
-            // Just an example how to lex operators that consist of two
-            // characters.
             if (match('|')) {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_OR);
             }
-
-            // Otherwise, we've seen nothing.
             return new TokenOther(TokenType.TOK_ERR);
         }
 
         if (match('{')) {
             currentPosition++;
-
             return new TokenOther(TokenType.TOK_OPEN_CURLY);
         }
 
@@ -291,84 +299,18 @@ public class Lexer {
 
         String result = resultBuilder.toString();
 
-        // Check if the identifier is one of the reserved keywords
-        if (result.equals("if")) {
-            return new TokenOther(TokenType.TOK_KW_IF);
+        Token tok = keywordMap.get(result);
+        if(tok != null) { // The string is a keyword
+            return tok;
         }
-
-        if (result.equals("else")) {
-            return new TokenOther(TokenType.TOK_KW_ELSE);
-        }
-
-        if (result.equals("while")) {
-            return new TokenOther(TokenType.TOK_KW_WHILE);
-        }
-
-        if (result.equals("Int")) {
-            return new TokenOther(TokenType.TOK_KW_INT);
-        }
-
-        if (result.equals("Bool")) {
-            return new TokenOther(TokenType.TOK_KW_BOOL);
-        }
-
-        if (result.equals("Char")) {
-            return new TokenOther(TokenType.TOK_KW_CHAR);
-        }
-
-        if (result.equals("var")) {
-            return new TokenOther(TokenType.TOK_KW_VAR);
-        }
-
-        if (result.equals("return")) {
-            return new TokenOther(TokenType.TOK_KW_RETURN);
-        }
-
-        if (result.equals("print")) {
-            return new TokenOther(TokenType.TOK_KW_PRINT);
-        }
-
-        if (result.equals("read")) {
-            return new TokenOther(TokenType.TOK_KW_READ);
-        }
-
-        if (result.equals("isEmpty")) {
-            return new TokenOther(TokenType.TOK_KW_IS_EMPTY);
-        }
-
-        if (result.equals(".hd")) {
-            return new TokenOther(TokenType.TOK_HD);
-        }
-
-        if (result.equals(".tl")) {
-            return new TokenOther(TokenType.TOK_TL);
-        }
-
-        if (result.equals(".fst")) {
-            return new TokenOther(TokenType.TOK_FST);
-        }
-
-        if (result.equals(".snd")) {
-            return new TokenOther(TokenType.TOK_SND);
-        }
-
-        if (result.equals("True")) {
-            return new TokenBool(true);
-        }
-
-        if (result.equals("False")) {
-            return new TokenBool(false);
-        }
-
-        if (result.equals("Void")) {
-            return new TokenOther(TokenType.TOK_KW_VOID);
-        }
-
 
         if (result.contains(".")){
-            throw new TokenException("Invalid field keyword in '" + result + "'.\n\t Did you put a space between field keywords?");
+            throw new TokenException(String.format(
+                    "Invalid field keyword in '%s'.\n\t Did you put a space between field keywords?"
+                    , result));
         }
-        // Identifier is not a keyword, so we treat it as identifier
+
+        // Identifier is not a keyword, so we treat it as an identifier
         return new TokenIdentifier(result);
     }
 }
