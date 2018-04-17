@@ -1,7 +1,7 @@
 main () :: -> Void
 {
     [Int] a = 1 : 2 + 3 : 4 : [];
-    [Bool] b = False : 5 < 3 : False : [];
+    [Bool] b = False : (5 < 3) : False : [];
 
     /* 11 */
     print(5*2+1);

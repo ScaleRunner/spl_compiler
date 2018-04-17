@@ -5,8 +5,8 @@ import typechecker.Substitution;
 import java.util.Objects;
 
 public class TupleType extends Type{
-    public final Type left;
-    public final Type right;
+    public  Type left;
+    public Type right;
 
     public TupleType(Type left, Type right){
         this.left = left;
