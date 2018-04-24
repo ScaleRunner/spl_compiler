@@ -7,7 +7,6 @@ import org.junit.Test;
 import parser.declarations.VariableDeclaration;
 import parser.exceptions.ParseException;
 import parser.statements.Statement;
-import parser.types.ListType;
 import parser.types.Type;
 import parser.types.Types;
 import parser.Parser;
@@ -62,6 +61,7 @@ public class TypecheckerTest {
 	private List<Node> typecheckSPL(String input) {
 		Lexer l = new Lexer(input);
 		Parser p = new Parser(l.tokenize());
+        tc = new Typechecker();
 		List<Declaration> decls = p.parseSPL();
 		List<Node> nodes = new ArrayList<>();
 
