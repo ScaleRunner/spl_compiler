@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 
 public class TypecheckerTest {
 	private Typechecker tc = null;
-	// These are for convenience.
 
 	@Before
 	public void setUp(){
@@ -630,11 +629,12 @@ public class TypecheckerTest {
     public void testCommentsExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/comments.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariables.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
     }
+
 
     @Test
     public void testAllTestsByMarkus() {

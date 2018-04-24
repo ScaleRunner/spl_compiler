@@ -353,8 +353,6 @@ public class Typechecker implements Visitor {
 
 			Type variableType = env.get(id.name);
 
-
-
 			if(variableType == null){
 				error(String.format("Variable %s is not defined", id.name), s);
 			} else if(!variableType.equals(s.right.getType()))
@@ -550,6 +548,13 @@ public class Typechecker implements Visitor {
 			return;
 		}
 
+		//This is need for stuff like []:[] or ([]:(([]:[]:[]):([]:[])))... use your imagination
+		if(checkOnlyEmptyListType(e.left.getType()) && (!(checkOnlyEmptyListType(e.right.getType())))){
+			error("Empty list on the lhs of cons operation is not allowed if rhs is not only composed by emptyList", e);
+			return;
+		}
+
+
 		ListType listTypeRight = (ListType) e.right.getType();
 
 		if(listTypeRight.listType == null){
@@ -560,54 +565,268 @@ public class Typechecker implements Visitor {
 			e.right.setType(listTypeRight);
 		}
 
-//		if(listTypeRight.listType instanceof TupleType){
-//
-//			TupleType t = (TupleType) listTypeRight.listType;
-//			if(t.right instanceof ListType){
-//				ListType lr = (ListType) t.right;
-//				//ListType ll = (ListType) t.left;
-//				ListType listTypeleft = (ListType) e.left.getType();
-//
-//				if(lr.listType == null)
-//					lr.listType = listTypeleft.listType;
-//
-//			}
-//			else if(t.left instanceof ListType){
-//				ListType lr = (ListType) t.right;
-//				ListType ll = (ListType) t.left;
-//
-//				if(ll.listType == null)
-//					ll.listType = lr.listType;
-//
-//				lr.listType = ll.listType;
-//			}
-//
-//
-//			if(t.right. == null){
-//				t.right = e.left.getType();
-//			}
-//
-//
-//		}
-		if(e.left.getType() instanceof ListType){
-			if(e.left.getType().equals(((ListType) e.right.getType()).listType))
-				e.left.setType(e.right.getType());
-			if(!e.left.getType().equals(e.right.getType())){
-				error("Typechecker: Left and right side of and expression must have the same listType. "+
-						e.left.getType() + ' ' + listTypeRight.listType,e );
+		//if(listTypeRight.listType instanceof TupleType ||){
+
+
+		//If rhs has list type of left.type, it's fine
+		if(((ListType) e.right.getType()).listType.equals(e.left.getType())){
+			e.setType(e.right.getType());
+			return;
+		}
+		//If rhs and lhs have the same list type, new list of any of their types.
+		//also fine
+		else if(e.right.getType().equals(e.left.getType())){
+			e.setType(new ListType(e.right.getType()));
+		}
+		//If one  of the sides of the expression has an empty list, needs more checks
+		else if(checkEmptyListTypeNull(e.left.getType()) || checkEmptyListTypeNull(e.right.getType()) ){
+			if(checkEmptyListTypeNull(e.left.getType()) && (!checkEmptyListTypeNull(e.right.getType())) ){
+				//Infer lhs type based on right
+				fixExpressionEmptyListType(e.left, e.right.getType(), e);
 
 			}
-		}
-		else if(!e.left.getType().equals(listTypeRight.listType)){
-			error("Typechecker: Left and right side of and expression must have the same listType. "+
-					e.left.getType() + ' ' + listTypeRight.listType,e );
+			else if((!checkEmptyListTypeNull(e.left.getType())) && (checkEmptyListTypeNull(e.right.getType()))){
+				//Infer rhs type based on left
+				fixExpressionEmptyListType(e.right, e.left.getType(), e);
+				//e.right.setType(fix);
+			}
 
 		}
-
-		if((e.left.getType() instanceof ListType) && (e.right.getType() instanceof ListType))
-			e.setType(new ListType(listTypeRight));
 		else
-			e.setType(listTypeRight);
+			error("LHS and RHS of cons expression are not the same", e);
+
+		if((e.left.getType() instanceof ListType) && (e.right.getType() instanceof ListType)){
+			if(((ListType) e.left.getType()).listType.equals(((ListType) e.right.getType()).listType)){
+				e.setType(new ListType(e.left.getType()));
+			}
+			else if(((ListType) e.right.getType()).listType.equals(e.left.getType())){
+				e.setType(e.right.getType());
+				return;
+			}
+			else{
+				error("Incompatible list types \n"+e.left.getType()+ " and \n"+e.right.getType(), e);
+			}
+		}
+		else
+			e.setType(e.right.getType());
+
+	}
+
+	public boolean checkEmptyListTypeNull(Type e){
+	    if(e instanceof TupleType) {
+	        Type left = ((TupleType) e).left;
+	        Type right = ((TupleType) e).right;
+	        boolean bleft;
+	        boolean bright;
+            return (checkEmptyListTypeNull(left) || checkEmptyListTypeNull(right));
+	    }
+        else if(e instanceof ListType){
+            Type listType = ((ListType) e).listType;
+            if(listType == emptyListType)
+                return true;
+            else
+                return checkEmptyListTypeNull(listType);
+        }
+//        else if (e instanceof EmptyListType)
+//        	return true;
+        else
+            return false;
+
+    }
+
+	public boolean checkOnlyEmptyListType(Type e){
+//		if(e instanceof TupleType) {
+//			Type left = ((TupleType) e).left;
+//			Type right = ((TupleType) e).right;
+//			return (checkOnlyEmptyListType(left) && checkOnlyEmptyListType(right));
+//		}
+//		else
+		if(e instanceof ListType){
+			Type listType = ((ListType) e).listType;
+			if(listType == emptyListType)
+				return true;
+			else
+				return checkOnlyEmptyListType(listType);
+		}
+		else if (e instanceof EmptyListType)
+			return true;
+		else
+			return false;
+
+	}
+
+    public void fixExpressionEmptyListType(Expression emptyListTypeExpr, Type fixer, Expression e) {
+		Type toBeFixed = emptyListTypeExpr.getType();
+
+		if(checkEmptyListTypeNull(toBeFixed)) {
+
+			if (toBeFixed instanceof ListType && fixer instanceof ListType) {
+				if (((ListType) toBeFixed).listType == emptyListType) {
+					//TODO: double check this later
+					emptyListTypeExpr.setType(fixer);
+					return;
+
+				} else if (checkEmptyListTypeNull(toBeFixed)) {
+					if (emptyListTypeExpr instanceof OperatorExpression) {
+						Expression leftOpExp = ((OperatorExpression) emptyListTypeExpr).left;
+						Expression rightOpExp = ((OperatorExpression) emptyListTypeExpr).right;
+						//Update types of lhs of expression
+						//fixer.listType is necessary because of this example, try to break this
+						//[[(Int, [Char])]] g = ((1, []):[]) : (((2, ('a':[])):[]):[]);
+						fixExpressionEmptyListType(leftOpExp, ((ListType) fixer).listType, e);
+						//Update types of rhs of expression
+						fixExpressionEmptyListType(rightOpExp, leftOpExp.getType(), e);
+
+//						);
+						if (((OperatorExpression) emptyListTypeExpr).left.getType().equals(((OperatorExpression) emptyListTypeExpr).right.getType())) {
+							emptyListTypeExpr.setType(new ListType(((OperatorExpression) emptyListTypeExpr).right.getType()));
+						} else if (((OperatorExpression) emptyListTypeExpr).left.getType().equals(((ListType) ((OperatorExpression) emptyListTypeExpr).right.getType()).listType)) {
+							emptyListTypeExpr.setType(new ListType(((ListType) ((OperatorExpression) emptyListTypeExpr).right.getType()).listType));
+						}
+
+					} else if (emptyListTypeExpr instanceof ListExpression) {
+						Type t = ((ListType)emptyListTypeExpr.getType()).listType;
+						//if setType with new List(inferEmpt... has problem...
+						emptyListTypeExpr.setType(inferEmptyListType(t, fixer, e));
+						//emptyListTypeExpr.setType(fixer);
+						return;
+					}
+				}
+
+			} else if (toBeFixed instanceof ListType && (!(fixer instanceof ListType))) {
+				Type listType = ((ListType) toBeFixed).listType;
+				if(listType == emptyListType){
+					emptyListTypeExpr.setType(new ListType(fixer));
+				}
+				else if(listType.getClass() == fixer.getClass()) {
+					if (checkEmptyListTypeNull(listType)) {
+						//from here
+						if (emptyListTypeExpr instanceof OperatorExpression) {
+							Expression leftOpExp = ((OperatorExpression) emptyListTypeExpr).left;
+							Expression rightOpExp = ((OperatorExpression) emptyListTypeExpr).right;
+
+							fixExpressionEmptyListType(leftOpExp, fixer, e);
+							fixExpressionEmptyListType(rightOpExp, leftOpExp.getType(), e);
+
+							if (((OperatorExpression) emptyListTypeExpr).left.getType().equals(((OperatorExpression) emptyListTypeExpr).right.getType())) {
+								emptyListTypeExpr.setType(new ListType(((OperatorExpression) emptyListTypeExpr).right.getType()));
+							} else if (((OperatorExpression) emptyListTypeExpr).left.getType().equals(((ListType) ((OperatorExpression) emptyListTypeExpr).right.getType()).listType)) {
+								emptyListTypeExpr.setType(new ListType(((ListType) ((OperatorExpression) emptyListTypeExpr).right.getType()).listType));
+							}
+						} else if (emptyListTypeExpr instanceof ListExpression) {
+							Type t = ((ListType) emptyListTypeExpr.getType()).listType;
+							emptyListTypeExpr.setType(new ListType(inferEmptyListType(t, fixer, e)));
+							//emptyListTypeExpr.setType(new ListType(fixer));
+							return;
+
+							//check if left and right have children...
+						}
+					} else {
+						if (!(listType.equals(fixer))) {
+							error("Typechecker: invalid list types", emptyListTypeExpr);
+							return;
+						}
+					}
+				}
+				else error("Typechecker: invalid list types "+ toBeFixed +" "+fixer, e);
+			} else if (((toBeFixed instanceof TupleType)) && ((fixer instanceof TupleType))) {
+					//if (toBeFixed.equals(emptyListType)) {
+					//	emptyListTypeExpr.setType(fixer);
+					//} else if (toBeFixed instanceof TupleType && fixer instanceof TupleType) {
+					((TupleExpression) emptyListTypeExpr).left.setType((inferEmptyListType(((TupleType) (toBeFixed)).left, ((TupleType) fixer).left, e)));
+					((TupleExpression) emptyListTypeExpr).right.setType((inferEmptyListType(((TupleType) (toBeFixed)).right, ((TupleType) fixer).right, e)));
+					emptyListTypeExpr.setType(new TupleType(((TupleExpression) emptyListTypeExpr).left.getType(), ((TupleExpression) emptyListTypeExpr).right.getType()));
+					return;
+
+			}
+			else if (toBeFixed instanceof TupleType && ((fixer instanceof ListType))) {
+				Type listType = ((ListType) fixer).listType;
+				TupleExpression t = (TupleExpression) emptyListTypeExpr;
+				Expression leftTupleExpr = t.left;
+				Expression rightTupleExpr = t.right;
+
+				if(! (listType instanceof TupleType)) {
+					error("EmptyTypeInference mismatch :Lhs has type Tuple and RHS does not. ("+listType+") ", e );
+					return;
+				}
+				else{
+
+					TupleType listTuple = (TupleType) listType;
+					fixExpressionEmptyListType(leftTupleExpr, listTuple.left, e );
+					fixExpressionEmptyListType(rightTupleExpr, listTuple.right, e);
+					emptyListTypeExpr.setType(
+							new TupleType(
+							leftTupleExpr.getType(),
+									rightTupleExpr.getType()
+
+					));
+				}
+
+			} else if (emptyListTypeExpr.getType().equals(fixer)) {
+				return;
+
+			} else if (emptyListTypeExpr.getType() instanceof ListType) {
+				Type listType = ((ListType) emptyListTypeExpr.getType()).listType;
+				if (listType.equals(fixer))
+					return;
+
+			} else {
+				error("Typechecker: invalid list types", emptyListTypeExpr);
+				return;
+			}
+		}
+
+
+    }
+
+	//TODO: spend some more time to check this for more cases where things should not work.
+	public Type inferEmptyListType(Type left, Type right, Expression e){
+
+
+		if(left instanceof TupleType && right instanceof TupleType) {
+			return new TupleType(
+					(inferEmptyListType(((TupleType) left).left ,((TupleType) right).left, e)),
+					inferEmptyListType(((TupleType) left).right, ((TupleType) right).right, e));
+
+		}
+		else if(left instanceof TupleType && right instanceof ListType){
+			//need some more thinking.
+			if(((ListType) right).listType instanceof TupleType)
+				return new ListType(inferEmptyListType(left, new TupleType(((TupleType) ((ListType) right).listType).left, ((TupleType) ((ListType) right).listType).right), e));
+			else{
+					//Error
+				return null;
+			}
+
+
+		}
+		else if(left instanceof ListType && right instanceof TupleType){
+			//need some more thinking.
+			Type leftListType = ((ListType) left).listType;
+			if(leftListType instanceof TupleType)
+				return new ListType(new TupleType(
+						(inferEmptyListType(((TupleType) ((ListType) left).listType).left ,((TupleType) right).left,e)),
+						inferEmptyListType(((TupleType) ((ListType) left).listType).right, ((TupleType) right).right,e)));
+			else
+				//don't know yet.
+				return null;
+
+
+		}
+		else if(left instanceof ListType && right instanceof ListType){
+			if(((ListType) right).listType == emptyListType)
+				return left;
+			else
+				return new ListType(inferEmptyListType(((ListType) left).listType, ((ListType) right).listType, e));
+		}
+		else if(left == typeEmptyList)
+			return right;
+		else if (right == typeEmptyList)
+			return left;
+		else if (right.equals(left))
+			return left;
+		error("Type mismatch in empty list inference. Left: "+left + " Right: "+right, e);
+		return null;
 
 	}
 
