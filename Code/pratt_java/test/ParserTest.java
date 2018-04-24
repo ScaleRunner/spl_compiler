@@ -593,6 +593,18 @@ public class ParserTest {
     }
 
     @Test
+    public void testReadCall() {
+        Lexer l = new Lexer("read(a)");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        Expression result = p.parseExpression();
+
+        Expression actual = new ReadExpression(new IdentifierExpression("a"));
+
+        assertEquals(result, actual);
+    }
+
+    @Test
     public void testFunCallStatement() {
         Lexer l = new Lexer("a();");
         List<Token> tokens = l.tokenize();

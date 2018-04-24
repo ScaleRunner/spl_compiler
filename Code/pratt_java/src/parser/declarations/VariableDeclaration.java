@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class VariableDeclaration extends Declaration{
 
-    public final Type varType;
+    public Type varType;
     public final IdentifierExpression left;
     public final Expression right;
 

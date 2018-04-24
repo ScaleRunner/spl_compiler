@@ -4,15 +4,14 @@ import lexer.Lexer;
 import org.junit.Before;
 import org.junit.Test;
 
+import parser.declarations.VariableDeclaration;
 import parser.exceptions.ParseException;
 import parser.statements.Statement;
 import parser.types.Type;
 import parser.types.Types;
 import parser.Parser;
 import parser.declarations.Declaration;
-import parser.declarations.VariableDeclaration;
 import parser.expressions.Expression;
-import parser.statements.Statement;
 import typechecker.*;
 import util.Node;
 import util.ReadSPL;
@@ -28,10 +27,6 @@ import java.util.stream.Stream;
 public class TypecheckerTest {
 	private Typechecker tc = null;
 	// These are for convenience.
-	private final Type typeInt = Types.intType;
-	private final Type typeBool = Types.boolType;
-	private final Type typeChar = Types.charType;
-	private final Type typeVoid = Types.voidType;
 
 	@Before
 	public void setUp(){
@@ -66,6 +61,7 @@ public class TypecheckerTest {
 	private List<Node> typecheckSPL(String input) {
 		Lexer l = new Lexer(input);
 		Parser p = new Parser(l.tokenize());
+        tc = new Typechecker();
 		List<Declaration> decls = p.parseSPL();
 		List<Node> nodes = new ArrayList<>();
 
@@ -89,14 +85,14 @@ public class TypecheckerTest {
 	public void testIntegerConstant() {
 		Node e = typecheckExpr("5");
 		assertTypecheckSuccess();
-		assertEquals(typeInt, e.getType());
+		assertEquals(Types.intType, e.getType());
 	}
 
     @Test
     public void testCharacterConstant() {
         Node e = typecheckExpr("'a'");
         assertTypecheckSuccess();
-        assertEquals(typeChar, e.getType());
+        assertEquals(Types.charType, e.getType());
     }
 
     @Test
@@ -153,7 +149,7 @@ public class TypecheckerTest {
 	public void testPlus() {
 		Node e = typecheckExpr("5 + 3");
 		assertTypecheckSuccess();
-		assertEquals(typeInt, e.getType());
+		assertEquals(Types.intType, e.getType());
 	}
 
 	@Test
@@ -202,7 +198,7 @@ public class TypecheckerTest {
 	public void testConsTupleNotEmpty() {
 		Node e = typecheckExpr("(1,'a'):(2,'b'):(3,'c'):[]");
 		assertTypecheckSuccess();
-		assertEquals(Types.listType(Types.tupleType(typeInt, typeChar)), e.getType());
+		assertEquals(Types.listType(Types.tupleType(Types.intType, Types.charType)), e.getType());
 	}
 
     @Test
@@ -237,6 +233,27 @@ public class TypecheckerTest {
         Node e = typecheckExpr("-(4 * 3) % 5");
         assertTypecheckSuccess();
         assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testVar() {
+        typecheckSPL("var a = 3;\n");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, tc.getVariableType("a"));
+    }
+
+    @Test
+    public void testVarInExpr() {
+        typecheckSPL("var a = 3; Int b = a + 5; Bool c = a < b;");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, tc.getVariableType("a"));
+    }
+
+    @Test
+    public void testVarInExprFaulty() {
+        typecheckSPL("var a = False; Int b = a + 5; Char c = a == False;");
+        assertTypecheckFailure();
+        assertEquals(Types.boolType, tc.getVariableType("a"));
     }
 
 	@Test
@@ -398,7 +415,7 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionUseVariableOutOfScore() {
-        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+        typecheckSPL("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
                 "return 1;\n " +
                 "} else {\n" +
@@ -441,7 +458,7 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionOutOfScope() {
-        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+        typecheckSPL("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
                 "return 1;\n " +
                 "} else {\n" +
@@ -462,8 +479,8 @@ public class TypecheckerTest {
     }
 
     @Test
-    public void testFunctionTooLessArguments() {
-        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+    public void testFunctionTooFewArguments() {
+        typecheckSPL("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
                 "return 1;\n " +
                 "} else {\n" +
@@ -481,10 +498,32 @@ public class TypecheckerTest {
     }
 
     @Test
+    public void testHandmade() {
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/handmade.spl");
+
+        List<Node> nodes = typecheckSPL(s);
+        assertTypecheckSuccess();
+
+        Type empty = ((VariableDeclaration) nodes.get(0)).varType;
+        assertEquals(Types.varType(Types.listType(Types.intType)), empty);
+    }
+
+    @Test
+    public void testVarList() {
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/var_list.spl");
+
+        List<Node> nodes = typecheckSPL(s);
+        assertTypecheckSuccess();
+        Type a = ((VariableDeclaration) nodes.get(0)).varType;
+        assertEquals(Types.varType(Types.listType(Types.intType)), a);
+    }
+
+
+    @Test
     public void testFunctionsExampleMarkus() {
 	    String s = ReadSPL.readLineByLineJava8("./test/splExamples/2-compile-errors/functions.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckFailure();
     }
 
@@ -494,7 +533,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/2-compile-errors/lists.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckFailure();
     }
 
@@ -503,7 +542,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/associativity.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -513,7 +552,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/assignments.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -524,7 +563,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functions.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -533,7 +572,7 @@ public class TypecheckerTest {
         //This test has a lot of funny things we did not take into account...
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functionsSimple.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -543,7 +582,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functionArgumentsSimple.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -553,7 +592,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariables.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -563,7 +602,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariablesSimple.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -573,7 +612,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/tuples.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -583,7 +622,7 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/lists.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
@@ -593,9 +632,10 @@ public class TypecheckerTest {
 
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariables.spl");
 
-        List<Node> nodes = typecheckSPL(s);
+        typecheckSPL(s);
         assertTypecheckSuccess();
     }
+
 
     @Test
     public void testAllTestsByMarkus() {
@@ -613,7 +653,7 @@ public class TypecheckerTest {
 
                     try {
                         setUp();
-                        List<Node> nodes = typecheckSPL(s);
+                        typecheckSPL(s);
                         if(path.toString().contains("ok")){
                             assertTypecheckSuccess();
                         } else {

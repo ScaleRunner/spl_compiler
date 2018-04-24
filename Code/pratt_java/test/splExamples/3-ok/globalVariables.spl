@@ -3,8 +3,15 @@ Int a = 1;
 Bool b = True;
 
 [Int] c = 3 : [];
-var z = [];
-Int a = 3;
+
+//Hey Dennis, check this out
+//var z = [];
+
+
+
+
+//already defined
+//Int a = 3;
 
 [Bool] d = False : [];
 
@@ -16,8 +23,8 @@ Int a = 3;
 
 main() :: -> Void
 {
-
-    z = c;
+    //Uncomment this
+    //z = c;
     // 5
     print( aa.fst );
     // 3

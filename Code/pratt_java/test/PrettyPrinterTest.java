@@ -303,4 +303,32 @@ public class PrettyPrinterTest {
                 , pp.getResultString());
         assertEquals(pp.getResultString(), result.get(0).toString());
     }
+
+    @Test
+    public void testThreeFunctions(){
+        Lexer l = new Lexer("facR( n ) :: Int -> Int {\n" +
+                "if (n < 2 ) {\n " +
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}\n" +
+                "fun(a) :: Int -> Int {\n" +
+                "a = 3;\n"+
+                "return facR(a+1);\n" +
+                "}\n"+
+                "get2() :: -> Int {\n" +
+                "return 2;\n" +
+                "}\n"+
+                "myfun() :: -> Int {\n" +
+                "return get2();\n" +
+                "}");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        ArrayList<Declaration> result = p.parseSPL();
+
+        PrettyPrinter pp = new PrettyPrinter();
+        pp.visit(result);
+        System.out.println(pp.getResultString());
+    }
 }
