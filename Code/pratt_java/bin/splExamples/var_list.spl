@@ -1,0 +1,10 @@
+var a = [];
+
+main()::->Void
+{
+    a = 1 : a;
+    
+    // This should fail
+    a = 'c';
+    a = 'c' : a;
+}

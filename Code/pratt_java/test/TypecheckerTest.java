@@ -7,6 +7,8 @@ import org.junit.Test;
 import parser.declarations.VariableDeclaration;
 import parser.exceptions.ParseException;
 import parser.statements.Statement;
+import parser.types.ListType;
+import parser.types.Type;
 import parser.types.Types;
 import parser.Parser;
 import parser.declarations.Declaration;
@@ -501,6 +503,16 @@ public class TypecheckerTest {
 
         typecheckSPL(s);
         assertTypecheckSuccess();
+    }
+
+    @Test
+    public void testVarList() {
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/var_list.spl");
+
+        List<Node> nodes = typecheckSPL(s);
+        assertTypecheckSuccess();
+        Type a = ((VariableDeclaration) nodes.get(0)).varType;
+        assertEquals(Types.varType(Types.listType(Types.intType)), a);
     }
 
 

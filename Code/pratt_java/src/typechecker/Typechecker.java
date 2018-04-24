@@ -348,7 +348,7 @@ public class Typechecker implements Visitor {
 	@Override
 	public void visit(AssignStatement s) {
 		this.visit(s.right);
-		if(s.name.getClass() == IdentifierExpression.class){
+		if(s.name instanceof IdentifierExpression){
 			IdentifierExpression id = (IdentifierExpression) s.name;
 
 			Type variableType = env.get(id.name);
@@ -528,8 +528,9 @@ public class Typechecker implements Visitor {
 	public void visit(VariableDeclaration d) {
 		this.visit(d.right);
 		if(d.right.getType() instanceof ListType){
-			if(((ListType) d.right.getType()).listType == null)
-				d.right.setType(d.varType);
+			if(((ListType) d.right.getType()).listType == null) { // we're dealing with an empty list
+                d.varType = Types.varType(d.right.getType());
+            }
 		}
 		if(d.varType.equals(d.right.getType()) || d.varType instanceof VarType) {
             if(env.get(d.left.name) != null){
