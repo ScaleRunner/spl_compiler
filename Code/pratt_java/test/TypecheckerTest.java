@@ -591,7 +591,7 @@ public class TypecheckerTest {
     public void testCommentsExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/comments.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariables.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();

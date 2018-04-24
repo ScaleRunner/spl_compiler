@@ -3,6 +3,8 @@ Int a = 1;
 Bool b = True;
 
 [Int] c = 3 : [];
+var z = [];
+Int a = 3;
 
 [Bool] d = False : [];
 
@@ -14,6 +16,8 @@ Bool b = True;
 
 main() :: -> Void
 {
+
+    z = c;
     // 5
     print( aa.fst );
     // 3
