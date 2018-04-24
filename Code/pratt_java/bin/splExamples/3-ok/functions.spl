@@ -78,12 +78,13 @@ printIntList(list) :: [Int] -> Void
     }
 }
 
-printIntListRec(list) :: [Int] -> Void
+printIntListRec(list) :: [Int] -> Int
 {
     if(!isEmpty(list))
     {
         print(list.hd);
         printIntListRec(list.tl);
+        return 2;
     }
 }
 

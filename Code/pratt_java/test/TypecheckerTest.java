@@ -626,6 +626,16 @@ public class TypecheckerTest {
     }
 
     @Test
+    public void testCrazyLists() {
+        //This test has a lot of funny things we did not take into account...
+
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/lists_crazy.spl");
+
+        typecheckSPL(s);
+        assertTypecheckSuccess();
+    }
+
+    @Test
     public void testCommentsExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
