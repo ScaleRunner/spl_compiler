@@ -1,6 +1,12 @@
+/**
+* In this example, 'empty' is used to create a list of type Int
+* The variable 'empty' will, after this operation, be of type Var(List[Int])
+**/
+
+var empty = [];
 var one = 1;
 
-[Int] list = 3 : one : [];
+[Int] list = 3 : one : empty;
 
 sum(x) :: [Int] -> Int
 {

@@ -501,8 +501,11 @@ public class TypecheckerTest {
     public void testHandmade() {
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/handmade.spl");
 
-        typecheckSPL(s);
+        List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
+
+        Type empty = ((VariableDeclaration) nodes.get(0)).varType;
+        assertEquals(Types.varType(Types.listType(Types.intType)), empty);
     }
 
     @Test
