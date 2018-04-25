@@ -4,8 +4,8 @@ main()::->Void
     [Int] a = [];
     [Int] b = 7:[];
     [Int] c = 2:b;
-    var porra = []:[];
-    [[Int]] pica = (2:[]):porra;
+    var zz = []:[];
+    [[Int]] xx = (2:[]):zz;
 
 
     [[Int]] d = (2:[]):[];
