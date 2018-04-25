@@ -1,8 +1,13 @@
 main()::->Void
 {
+
     [Int] a = [];
     [Int] b = 7:[];
     [Int] c = 2:b;
+    var zz = []:[];
+    [[Int]] xx = (2:[]):zz;
+
+
     [[Int]] d = (2:[]):[];
 
     [[(Int, [Char])]] e = ((1, []):[]) : ((2, ('a':[])):[]);
@@ -56,7 +61,11 @@ main()::->Void
     [ ([Int],Int) ] p = ([],1) : (c,2) : ([],3): ([],4):[];
 
     ([Int], Char) q = (a, 'c');
-
+    //Should not work and does not
+    //But gets null pointer exception
+    //[ (Int, [Int]) ] r = (1,b) : (2,c) : (3,[]:[]): (4,[]):[];
+    //This works as it should though
+    //[ (Int, [[Int]]) ] r = (1,(7:[]):[]) : (2,(7:[]):[]) : (3, ([]:[])): (4,[]):[];
     [ (Int, [Int]) ] r = (1,b) : (2,c) : (3,[]): (4,[]):[];
     [ ([Int],Int) ] s = (b,1) : (c,2) : ([],3): ([],4):[];
 
