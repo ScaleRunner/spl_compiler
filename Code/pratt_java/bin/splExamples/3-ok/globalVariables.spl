@@ -4,6 +4,15 @@ Bool b = True;
 
 [Int] c = 3 : [];
 
+//Hey Dennis, check this out
+//var z = [];
+
+
+
+
+//already defined
+//Int a = 3;
+
 [Bool] d = False : [];
 
 (Int, Int) aa = (5, 3);
@@ -14,6 +23,8 @@ Bool b = True;
 
 main() :: -> Void
 {
+    //Uncomment this
+    //z = c;
     // 5
     print( aa.fst );
     // 3

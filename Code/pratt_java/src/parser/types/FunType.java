@@ -34,4 +34,12 @@ public class FunType extends Node {
 
         return Objects.hash(argsTypes, returnType);
     }
+
+    @Override
+    public String toString() {
+        return "FunType{" +
+                "argsTypes=" + argsTypes + "\n" +
+                ", returnType=" + returnType + "\n" +
+                '}';
+    }
 }

@@ -6,7 +6,9 @@ main()::->Void
     [(Int,Int)] d = (1,1) : (2,2) : (3,3) : [];
     [ (Int, [Int]) ] e = (1,b) : (2,c) : (3,[]) : (4,[]): [];
     Int f = c.tl.hd;
-    [[Int]] g = a : b : c : [];
+    // We do not allow an empty list to be appended to a list when the rhs is not an empty list
+    //[[Int]] g = a : b : c : [];
+    [[Int]] g = b : c : a;
 
     // True
     print( isEmpty(a) );
