@@ -1,0 +1,13 @@
+wrongIf(b) :: Bool -> Int {
+    if(b){
+        return 1;
+    } else {
+        b = True;
+    }
+}
+
+main() :: -> Void
+{
+    Int result = wrongIf(False);
+    print(result);
+}

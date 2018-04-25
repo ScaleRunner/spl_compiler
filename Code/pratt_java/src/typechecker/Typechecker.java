@@ -598,7 +598,7 @@ public class Typechecker implements Visitor {
 
 		}
 		else
-			error("LHS and RHS of cons expression are not the same", e);
+			error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
 
 		if((e.left.getType() instanceof ListType) && (e.right.getType() instanceof ListType)){
 			if(((ListType) e.left.getType()).listType.equals(((ListType) e.right.getType()).listType)){

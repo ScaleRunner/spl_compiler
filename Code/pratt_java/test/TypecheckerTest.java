@@ -667,4 +667,19 @@ public class TypecheckerTest {
         }
     }
 
+    @Test
+    public void testVariableAlreadyExists() {
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/variable_already_exists.spl");
+
+        typecheckSPL(s);
+        assertTypecheckFailure();
+    }
+
+    @Test
+    public void testIfNotReturning() {
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/if_not_returning.spl");
+
+        typecheckSPL(s);
+        assertTypecheckFailure();
+    }
 }
