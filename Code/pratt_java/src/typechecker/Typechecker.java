@@ -587,6 +587,7 @@ public class Typechecker implements Visitor {
 		//also fine
 		else if(e.right.getType().equals(e.left.getType())){
 			e.setType(new ListType(e.right.getType()));
+			return;
 		}
 		//If one  of the sides of the expression has an empty list, needs more checks
 		else if(checkEmptyListTypeNull(e.left.getType()) || checkEmptyListTypeNull(e.right.getType()) ){
@@ -600,6 +601,9 @@ public class Typechecker implements Visitor {
 				fixExpressionEmptyListType(e.right, e.left.getType(), e);
 				//e.right.setType(fix);
 			}
+			//not fully tested
+			else
+				fixExpressionEmptyListType(e.right, e.left.getType(), e);
 
 		}
 		else
@@ -681,7 +685,8 @@ public class Typechecker implements Visitor {
 							emptyListTypeExpr.setType(new ListType(((ListType) ((OperatorExpression) emptyListTypeExpr).right.getType()).listType));
 						}
 
-					} else if (emptyListTypeExpr instanceof ListExpression) {
+					} else if (emptyListTypeExpr instanceof ListExpression ||
+							emptyListTypeExpr instanceof IdentifierExpression) {
 						Type t = ((ListType)emptyListTypeExpr.getType()).listType;
 						//if setType with new List(inferEmpt... has problem...
 						emptyListTypeExpr.setType(inferEmptyListType(t, fixer, e));
@@ -709,7 +714,8 @@ public class Typechecker implements Visitor {
 							} else if (((OperatorExpression) emptyListTypeExpr).left.getType().equals(((ListType) ((OperatorExpression) emptyListTypeExpr).right.getType()).listType)) {
 								emptyListTypeExpr.setType(new ListType(((ListType) ((OperatorExpression) emptyListTypeExpr).right.getType()).listType));
 							}
-						} else if (emptyListTypeExpr instanceof ListExpression) {
+						} else if (emptyListTypeExpr instanceof ListExpression ||
+								emptyListTypeExpr instanceof IdentifierExpression) {
 							Type t = ((ListType) emptyListTypeExpr.getType()).listType;
 							emptyListTypeExpr.setType(new ListType(inferEmptyListType(t, fixer, e)));
 							//emptyListTypeExpr.setType(new ListType(fixer));

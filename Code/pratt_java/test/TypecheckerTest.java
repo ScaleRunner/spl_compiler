@@ -601,7 +601,7 @@ public class TypecheckerTest {
 
     @Test
     public void testlistFunction3OkExampleMarkus() {
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/lists.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/lists_crazy.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
