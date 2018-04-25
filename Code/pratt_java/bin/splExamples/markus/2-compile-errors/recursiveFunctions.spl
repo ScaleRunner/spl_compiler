@@ -14,5 +14,6 @@ g(x) :: Bool -> Bool
 
 main() :: -> Void
 {
-	print(3);
+    f(1);
+    g(True);
 }

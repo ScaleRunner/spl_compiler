@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 
 public class TypecheckerTest {
 	private Typechecker tc = null;
+	// These are for convenience.
 
 	@Before
 	public void setUp(){
@@ -498,7 +499,7 @@ public class TypecheckerTest {
 
     @Test
     public void testHandmade() {
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/handmade.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/handmade.spl");
 
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
@@ -520,7 +521,7 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionsExampleMarkus() {
-	    String s = ReadSPL.readLineByLineJava8("./test/splExamples/2-compile-errors/functions.spl");
+	    String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/2-compile-errors/functions.spl");
 
         typecheckSPL(s);
         assertTypecheckFailure();
@@ -530,7 +531,7 @@ public class TypecheckerTest {
     public void testListsExampleMarkus() {
 	    //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/2-compile-errors/lists.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/2-compile-errors/lists.spl");
 
         typecheckSPL(s);
         assertTypecheckFailure();
@@ -539,7 +540,7 @@ public class TypecheckerTest {
     @Test
     public void testAssociativityOkExampleMarkus() {
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/associativity.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/associativity.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -549,7 +550,7 @@ public class TypecheckerTest {
     public void testAssignmentsOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/assignments.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/assignments.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -560,7 +561,7 @@ public class TypecheckerTest {
     public void testFunctionsOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functions.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/functions.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -569,7 +570,7 @@ public class TypecheckerTest {
     @Test
     public void testFunctionsSimpleOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functionsSimple.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/functionsSimple.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -579,7 +580,7 @@ public class TypecheckerTest {
     public void testfunctionArgumentsSimpleOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/functionArgumentsSimple.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/functionArgumentsSimple.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -587,9 +588,7 @@ public class TypecheckerTest {
 
     @Test
     public void testglobalVariablesOkExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
-
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariables.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariables.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -597,9 +596,8 @@ public class TypecheckerTest {
 
     @Test
     public void testglobalVariablesSimpleOkExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
-
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariablesSimple.spl");
+        
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariablesSimple.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -609,7 +607,7 @@ public class TypecheckerTest {
     public void testtuplesOkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/tuples.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/tuples.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -619,17 +617,17 @@ public class TypecheckerTest {
     public void testlistFunction3OkExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/lists.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/lists.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
     @Test
-    public void testCrazyLists() {
+    public void testlistCrazy() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/lists_crazy.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/lists_crazy.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -639,26 +637,33 @@ public class TypecheckerTest {
     public void testCommentsExampleMarkus() {
         //This test has a lot of funny things we did not take into account...
 
-        String s = ReadSPL.readLineByLineJava8("./test/splExamples/3-ok/globalVariables.spl");
+        String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariables.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
     }
 
-
     @Test
     public void testAllTestsByMarkus() {
-        try (Stream<Path> paths = Files.walk(Paths.get("./test/splExamples"))) {
+	    Long sleepTime = 10L;
+        try (Stream<Path> paths = Files.walk(Paths.get("./test/splExamples/markus"))) {
             paths.forEach(path ->{
                 if(Files.isRegularFile(path)){
                     try {
                         // To not mess up printing
-                        Thread.sleep( 1000);
+                        Thread.sleep( sleepTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+
                     System.out.println(path.toString());
                     String s = ReadSPL.readLineByLineJava8(path.toString());
+                    try {
+                        // To not mess up printing
+                        Thread.sleep( sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
                     try {
                         setUp();

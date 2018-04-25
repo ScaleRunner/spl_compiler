@@ -1,5 +1,0 @@
-main()::->Void
-{
-    /* missing opening parenthesis */
-    Int a = (5));
-}

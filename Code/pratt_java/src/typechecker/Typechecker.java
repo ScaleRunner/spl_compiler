@@ -829,9 +829,9 @@ public class Typechecker implements Visitor {
 			else
 				return new ListType(inferEmptyListType(((ListType) left).listType, ((ListType) right).listType, e));
 		}
-		else if(left == typeEmptyList)
+		else if(left == emptyListType)
 			return right;
-		else if (right == typeEmptyList)
+		else if (right == emptyListType)
 			return left;
 		else if (right.equals(left))
 			return left;
@@ -839,11 +839,6 @@ public class Typechecker implements Visitor {
 		return null;
 
 	}
-
-
-	public Type getVariableType(String name){
-        return env.get(name);
-    }
 
 	public Type getVariableType(String name){
         return env.get(name);
