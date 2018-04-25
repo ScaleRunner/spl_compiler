@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import parser.Parser;
 import parser.declarations.Declaration;
+import util.Node;
 
 public class CodeGeneratorTest {
 
@@ -47,7 +48,7 @@ public class CodeGeneratorTest {
         }
     }
 
-    private String runProgram(String program, boolean debug){
+    private String runSPL(String program, boolean debug){
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         List<Declaration> nodes = p.parseSPL();
@@ -60,37 +61,50 @@ public class CodeGeneratorTest {
         return runSSM(debug);
     }
 
+    private String runExpression(String program, boolean debug){
+        Lexer l = new Lexer(program);
+        Parser p = new Parser(l.tokenize());
+        Node n = p.parseExpression();
+        CodeGenerator gen = new CodeGenerator();
+        try {
+            gen.generateCode(n, "test.ssm", "trap 0");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return runSSM(debug);
+    }
+
     @Test
     public void testIntegerConstant(){
-        String result = runProgram("42", false);
+        String result = runExpression("42", false);
         assertEquals("42", result);
     }
 
     @Test
     public void testAddition(){
-        String result = runProgram("4 + 2", false);
+        String result = runExpression("4 + 2", false);
         assertEquals("6", result);
     }
 
     @Test
     public void testAdditionVsMultiplicationPrecedence(){
-        String result = runProgram("4 + 2 * 3 + 2", false);
+        String result = runExpression("4 + 2 * 3 + 2", false);
         assertEquals("12", result);
     }
 
     @Test
     public void testSubtraction(){
-        String result = runProgram("42-45", false);
+        String result = runExpression("42-45", false);
         assertEquals("-3", result);
     }
 
     @Test
     public void testSubtractionAssociativity(){
-        String result = runProgram("6 - 3 - 2", false);
+        String result = runExpression("6 - 3 - 2", false);
         assertEquals("1", result);
-        result = runProgram("6 - (3 - 2)", false);
+        result = runExpression("6 - (3 - 2)", false);
         assertEquals("5", result);
-        result = runProgram("(6 - 3) - 2", false);
+        result = runExpression("(6 - 3) - 2", false);
         assertEquals("1", result);
     }
 

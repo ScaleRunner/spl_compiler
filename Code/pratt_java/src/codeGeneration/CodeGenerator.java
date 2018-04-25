@@ -44,12 +44,12 @@ public class CodeGenerator implements Visitor {
         out.close();
     }
 
-    private void generateCode(Node n, String outputFilename)
+    public void generateCode(Node n, String outputFilename)
             throws FileNotFoundException {
         generateCode(n, outputFilename, null);
     }
 
-    private void generateCode(Node n, String outputFilename,
+    public void generateCode(Node n, String outputFilename,
                              String postamble) throws FileNotFoundException {
         n.accept(this);
         if (postamble != null) {
