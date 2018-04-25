@@ -349,6 +349,11 @@ public class Typechecker implements Visitor {
 
 			if(variableType == null){
 				error(String.format("Variable %s is not defined", id.name), s);
+			} else if(variableType instanceof ListType){
+				Type listType = ((ListType) variableType).listType;
+				if(listType == Types.emptyListType && s.right.getType() instanceof ListType){
+				    s.name.setType(s.right.getType());
+                }
 			} else if(!variableType.equals(s.right.getType()))
 				error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
 						s.right.getType(), id.name, variableType, s.right.getType()),s);

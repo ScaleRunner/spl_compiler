@@ -4,11 +4,13 @@ main()::->Void
 {
     [Int] i = 1 : 2 : 3 : [];
 
+    a = i;
+
+    a = [];
     a = 1 : a;
     
     // This should fail
     //a = 'c';
     //a = 'c' : a;
 
-    a = i;
 }
