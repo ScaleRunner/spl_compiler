@@ -1,0 +1,11 @@
+Int a = 1;
+
+//already defined
+//Int a = 3;
+
+main() :: -> Void
+{
+    a = 2;
+    // Do we want to allow this?
+    //Int a = 2;
+}

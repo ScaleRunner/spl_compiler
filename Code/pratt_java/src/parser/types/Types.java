@@ -6,6 +6,7 @@ public class Types {
     public final static CharType charType = CharType.getInstance();
     public final static BoolType boolType = BoolType.getInstance();
     public final static VoidType voidType = VoidType.getInstance();
+    public final static EmptyListType emptyListType = EmptyListType.getInstance();
 
     public static VarType varType(){
         return new VarType();
