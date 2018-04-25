@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 
 public class TypecheckerTest {
 	private Typechecker tc = null;
-	// These are for convenience.
 
 	@Before
 	public void setUp(){
@@ -529,8 +528,6 @@ public class TypecheckerTest {
 
     @Test
     public void testListsExampleMarkus() {
-	    //This test has a lot of funny things we did not take into account...
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/2-compile-errors/lists.spl");
 
         typecheckSPL(s);
@@ -539,7 +536,6 @@ public class TypecheckerTest {
 
     @Test
     public void testAssociativityOkExampleMarkus() {
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/associativity.spl");
 
         typecheckSPL(s);
@@ -548,8 +544,6 @@ public class TypecheckerTest {
 
     @Test
     public void testAssignmentsOkExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/assignments.spl");
 
         typecheckSPL(s);
@@ -559,8 +553,6 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionsOkExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/functions.spl");
 
         typecheckSPL(s);
@@ -569,7 +561,6 @@ public class TypecheckerTest {
 
     @Test
     public void testFunctionsSimpleOkExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/functionsSimple.spl");
 
         typecheckSPL(s);
@@ -578,8 +569,6 @@ public class TypecheckerTest {
 
     @Test
     public void testfunctionArgumentsSimpleOkExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/functionArgumentsSimple.spl");
 
         typecheckSPL(s);
@@ -596,7 +585,6 @@ public class TypecheckerTest {
 
     @Test
     public void testglobalVariablesSimpleOkExampleMarkus() {
-        
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariablesSimple.spl");
 
         typecheckSPL(s);
@@ -605,8 +593,6 @@ public class TypecheckerTest {
 
     @Test
     public void testtuplesOkExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/tuples.spl");
 
         typecheckSPL(s);
@@ -615,8 +601,6 @@ public class TypecheckerTest {
 
     @Test
     public void testlistFunction3OkExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/lists.spl");
 
         typecheckSPL(s);
@@ -625,8 +609,6 @@ public class TypecheckerTest {
 
     @Test
     public void testlistCrazy() {
-        //This test has a lot of funny things we did not take into account...
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/lists_crazy.spl");
 
         typecheckSPL(s);
@@ -635,8 +617,6 @@ public class TypecheckerTest {
 
     @Test
     public void testCommentsExampleMarkus() {
-        //This test has a lot of funny things we did not take into account...
-
         String s = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariables.spl");
 
         typecheckSPL(s);
