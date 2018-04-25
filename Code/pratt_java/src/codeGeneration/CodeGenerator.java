@@ -60,7 +60,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(Expression e) {
-
+        Expression.visitExpression(this, e);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IntegerExpression e) {
-
+        output.add("ldc " + e.name);
     }
 
     @Override
@@ -100,7 +100,21 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(OperatorExpression e) {
-
+        this.visit(e.left);
+        this.visit(e.right);
+        switch (e.operator) {
+            case TOK_PLUS:
+                output.add("add");
+                break;
+            case TOK_MULT:
+                output.add("mul");
+                break;
+            case TOK_MINUS:
+                output.add("sub");
+                break;
+            default:
+                throw new CodeGenerationException(String.format("Invalid operator '%s'.", e.operator), e);
+        }
     }
 
     @Override
@@ -168,11 +182,6 @@ public class CodeGenerator implements Visitor {
 
     }
 
-//    @Override
-//    public void visit(AstExprInteger i) {
-//        output.add("ldc " + i.getValue());
-//    }
-//
 //    @Override
 //    public void visit(AstExprBinOp e) {
 //        e.getLeft().accept(this);
