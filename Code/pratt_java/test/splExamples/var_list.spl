@@ -2,9 +2,13 @@ var a = [];
 
 main()::->Void
 {
+    [Int] i = 1 : 2 : 3 : [];
+
     a = 1 : a;
     
     // This should fail
     //a = 'c';
     //a = 'c' : a;
+
+    a = i;
 }
