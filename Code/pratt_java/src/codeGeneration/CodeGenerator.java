@@ -65,7 +65,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BooleanExpression e) {
-
+        // If e.name than "1" else "0"
+        String val = e.name ? "1" : "0";
+        output.add("ldc " + val);
     }
 
     @Override

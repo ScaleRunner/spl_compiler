@@ -81,6 +81,18 @@ public class CodeGeneratorTest {
     }
 
     @Test
+    public void testBoolean(){
+        String result = runExpression("True", false);
+        assertEquals("1", result);
+
+        result = runExpression("False", false);
+        assertEquals("0", result);
+
+        result = runExpression("True != False", false);
+        assertEquals("-1", result);
+    }
+
+    @Test
     public void testAddition(){
         String result = runExpression("4 + 2", false);
         assertEquals("6", result);
