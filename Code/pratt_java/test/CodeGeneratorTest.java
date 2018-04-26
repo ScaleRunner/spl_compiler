@@ -108,4 +108,49 @@ public class CodeGeneratorTest {
         assertEquals("1", result);
     }
 
+    @Test
+    public void testAllBinaryOps(){
+        String result = runExpression("42-45", false);
+        assertEquals("-3", result);
+
+        result = runExpression("7+3", false);
+        assertEquals("10", result);
+
+        result = runExpression("7*3", false);
+        assertEquals("21", result);
+
+        result = runExpression("6/3", false);
+        assertEquals("2", result);
+
+        result = runExpression("5%3", false);
+        assertEquals("2", result);
+
+        result = runExpression("5 > 3", false);
+        assertNotEquals("0", result);
+
+        result = runExpression("5 < 3", false);
+        assertEquals("0", result);
+
+        result = runExpression("5 >= 5", false);
+        assertNotEquals("0", result);
+
+        result = runExpression("5 >= 6", false);
+        assertEquals("0", result);
+
+        result = runExpression("5 <= 5", false);
+        assertNotEquals("0", result);
+
+        result = runExpression("5 <= 6", false);
+        assertNotEquals("0", result);
+
+        result = runExpression("6 <= 5", false);
+        assertEquals("0", result);
+
+        result = runExpression("1 == 1", false);
+        assertNotEquals("0", result);
+
+        result = runExpression("1 == 1 && 1 != 0", false);
+        assertNotEquals("1", result);
+    }
+
 }

@@ -103,6 +103,7 @@ public class CodeGenerator implements Visitor {
         this.visit(e.left);
         this.visit(e.right);
         switch (e.operator) {
+            // arithmetic binary functions
             case TOK_PLUS:
                 output.add("add");
                 break;
@@ -112,6 +113,41 @@ public class CodeGenerator implements Visitor {
             case TOK_MINUS:
                 output.add("sub");
                 break;
+            case TOK_MOD:
+                output.add("mod");
+                break;
+            case TOK_DIV:
+                output.add("div");
+                break;
+
+            // Boolean
+            case TOK_AND:
+                output.add("and");
+                break;
+            case TOK_OR:
+                output.add("or");
+                break;
+
+            // Comparison
+            case TOK_EQ:
+                output.add("eq");
+                break;
+            case TOK_NEQ:
+                output.add("ne");
+                break;
+            case TOK_LT:
+                output.add("lt");
+                break;
+            case TOK_GT:
+                output.add("gt");
+                break;
+            case TOK_LEQ:
+                output.add("le");
+                break;
+            case TOK_GEQ:
+                output.add("ge");
+                break;
+
             default:
                 throw new CodeGenerationException(String.format("Invalid operator '%s'.", e.operator), e);
         }
