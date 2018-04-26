@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
+import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
@@ -162,7 +163,14 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PrefixExpression e) {
+        this.visit(e.right);
 
+        if(e.operator == TokenType.TOK_MINUS)
+            output.add("neg");
+        else if(e.operator == TokenType.TOK_NOT)
+            output.add("not");
+        else
+            throw new CodeGenerationException("Invalid operator", e);
     }
 
     @Override
