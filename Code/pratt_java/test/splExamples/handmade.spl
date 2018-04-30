@@ -10,6 +10,7 @@ var one = 1;
 
 sum(x) :: [Int] -> Int
 {
+
     var result = 0;
     if( ! isEmpty(x) )
     {

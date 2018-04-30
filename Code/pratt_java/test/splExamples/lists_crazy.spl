@@ -7,7 +7,7 @@ main()::->Void
     var zz = []:[];
     [[Int]] xx = (2:[]):zz;
 
-
+    //([Int], [Bool]) myTuple = ([],[]);
     [[Int]] d = (2:[]):[];
 
     [[(Int, [Char])]] e = ((1, []):[]) : ((2, ('a':[])):[]);
@@ -16,23 +16,23 @@ main()::->Void
     [[[([Int], [Int])]]]  y = (((([],[]):((1:[]),(2:[])):[]):[]):[]);
 
     //Should not work and does not
-    //[[[([Int], [Int])]]] n = (([],[]):(([]),([])):[]) : y;
+    //[[[([Int], [Int])]]] nn = (([],[]):(([]),([])):[]) : y;
     //Should not work and does not;
     //[[Int]] h = 2:[]:[]:[]:[];
     //Should not work and does not;
-    //[[[Int]]] l =  (4:5:6:[]) : (((1:2:3:[]):[]):[]);
+    //[[[Int]]] ll =  (4:5:6:[]) : (((1:2:3:[]):[]):[]);
     //Attempts to create list with []:y, which fails, but generates nullpointerexception
     //somewhere else after error is found
-    //[[[([Int], [Int])]]] n = ([],[]):(([]),([])):[] : y;
+    //[[[([Int], [Int])]]] nn = ([],[]):(([]),([])):[] : y;
     //Unbalanced parenthesis give strange error
     //Missing ';' at the end of the line.
     //[[[([Int], [Int])]]] n = ([],[]):([]),([])):[] : y;
 
     //Should not work and does not;
-    //[[(Int, Char)]] g = (1, []): (((2, 'a'):[]):[]);
+    //[[(Int, Char)]] gg = (1, []): (((2, 'a'):[]):[]);
 
     //Should not work and does not;
-    //[[(Int, Char)]] g = ((1, []):[]) : (((2, 'a'):[]):[]);
+    //[[(Int, Char)]] gg = ((1, []):[]) : (((2, 'a'):[]):[]);
     //Should not work and does not;
     //[Int] l = []:1:[];
     //Should not work and does not;

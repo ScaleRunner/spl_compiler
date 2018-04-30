@@ -89,6 +89,7 @@ public class CodeGeneratorTest {
         assertEquals("0", result);
 
         result = runExpression("True != False", false);
+        //-1 represents True;
         assertEquals("-1", result);
     }
 
@@ -109,7 +110,10 @@ public class CodeGeneratorTest {
                                             1111 1111
         */
         result = runExpression("!True", false);
-        assertEquals("-2", result);
+        assertEquals("0", result);
+
+        result = runExpression("!False", false);
+        assertEquals("1", result);
     }
 
     @Test
