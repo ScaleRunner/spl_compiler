@@ -4,15 +4,13 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
-import compiler.CompileException;
+import codeGeneration.writer.ProgramWriter;
 import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
-import parser.types.Type;
-import parser.types.Types;
 import util.Node;
 import util.Visitor;
 
@@ -27,26 +25,28 @@ public class CodeGenerator implements Visitor {
     //need to work on it later
     HashMap<String, Integer> argsPlusOffset = new HashMap<>();
 
+    private String currentBranch = "root";
+
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath);
     }
 
-    public void generateCode(List<Declaration> nodes, String postamble)
-            throws FileNotFoundException {
+    public void generateCode(List<Declaration> nodes, Command postamble) throws FileNotFoundException {
         for(Node n : nodes){
             n.accept(this);
         }
 
         if (postamble != null) {
-            programWriter.addToOutput(postamble);
+            programWriter.addToOutput("root", postamble);
         }
         programWriter.writeToFile();
     }
 
-    public void generateCode(Node n, String postamble) throws FileNotFoundException {
+    public void generateCode(Node n, Command postamble) throws FileNotFoundException {
         n.accept(this);
+
         if (postamble != null) {
-            programWriter.addToOutput(postamble);
+            programWriter.addToOutput("root", postamble);
         }
         programWriter.writeToFile();
     }
@@ -60,7 +60,7 @@ public class CodeGenerator implements Visitor {
     public void visit(BooleanExpression e) {
         // If e.name than "-1" else "0"
         String val = e.name ? "-1" : "0";
-        programWriter.addToOutput("ldc", val);
+        programWriter.addToOutput(currentBranch, new Command("ldc", val));
     }
 
     @Override
@@ -68,32 +68,32 @@ public class CodeGenerator implements Visitor {
         for(Expression arg : e.args){
             this.visit(arg);
         }
-        programWriter.addToOutput("bsr", e.function_name.name);
+        programWriter.addToOutput(currentBranch, new Command("bsr", e.function_name.name));
     }
 
     @Override
     public void visit(CharacterExpression e) {
-        programWriter.addToOutput("ldc", Integer.toString( (int) e.name));
+        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString( (int) e.name)));
     }
 
     @Override
     public void visit(IdentifierExpression e) {
         //If identifier is in the rhs of Assignment, we need to use an offset to load it to the stack;
-
         if(!lsideAssign){
-
-            programWriter.addToOutput("ldr MP"); //Loads value from MP (assuming MP is in origin)
-            programWriter.addToOutput("ldc "+localVariablesPlusOffset.get(e.name)); // Loads offset FromOrigin
-            programWriter.addToOutput("add");// With this address we can load variable
-            programWriter.addToOutput("lda 0"); //Loads value from address
+            programWriter.addToOutput(currentBranch,
+                    new Command("ldr", "MP")); //Loads value from MP (assuming MP is in origin)
+            programWriter.addToOutput(currentBranch,
+                    new Command("ldc",
+                            Integer.toString(localVariablesPlusOffset.get(e.name)))
+            ); // Loads offset FromOrigin
+            programWriter.addToOutput(currentBranch, new Command("add"));// With this address we can load variable
+            programWriter.addToOutput(currentBranch, new Command("lda", "0")); //Loads value from address
         }
-
-
     }
 
     @Override
     public void visit(IntegerExpression e) {
-        programWriter.addToOutput("ldc", Integer.toString(e.name));
+        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(e.name)));
     }
 
     @Override
@@ -113,47 +113,47 @@ public class CodeGenerator implements Visitor {
         switch (e.operator) {
             // arithmetic binary functions
             case TOK_PLUS:
-                programWriter.addToOutput("add");
+                programWriter.addToOutput(currentBranch, new Command("add"));
                 break;
             case TOK_MULT:
-                programWriter.addToOutput("mul");
+                programWriter.addToOutput(currentBranch, new Command("mul"));
                 break;
             case TOK_MINUS:
-                programWriter.addToOutput("sub");
+                programWriter.addToOutput(currentBranch, new Command("sub"));
                 break;
             case TOK_MOD:
-                programWriter.addToOutput("mod");
+                programWriter.addToOutput(currentBranch, new Command("mod"));
                 break;
             case TOK_DIV:
-                programWriter.addToOutput("div");
+                programWriter.addToOutput(currentBranch, new Command("div"));
                 break;
 
             // Boolean
             case TOK_AND:
-                programWriter.addToOutput("and");
+                programWriter.addToOutput(currentBranch, new Command("and"));
                 break;
             case TOK_OR:
-                programWriter.addToOutput("or");
+                programWriter.addToOutput(currentBranch, new Command("or"));
                 break;
 
             // Comparison
             case TOK_EQ:
-                programWriter.addToOutput("eq");
+                programWriter.addToOutput(currentBranch, new Command("eq"));
                 break;
             case TOK_NEQ:
-                programWriter.addToOutput("ne");
+                programWriter.addToOutput(currentBranch, new Command("ne"));
                 break;
             case TOK_LT:
-                programWriter.addToOutput("lt");
+                programWriter.addToOutput(currentBranch, new Command("lt"));
                 break;
             case TOK_GT:
-                programWriter.addToOutput("gt");
+                programWriter.addToOutput(currentBranch, new Command("gt"));
                 break;
             case TOK_LEQ:
-                programWriter.addToOutput("le");
+                programWriter.addToOutput(currentBranch, new Command("le"));
                 break;
             case TOK_GEQ:
-                programWriter.addToOutput("ge");
+                programWriter.addToOutput(currentBranch, new Command("ge"));
                 break;
 
             default:
@@ -171,9 +171,9 @@ public class CodeGenerator implements Visitor {
         this.visit(e.right);
 
         if(e.operator == TokenType.TOK_MINUS)
-            programWriter.addToOutput("neg");
+            programWriter.addToOutput(currentBranch, new Command("neg"));
         else if(e.operator == TokenType.TOK_NOT){
-            programWriter.addToOutput("not");
+            programWriter.addToOutput(currentBranch, new Command("not"));
         }
         else
             throw new CodeGenerationException("Invalid operator", e);
@@ -199,7 +199,7 @@ public class CodeGenerator implements Visitor {
         for(Expression arg : s.args){
             this.visit(arg);
         }
-        programWriter.addToOutput("bsr", s.function_name.name);
+        programWriter.addToOutput(currentBranch, new Command("bsr", s.function_name.name));
     }
 
     @Override
@@ -231,8 +231,8 @@ public class CodeGenerator implements Visitor {
     public void visit(FunctionDeclaration d) {
 
         int i = 0;
-        programWriter.createBranch(d.funName.name);
-        programWriter.addToOutput("link "+ (d.decls.size()-1));
+        currentBranch = d.funName.name;
+        programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(d.decls.size()-1)));
 
         for(Declaration varDec : d.decls){
             localVariableDeclarationOffset = i;
@@ -242,8 +242,6 @@ public class CodeGenerator implements Visitor {
         for(Statement funStmt : d.stats){
             this.visit(funStmt);
         }
-
-
     }
 
     @Override
@@ -252,9 +250,8 @@ public class CodeGenerator implements Visitor {
         this.visit(d.left);
         lsideAssign = false;
         this.visit(d.right);
-        programWriter.addToOutput("stl "+localVariableDeclarationOffset);
+        programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(localVariableDeclarationOffset)));
         localVariablesPlusOffset.put(d.left.name, localVariableDeclarationOffset);
-
     }
 
 }
