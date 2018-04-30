@@ -7,9 +7,9 @@ import java.util.Objects;
 
 public class ReadExpression extends Expression {
 
-    public final Expression arg;
+    public final IntegerExpression arg;
 
-    public ReadExpression(Expression arg) {
+    public ReadExpression(IntegerExpression arg) {
         this.arg = arg;
     }
 

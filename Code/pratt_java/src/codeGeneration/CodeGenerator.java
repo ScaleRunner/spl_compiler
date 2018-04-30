@@ -196,6 +196,11 @@ public class CodeGenerator implements Visitor {
     }
 
     @Override
+    public void visit(ReadExpression e) {
+
+    }
+
+    @Override
     public void visit(TupleExpression e) {
 
     }

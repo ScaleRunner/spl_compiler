@@ -320,6 +320,22 @@ public class Typechecker implements Visitor {
 	}
 
 	@Override
+	public void visit(ReadExpression e) {
+		this.visit(e.arg);
+		if(e.arg.getType() != Types.intType){
+		    error(String.format("Invalid argument type for function 'read'.\n\tExpected Type: %s\n\tActual Type: %s",
+                    Types.intType, e.arg.getType()), e);
+        }
+        if(e.arg.name == 0){
+		    e.setType(Types.intType);
+        } else if(e.arg.name == 1){
+		    e.setType(Types.charType);
+        } else {
+		    error(String.format("Invalid argument for 'read'.\n\tExpected: {0, 1}\n\tActual: %s", e.arg.name), e);
+        }
+	}
+
+	@Override
 	public void visit(TupleExpression e) {
 		this.visit(e.left);
 		this.visit(e.right);

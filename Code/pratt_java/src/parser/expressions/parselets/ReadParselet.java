@@ -6,6 +6,7 @@ import parser.Parser;
 import parser.Precedence;
 import parser.exceptions.ParseException;
 import parser.expressions.Expression;
+import parser.expressions.IntegerExpression;
 import parser.expressions.ReadExpression;
 import parser.expressions.isEmptyExpression;
 
@@ -15,19 +16,22 @@ import parser.expressions.isEmptyExpression;
 
 public class ReadParselet implements PrefixParseletExpression{
     public Expression parse(Parser parser, Token token) {
-        //TODO: What does this function take? Right now it just has 1 argument.
         Expression arg;
 
         if(!parser.match(TokenType.TOK_OPEN_PARENTHESIS)){
             throw new ParseException(parser,"Expected '(' after read keyword");
         }
         arg = parser.parseExpression();
+        if(!(arg instanceof IntegerExpression)){
+            throw new ParseException(parser, "The argument of 'read' should be an Integer.");
+        }
+        IntegerExpression expr = (IntegerExpression) arg;
 
         if(!parser.match(TokenType.TOK_CLOSE_PARENTHESIS)){
             throw new ParseException(parser,"Expected ')' after read argument");
         }
 
-        return new ReadExpression(arg);
+        return new ReadExpression(expr);
     }
 
     public int getPrecedence() {

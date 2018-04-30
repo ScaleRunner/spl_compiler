@@ -235,6 +235,27 @@ public class TypecheckerTest {
     }
 
     @Test
+    public void testReadChar() {
+        Node e = typecheckExpr("read(1)");
+        assertTypecheckSuccess();
+        assertEquals(Types.charType, e.getType());
+    }
+
+    @Test
+    public void testReadInteger() {
+        Node e = typecheckExpr("read(0)");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, e.getType());
+    }
+
+    @Test
+    public void testReadVar() {
+        typecheckSPL("var a = read(0);\n");
+        assertTypecheckSuccess();
+        assertEquals(Types.intType, tc.getVariableType("a"));
+    }
+
+    @Test
     public void testVar() {
         typecheckSPL("var a = 3;\n");
         assertTypecheckSuccess();

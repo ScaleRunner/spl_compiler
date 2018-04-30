@@ -382,6 +382,13 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void visit(ReadExpression e) {
+        builder.append("read(");
+        this.visit(e.arg);
+        builder.append(")");
+    }
+
+    @Override
     public void visit(TupleExpression e) {
         builder.append('(');
         this.visit(e.left);

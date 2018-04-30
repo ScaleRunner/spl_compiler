@@ -9,28 +9,30 @@ import util.Visitor;
 public abstract class Expression extends Node {
 
     public static void visitExpression(Visitor v, Expression e){
-        if (e.getClass() == BooleanExpression.class) {
+        if (e instanceof BooleanExpression) {
             v.visit((BooleanExpression) e);
-        } else if(e.getClass() == CallExpression.class){
+        } else if(e instanceof CallExpression){
             v.visit((CallExpression) e);
-        } else if(e.getClass() == CharacterExpression.class){
+        } else if(e instanceof CharacterExpression){
             v.visit((CharacterExpression) e);
-        } else if(e.getClass() == IdentifierExpression.class){
+        } else if(e instanceof IdentifierExpression){
             v.visit((IdentifierExpression) e);
-        } else if(e.getClass() == IntegerExpression.class){
+        } else if(e instanceof IntegerExpression){
             v.visit((IntegerExpression) e);
-        } else if(e.getClass() == isEmptyExpression.class){
+        } else if(e instanceof isEmptyExpression){
             v.visit((isEmptyExpression) e);
-        } else if (e.getClass() == ListExpression.class) {
+        } else if (e instanceof ListExpression) {
             v.visit((ListExpression) e);
-        } else if(e.getClass() == OperatorExpression.class){
+        } else if(e instanceof OperatorExpression){
             v.visit((OperatorExpression) e);
-        } else if(e.getClass() == PostfixExpression.class){
+        } else if(e instanceof PostfixExpression){
             v.visit((PostfixExpression) e);
-        } else if(e.getClass() == PrefixExpression.class){
+        } else if(e instanceof PrefixExpression){
             v.visit((PrefixExpression) e);
-        } else if (e.getClass() == TupleExpression.class) {
+        } else if (e instanceof TupleExpression) {
             v.visit((TupleExpression) e);
+        } else if (e instanceof ReadExpression) {
+            v.visit((ReadExpression) e);
         }
     }
     
