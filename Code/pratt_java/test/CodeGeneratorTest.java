@@ -97,23 +97,12 @@ public class CodeGeneratorTest {
     public void testPrefix(){
         String result = runExpression("--1", false);
         assertEquals("1", result);
-        //TODO: Make sense of the following?
-        /*
-         True is represented as the integer 1
-            complement representation:
-                                             +    1
-                                            0000 0001
-         NEG does complement negation:
-                                             -
-                                            1111 1110
-         And then +1?                        -     2?
-                                            1111 1111
-        */
+
         result = runExpression("!True", false);
         assertEquals("0", result);
 
         result = runExpression("!False", false);
-        assertEquals("1", result);
+        assertEquals("-1", result);
     }
 
     @Test
