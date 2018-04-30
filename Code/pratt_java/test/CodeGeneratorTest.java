@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import parser.Parser;
 import parser.declarations.Declaration;
+import typechecker.Typechecker;
 import util.Node;
 
 public class CodeGeneratorTest {
@@ -54,6 +55,9 @@ public class CodeGeneratorTest {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         List<Declaration> nodes = p.parseSPL();
+        Typechecker tc = new Typechecker();
+        tc.typecheck(nodes);
+
         CodeGenerator gen = new CodeGenerator("test.ssm");
         try {
             gen.generateCode(nodes, postamble);
@@ -67,6 +71,9 @@ public class CodeGeneratorTest {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         Node n = p.parseExpression();
+        Typechecker tc = new Typechecker();
+        tc.typecheck(n);
+
         CodeGenerator gen = new CodeGenerator("test.ssm");
         try {
             gen.generateCode(n, postamble);

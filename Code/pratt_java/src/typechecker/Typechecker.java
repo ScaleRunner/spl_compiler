@@ -13,7 +13,6 @@ import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import util.Node;
-import util.TypeError;
 import util.Visitor;
 
 public class Typechecker implements Visitor {
@@ -31,10 +30,22 @@ public class Typechecker implements Visitor {
 		this.errors = new LinkedList<>();
 		this.env = new Environment();
 	}
+
 	public boolean typecheck(Node ast) {
 		ast.accept(this);
 		return errors.isEmpty();
 	}
+
+	public boolean typecheck(List<? extends Node> nodes){
+	    boolean correct = true;
+	    for(Node n : nodes){
+	        if(!typecheck(n)){
+	            correct = false;
+            }
+        }
+        printErrors();
+	    return correct;
+    }
 
 	public List<TypeError> getErrors() {
 		return errors;

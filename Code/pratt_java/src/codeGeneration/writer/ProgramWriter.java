@@ -49,8 +49,10 @@ public class ProgramWriter {
 
         List<Command> rootCommands = branchMap.remove("root");
 
-        for(Command command : rootCommands){
-            out.println(writeCommand("", command));
+        if(rootCommands != null){
+            for(Command command : rootCommands){
+                out.println(writeCommand("", command));
+            }
         }
 
         List<Command> mainCommands = branchMap.remove("main");
