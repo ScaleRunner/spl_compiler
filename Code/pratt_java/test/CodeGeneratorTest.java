@@ -185,6 +185,21 @@ public class CodeGeneratorTest {
     }
 
     @Test
+    public void testMultipleFunWithArguments(){
+        String result = runSPL("main()::->Void{\n" +
+                "Int a = 3+ 2;\n" +
+                "Int b = 5+ 3;\n" +
+                "Int c = b;\n" +
+                "multBy2(c);\n" +
+                "return;" +
+                "}"+
+                "multBy2( n ) :: Int -> Int {\n" +
+                "return n * 2;\n" +
+                "}", false);
+        assertEquals("8", result);
+    }
+
+    @Test
     public void testSingleFunLocalVarDecl(){
         String result = runSPL("main()::->Void{\n" +
                 "Int a = 3+ 2;\n" +
@@ -192,7 +207,9 @@ public class CodeGeneratorTest {
                 "Int c = b;\n" +
                 "print(a);\n" +
                 "}", false);
-        assertEquals("-3", result);
+        assertEquals("8", result);
     }
+
+
 
 }

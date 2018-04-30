@@ -4,15 +4,12 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
-import compiler.CompileException;
 import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
-import parser.types.Type;
-import parser.types.Types;
 import util.Node;
 import util.Visitor;
 
@@ -21,7 +18,7 @@ public class CodeGenerator implements Visitor {
     private final ProgramWriter programWriter;
     //Controls what to do if identifier is in lhs of Assignment (stl)
     //Or rhs (load from MP + offset);
-    private boolean lsideAssign = false;
+    private boolean lsideIdentifier = false;
     private int localVariableDeclarationOffset;
     HashMap<String, Integer> localVariablesPlusOffset = new HashMap<>();
     //need to work on it later
@@ -65,9 +62,11 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
+        lsideIdentifier = true;
         for(Expression arg : e.args){
             this.visit(arg);
         }
+        lsideIdentifier = false;
         programWriter.addToOutput("bsr", e.function_name.name);
     }
 
@@ -79,8 +78,8 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(IdentifierExpression e) {
         //If identifier is in the rhs of Assignment, we need to use an offset to load it to the stack;
-
-        if(!lsideAssign){
+        //Add test for global variables as well;
+        if(!lsideIdentifier && (localVariablesPlusOffset.get(e.name) !=null)){
 
             programWriter.addToOutput("ldr MP"); //Loads value from MP (assuming MP is in origin)
             programWriter.addToOutput("ldc "+localVariablesPlusOffset.get(e.name)); // Loads offset FromOrigin
@@ -186,7 +185,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(Statement s) {
-
+        Statement.visitStatement(this, s);
     }
 
     @Override
@@ -219,6 +218,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ReturnStatement s) {
+        if(s.arg != null)
+            this.visit(s.arg);
 
     }
 
@@ -232,7 +233,8 @@ public class CodeGenerator implements Visitor {
 
         int i = 0;
         programWriter.createBranch(d.funName.name);
-        programWriter.addToOutput("link "+ (d.decls.size()-1));
+        if(d.decls.size() != 0)
+            programWriter.addToOutput("link "+ (d.decls.size()-1));
 
         for(Declaration varDec : d.decls){
             localVariableDeclarationOffset = i;
@@ -248,9 +250,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(VariableDeclaration d) {
-        lsideAssign = true;
+        lsideIdentifier = true;
         this.visit(d.left);
-        lsideAssign = false;
+        lsideIdentifier = false;
         this.visit(d.right);
         programWriter.addToOutput("stl "+localVariableDeclarationOffset);
         localVariablesPlusOffset.put(d.left.name, localVariableDeclarationOffset);
