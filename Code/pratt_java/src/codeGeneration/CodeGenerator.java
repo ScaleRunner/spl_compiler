@@ -197,7 +197,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ReadExpression e) {
-
+        String arg = e.arg.name == 0 ? "10": "11";
+        programWriter.addToOutput(currentBranch, new Command("trap", arg));
     }
 
     @Override

@@ -195,6 +195,18 @@ public class CodeGeneratorTest {
     }
 
     @Test
+    public void testReadInteger(){
+        String result = runExpression("read(0)", new Command("trap", "0"), false);
+        assertEquals("Please enter an integer: ", result);
+    }
+
+    @Test
+    public void testReadChar(){
+        String result = runExpression("read(1)", new Command("trap", "1"), false);
+        assertEquals("Please enter a character: ", result);
+    }
+
+    @Test
     public void testMultipleFunWithArguments(){
         String result = runSPL("main()::->Void{\n" +
                 "Int a = 3+ 2;\n" +
