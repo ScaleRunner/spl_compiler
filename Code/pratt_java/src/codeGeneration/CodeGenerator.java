@@ -4,12 +4,14 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
+import codeGeneration.writer.ProgramWriter;
 import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
+import parser.types.CharType;
 import util.Node;
 import util.Visitor;
 
@@ -215,6 +217,12 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PrintStatement s) {
+
+        this.visit(s.arg);
+        if(s.arg.getType() instanceof CharType)
+            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+        else
+            programWriter.addToOutput(currentBranch, new Command("trap", "0"));
 
     }
 

@@ -197,7 +197,7 @@ public class CodeGeneratorTest {
                 "}"+
                 "multBy2( n ) :: Int -> Int {\n" +
                 "return n * 2;\n" +
-                "}", false);
+                "}", null,false);
         assertEquals("8", result);
     }
 
@@ -209,7 +209,7 @@ public class CodeGeneratorTest {
                 "Int c = b;\n" +
                 "print(a);\n" +
                 "}", null,false);
-        assertEquals("8", result);
+        assertEquals("5", result);
     }
 
 
