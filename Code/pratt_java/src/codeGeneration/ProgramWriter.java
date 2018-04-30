@@ -16,6 +16,10 @@ public class ProgramWriter {
         this.filepath = filepath;
     }
 
+    public void createBranch(String branch){
+        output.add(branch + ':');
+    }
+
     public void addToOutput(String command){
         addToOutput("", command, "");
     }
