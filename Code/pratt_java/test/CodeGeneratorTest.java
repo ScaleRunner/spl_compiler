@@ -178,4 +178,15 @@ public class CodeGeneratorTest {
         assertNotEquals("1", result);
     }
 
+    @Test
+    public void testSingleFunLocalVarDecl(){
+        String result = runSPL("main()::->Void{\n" +
+                "Int a = 3+ 2;\n" +
+                "Int b = 5+ 3;\n" +
+                "Int c = b;\n" +
+                "print(a);\n" +
+                "}", false);
+        assertEquals("-3", result);
+    }
+
 }

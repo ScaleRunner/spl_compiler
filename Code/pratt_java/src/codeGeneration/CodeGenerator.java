@@ -1,20 +1,31 @@
 package codeGeneration;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.List;
 
+import compiler.CompileException;
 import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
+import parser.types.Type;
+import parser.types.Types;
 import util.Node;
 import util.Visitor;
 
 public class CodeGenerator implements Visitor {
 
     private final ProgramWriter programWriter;
+    //Controls what to do if identifier is in lhs of Assignment (stl)
+    //Or rhs (load from MP + offset);
+    private boolean lsideAssign = false;
+    private int localVariableDeclarationOffset;
+    HashMap<String, Integer> localVariablesPlusOffset = new HashMap<>();
+    //need to work on it later
+    HashMap<String, Integer> argsPlusOffset = new HashMap<>();
 
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath);
@@ -64,6 +75,16 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IdentifierExpression e) {
+        //If identifier is in the rhs of Assignment, we need to use an offset to load it to the stack;
+
+        if(!lsideAssign){
+
+            programWriter.addToOutput("ldr MP"); //Loads value from MP (assuming MP is in origin)
+            programWriter.addToOutput("ldc "+localVariablesPlusOffset.get(e.name)); // Loads offset FromOrigin
+            programWriter.addToOutput("add");// With this address we can load variable
+            programWriter.addToOutput("lda 0"); //Loads value from address
+        }
+
 
     }
 
@@ -173,6 +194,11 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(CallStatement s) {
 
+        for(Expression e: s.args){
+            this.visit(e);
+        }
+        programWriter.addToOutput("bsr "+s.function_name);
+
     }
 
     @Override
@@ -197,16 +223,37 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(Declaration d) {
-
+        Declaration.visitDeclaration(this, d);
     }
 
     @Override
     public void visit(FunctionDeclaration d) {
 
+        int i = 0;
+        programWriter.createBranch(d.funName.name);
+        programWriter.addToOutput("link "+ (d.decls.size()-1));
+
+        for(Declaration varDec : d.decls){
+            localVariableDeclarationOffset = i;
+            this.visit(varDec);
+            i++;
+        }
+        for(Statement funStmt : d.stats){
+            this.visit(funStmt);
+        }
+
+
     }
 
     @Override
     public void visit(VariableDeclaration d) {
+        lsideAssign = true;
+        this.visit(d.left);
+        lsideAssign = false;
+        this.visit(d.right);
+        programWriter.addToOutput("stl "+localVariableDeclarationOffset);
+        localVariablesPlusOffset.put(d.left.name, localVariableDeclarationOffset);
 
     }
+
 }
