@@ -209,6 +209,18 @@ public class CodeGeneratorTest {
     }
 
     @Test
+    public void testWhileLoop(){
+        String result = runSPL("main()::->Void{\n" +
+                "Bool a = True; " +
+                "while(a){" +
+                "    print(a);" +
+                "    a = False;" +
+                "}" +
+                "}", null,false);
+        assertEquals("-1", result);
+    }
+
+    @Test
     public void testSingleFunLocalVarDecl(){
         String result = runSPL("main()::->Void{\n" +
                 "Int a = 3+ 2;\n" +

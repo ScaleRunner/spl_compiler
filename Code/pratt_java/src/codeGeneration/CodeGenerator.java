@@ -210,9 +210,37 @@ public class CodeGenerator implements Visitor {
 
     }
 
+    /**
+     * For the loop statement:
+     * - visit the condition
+     * - branch based on the condition
+     * - create the new branch loop
+     * @param loopStatement
+     */
     @Override
-    public void visit(LoopStatement s) {
+    public void visit(LoopStatement loopStatement) {
+        String oldBranchName = currentBranch;
+        String newBranchName = currentBranch + "_loop";
 
+        // Visit the condition
+        this.visit(loopStatement.condition);
+
+        // Branch based on the condition
+        programWriter.addToOutput(currentBranch, new Command("brt", newBranchName));
+
+        // Create a new branch and build it
+        currentBranch = newBranchName;
+        for(Statement s : loopStatement.body){
+            s.accept(this);
+        }
+
+        // Visit the condition again to check if the loop can be broken and branch on it
+        this.visit(loopStatement.condition);
+        programWriter.addToOutput(currentBranch, new Command("brt", newBranchName));
+
+        // We are out of the loop
+        // Restore old branch name to continue building the oldbranch
+        currentBranch = oldBranchName;
     }
 
     @Override
