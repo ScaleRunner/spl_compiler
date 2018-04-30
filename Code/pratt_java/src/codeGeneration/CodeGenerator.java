@@ -54,7 +54,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
-
+        for(Expression arg : e.args){
+            this.visit(arg);
+        }
+        programWriter.addToOutput("bsr", e.function_name.name);
     }
 
     @Override
@@ -172,7 +175,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallStatement s) {
-
+        for(Expression arg : s.args){
+            this.visit(arg);
+        }
+        programWriter.addToOutput("bsr", s.function_name.name);
     }
 
     @Override
