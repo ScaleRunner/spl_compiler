@@ -66,8 +66,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BooleanExpression e) {
-        // If e.name than "1" else "0"
-        String val = e.name ? "1" : "0";
+        // If e.name than "-1" else "0"
+        String val = e.name ? "-1" : "0";
         output.add("ldc " + val);
     }
 
@@ -229,24 +229,4 @@ public class CodeGenerator implements Visitor {
     public void visit(VariableDeclaration d) {
 
     }
-
-//    @Override
-//    public void visit(AstExprBinOp e) {
-//        e.getLeft().accept(this);
-//        e.getRight().accept(this);
-//        switch (e.getOperator()) {
-//            case TOK_PLUS:
-//                output.add("add");
-//                break;
-//            case TOK_MULT:
-//                output.add("mul");
-//                break;
-//            case TOK_MINUS:
-//                output.add("sub");
-//                break;
-//            default:
-//                throw new Error("Code generator: AstExprBinOp: unknown operator "
-//                        + e.getOperator().toString());
-//        }
-//    }
 }

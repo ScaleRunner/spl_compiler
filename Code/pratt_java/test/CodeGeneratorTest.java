@@ -83,7 +83,7 @@ public class CodeGeneratorTest {
     @Test
     public void testBoolean(){
         String result = runExpression("True", false);
-        assertEquals("1", result);
+        assertEquals("-1", result);
 
         result = runExpression("False", false);
         assertEquals("0", result);
