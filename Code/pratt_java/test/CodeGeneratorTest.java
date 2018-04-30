@@ -166,31 +166,31 @@ public class CodeGeneratorTest {
         assertEquals("2", result);
 
         result = runExpression("5 > 3", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("5 < 3", new Command("trap", "0"), false);
         assertEquals("0", result);
 
         result = runExpression("5 >= 5", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("5 >= 6", new Command("trap", "0"), false);
         assertEquals("0", result);
 
         result = runExpression("5 <= 5", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("5 <= 6", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("6 <= 5", new Command("trap", "0"), false);
         assertEquals("0", result);
 
         result = runExpression("1 == 1", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("1 == 1 && 1 != 0", new Command("trap", "0"), false);
-        assertNotEquals("1", result);
+        assertEquals("-1", result);
     }
 
     @Test
