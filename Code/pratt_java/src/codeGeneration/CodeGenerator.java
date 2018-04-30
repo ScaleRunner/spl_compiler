@@ -60,17 +60,20 @@ public class CodeGenerator implements Visitor {
     public void visit(BooleanExpression e) {
         // If e.name than "-1" else "0"
         String val = e.name ? "-1" : "0";
-        programWriter.addToOutput("ldc " + val);
+        programWriter.addToOutput("ldc", val);
     }
 
     @Override
     public void visit(CallExpression e) {
-
+        for(Expression arg : e.args){
+            this.visit(arg);
+        }
+        programWriter.addToOutput("bsr", e.function_name.name);
     }
 
     @Override
     public void visit(CharacterExpression e) {
-
+        programWriter.addToOutput("ldc", Integer.toString( (int) e.name));
     }
 
     @Override
@@ -193,12 +196,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallStatement s) {
-
-        for(Expression e: s.args){
-            this.visit(e);
+        for(Expression arg : s.args){
+            this.visit(arg);
         }
-        programWriter.addToOutput("bsr "+s.function_name);
-
+        programWriter.addToOutput("bsr", s.function_name.name);
     }
 
     @Override
