@@ -17,7 +17,19 @@ public class ProgramWriter {
     }
 
     public void addToOutput(String command){
-        output.add(command);
+        addToOutput("", command, "");
+    }
+
+    public void addToOutput(String command, String args){
+        addToOutput("", command, args);
+    }
+
+    public void addToOutput(String branch, String command, String args){
+        if(!branch.equals("")){
+            branch = branch + ":";
+        }
+        String outputLine = String.format("%-10s %-10s %-10s", branch, command, args);
+        output.add(outputLine);
     }
 
     public void writeToFile() throws FileNotFoundException {

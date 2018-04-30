@@ -69,7 +69,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IntegerExpression e) {
-        programWriter.addToOutput("ldc " + e.name);
+        programWriter.addToOutput("ldc", Integer.toString(e.name));
     }
 
     @Override
