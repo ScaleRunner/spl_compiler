@@ -219,6 +219,9 @@ public class CodeGenerator implements Visitor {
      */
     @Override
     public void visit(LoopStatement loopStatement) {
+
+        //TODO: I think we should check the condition within the SSM right? Because now the condition can never change?
+
         String oldBranchName = currentBranch;
         String newBranchName = currentBranch + "_loop";
 
