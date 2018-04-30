@@ -18,6 +18,7 @@ import parser.Parser;
 import parser.declarations.Declaration;
 import typechecker.Typechecker;
 import util.Node;
+import util.ReadSPL;
 
 public class CodeGeneratorTest {
 
@@ -209,13 +210,26 @@ public class CodeGeneratorTest {
     }
 
     @Test
-    public void testWhileLoop(){
+    public void testWhileLoop_conditionTrue(){
+        //TODO: This one loops (see loopStatement TODO)
         String result = runSPL("main()::->Void{\n" +
                 "Bool a = True; " +
                 "while(a){" +
-                "    print(a);" +
                 "    a = False;" +
                 "}" +
+                "print(a);" +
+                "}", null,false);
+        assertEquals("0", result);
+    }
+
+    @Test
+    public void testWhileLoop_conditionFalse(){
+        String result = runSPL("main()::->Void{\n" +
+                "Bool a = True; " +
+                "while(!a){" +
+                "    a = False;" +
+                "}" +
+                "print(a);" +
                 "}", null,false);
         assertEquals("-1", result);
     }
@@ -231,6 +245,23 @@ public class CodeGeneratorTest {
         assertEquals("5", result);
     }
 
+    @Test
+    public void FactorialImperative(){
+        String result = runSPL("main()::->Void{\n" +
+                "Int a = 3+ 2;\n" +
+                "Int b = 5+ 3;\n" +
+                "Int c = b;\n" +
+                "print(a);\n" +
+                "}", null,false);
+        assertEquals("5", result);
+    }
 
+    @Test
+    public void FactorialRecursive(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/factorial_recursive.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("120", result);
+    }
 
 }
