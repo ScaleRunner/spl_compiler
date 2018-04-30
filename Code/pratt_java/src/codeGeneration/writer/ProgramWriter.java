@@ -49,13 +49,13 @@ public class ProgramWriter {
 
         List<Command> rootCommands = branchMap.remove("root");
 
-        out.println(writeCommand("", new Command("bra", "main")));
-
         for(Command command : rootCommands){
             out.println(writeCommand("", command));
         }
 
-        out.println(writeCommand("", new Command("halt")));
+        List<Command> mainCommands = branchMap.remove("main");
+        if(mainCommands != null)
+            out.println(writeCommand("", new Command("bra", "main")));
 
         for(Map.Entry<String, List<Command>> entry : branchMap.entrySet()){
             String branchName = entry.getKey();
@@ -64,6 +64,13 @@ public class ProgramWriter {
             out.println(writeCommand(branchName, commands.get(0)));
             for(int i = 1; i < commands.size(); i ++){
                 out.println(writeCommand("", commands.get(i)));
+            }
+        }
+
+        if(mainCommands != null){
+            out.println(writeCommand("main", mainCommands.get(0)));
+            for(int i = 1; i < mainCommands.size(); i ++){
+                out.println(writeCommand("", mainCommands.get(i)));
             }
         }
 
