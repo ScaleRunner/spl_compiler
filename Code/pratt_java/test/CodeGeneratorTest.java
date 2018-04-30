@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import codeGeneration.CodeGenerator;
+import codeGeneration.Command;
+import compiler.CompileException;
 import lexer.Lexer;
 import org.junit.Test;
 
@@ -48,20 +50,20 @@ public class CodeGeneratorTest {
         }
     }
 
-    private String runSPL(String program, boolean debug){
+    private String runSPL(String program, Command postamble, boolean debug){
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         List<Declaration> nodes = p.parseSPL();
         CodeGenerator gen = new CodeGenerator("test.ssm");
         try {
-            gen.generateCode(nodes, "trap 0");
+            gen.generateCode(nodes, postamble);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         return runSSM(debug);
     }
 
-    private String runExpression(String program, String postamble, boolean debug){
+    private String runExpression(String program, Command postamble, boolean debug){
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         Node n = p.parseExpression();
@@ -76,111 +78,111 @@ public class CodeGeneratorTest {
 
     @Test
     public void testIntegerConstant(){
-        String result = runExpression("42", "trap 0", false);
+        String result = runExpression("42", new Command("trap", "0"), false);
         assertEquals("42", result);
     }
 
     @Test
     public void testBoolean(){
-        String result = runExpression("True","trap 0",false);
+        String result = runExpression("True",new Command("trap", "0"),false);
         assertEquals("-1", result);
 
-        result = runExpression("False","trap 0",false);
+        result = runExpression("False",new Command("trap", "0"),false);
         assertEquals("0", result);
 
-        result = runExpression("True != False", "trap 0",false);
+        result = runExpression("True != False", new Command("trap", "0"),false);
         //-1 represents True;
         assertEquals("-1", result);
     }
 
     @Test
     public void testCharacterConstant(){
-        String result = runExpression("'a'","trap 1", false);
+        String result = runExpression("'a'",new Command("trap", "0"), false);
         assertEquals("a", result);
     }
 
     @Test
     public void testPrefix(){
-        String result = runExpression("--1","trap 0", false);
+        String result = runExpression("--1",new Command("trap", "0"), false);
         assertEquals("1", result);
 
-        result = runExpression("!True","trap 0", false);
+        result = runExpression("!True",new Command("trap", "0"), false);
         assertEquals("0", result);
 
-        result = runExpression("!False","trap 0", false);
+        result = runExpression("!False",new Command("trap", "0"), false);
         assertEquals("-1", result);
     }
 
     @Test
     public void testAddition(){
-        String result = runExpression("4 + 2","trap 0", false);
+        String result = runExpression("4 + 2",new Command("trap", "0"), false);
         assertEquals("6", result);
     }
 
     @Test
     public void testAdditionVsMultiplicationPrecedence(){
-        String result = runExpression("4 + 2 * 3 + 2","trap 0", false);
+        String result = runExpression("4 + 2 * 3 + 2",new Command("trap", "0"), false);
         assertEquals("12", result);
     }
 
     @Test
     public void testSubtraction(){
-        String result = runExpression("42-45", "trap 0",false);
+        String result = runExpression("42-45", new Command("trap", "0"),false);
         assertEquals("-3", result);
     }
 
     @Test
     public void testSubtractionAssociativity(){
-        String result = runExpression("6 - 3 - 2", "trap 0",false);
+        String result = runExpression("6 - 3 - 2", new Command("trap", "0"),false);
         assertEquals("1", result);
-        result = runExpression("6 - (3 - 2)", "trap 0",false);
+        result = runExpression("6 - (3 - 2)", new Command("trap", "0"),false);
         assertEquals("5", result);
-        result = runExpression("(6 - 3) - 2","trap 0", false);
+        result = runExpression("(6 - 3) - 2",new Command("trap", "0"), false);
         assertEquals("1", result);
     }
 
     @Test
     public void testAllBinaryOps(){
-        String result = runExpression("42-45","trap 0", false);
+        String result = runExpression("42-45",new Command("trap", "0"), false);
         assertEquals("-3", result);
 
-        result = runExpression("7+3","trap 0", false);
+        result = runExpression("7+3",new Command("trap", "0"), false);
         assertEquals("10", result);
 
-        result = runExpression("7*3","trap 0", false);
+        result = runExpression("7*3",new Command("trap", "0"), false);
         assertEquals("21", result);
 
-        result = runExpression("6/3", "trap 0", false);
+        result = runExpression("6/3", new Command("trap", "0"), false);
         assertEquals("2", result);
 
-        result = runExpression("5%3", "trap 0", false);
+        result = runExpression("5%3", new Command("trap", "0"), false);
         assertEquals("2", result);
 
-        result = runExpression("5 > 3", "trap 0", false);
+        result = runExpression("5 > 3", new Command("trap", "0"), false);
         assertNotEquals("0", result);
 
-        result = runExpression("5 < 3", "trap 0", false);
+        result = runExpression("5 < 3", new Command("trap", "0"), false);
         assertEquals("0", result);
 
-        result = runExpression("5 >= 5", "trap 0", false);
+        result = runExpression("5 >= 5", new Command("trap", "0"), false);
         assertNotEquals("0", result);
 
-        result = runExpression("5 >= 6", "trap 0", false);
+        result = runExpression("5 >= 6", new Command("trap", "0"), false);
         assertEquals("0", result);
 
-        result = runExpression("5 <= 5", "trap 0", false);
+        result = runExpression("5 <= 5", new Command("trap", "0"), false);
         assertNotEquals("0", result);
 
-        result = runExpression("5 <= 6", "trap 0", false);
+        result = runExpression("5 <= 6", new Command("trap", "0"), false);
         assertNotEquals("0", result);
 
-        result = runExpression("6 <= 5", "trap 0", false);
+        result = runExpression("6 <= 5", new Command("trap", "0"), false);
         assertEquals("0", result);
 
-        result = runExpression("1 == 1", "trap 0", false);
+        result = runExpression("1 == 1", new Command("trap", "0"), false);
         assertNotEquals("0", result);
 
-        result = runExpression("1 == 1 && 1 != 0", "trap 0", false);
+        result = runExpression("1 == 1 && 1 != 0", new Command("trap", "0"), false);
         assertNotEquals("1", result);
     }
 
@@ -206,7 +208,7 @@ public class CodeGeneratorTest {
                 "Int b = 5+ 3;\n" +
                 "Int c = b;\n" +
                 "print(a);\n" +
-                "}", false);
+                "}", null,false);
         assertEquals("8", result);
     }
 
