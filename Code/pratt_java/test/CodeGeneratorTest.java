@@ -61,13 +61,13 @@ public class CodeGeneratorTest {
         return runSSM(debug);
     }
 
-    private String runExpression(String program, boolean debug){
+    private String runExpression(String program, String postamble, boolean debug){
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         Node n = p.parseExpression();
         CodeGenerator gen = new CodeGenerator("test.ssm");
         try {
-            gen.generateCode(n, "trap 0");
+            gen.generateCode(n, postamble);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -76,105 +76,111 @@ public class CodeGeneratorTest {
 
     @Test
     public void testIntegerConstant(){
-        String result = runExpression("42", false);
+        String result = runExpression("42", "trap 0", false);
         assertEquals("42", result);
     }
 
     @Test
     public void testBoolean(){
-        String result = runExpression("True", false);
+        String result = runExpression("True","trap 0",false);
         assertEquals("-1", result);
 
-        result = runExpression("False", false);
+        result = runExpression("False","trap 0",false);
         assertEquals("0", result);
 
-        result = runExpression("True != False", false);
+        result = runExpression("True != False", "trap 0",false);
         //-1 represents True;
         assertEquals("-1", result);
     }
 
     @Test
+    public void testCharacterConstant(){
+        String result = runExpression("'a'","trap 1", false);
+        assertEquals("a", result);
+    }
+
+    @Test
     public void testPrefix(){
-        String result = runExpression("--1", false);
+        String result = runExpression("--1","trap 0", false);
         assertEquals("1", result);
 
-        result = runExpression("!True", false);
+        result = runExpression("!True","trap 0", false);
         assertEquals("0", result);
 
-        result = runExpression("!False", false);
+        result = runExpression("!False","trap 0", false);
         assertEquals("-1", result);
     }
 
     @Test
     public void testAddition(){
-        String result = runExpression("4 + 2", false);
+        String result = runExpression("4 + 2","trap 0", false);
         assertEquals("6", result);
     }
 
     @Test
     public void testAdditionVsMultiplicationPrecedence(){
-        String result = runExpression("4 + 2 * 3 + 2", false);
+        String result = runExpression("4 + 2 * 3 + 2","trap 0", false);
         assertEquals("12", result);
     }
 
     @Test
     public void testSubtraction(){
-        String result = runExpression("42-45", false);
+        String result = runExpression("42-45", "trap 0",false);
         assertEquals("-3", result);
     }
 
     @Test
     public void testSubtractionAssociativity(){
-        String result = runExpression("6 - 3 - 2", false);
+        String result = runExpression("6 - 3 - 2", "trap 0",false);
         assertEquals("1", result);
-        result = runExpression("6 - (3 - 2)", false);
+        result = runExpression("6 - (3 - 2)", "trap 0",false);
         assertEquals("5", result);
-        result = runExpression("(6 - 3) - 2", false);
+        result = runExpression("(6 - 3) - 2","trap 0", false);
         assertEquals("1", result);
     }
 
     @Test
     public void testAllBinaryOps(){
-        String result = runExpression("42-45", false);
+        String result = runExpression("42-45","trap 0", false);
         assertEquals("-3", result);
 
-        result = runExpression("7+3", false);
+        result = runExpression("7+3","trap 0", false);
         assertEquals("10", result);
 
-        result = runExpression("7*3", false);
+        result = runExpression("7*3","trap 0", false);
         assertEquals("21", result);
 
-        result = runExpression("6/3", false);
+        result = runExpression("6/3", "trap 0", false);
         assertEquals("2", result);
 
-        result = runExpression("5%3", false);
+        result = runExpression("5%3", "trap 0", false);
         assertEquals("2", result);
 
-        result = runExpression("5 > 3", false);
+        result = runExpression("5 > 3", "trap 0", false);
         assertNotEquals("0", result);
 
-        result = runExpression("5 < 3", false);
+        result = runExpression("5 < 3", "trap 0", false);
         assertEquals("0", result);
 
-        result = runExpression("5 >= 5", false);
+        result = runExpression("5 >= 5", "trap 0", false);
         assertNotEquals("0", result);
 
-        result = runExpression("5 >= 6", false);
+        result = runExpression("5 >= 6", "trap 0", false);
         assertEquals("0", result);
 
-        result = runExpression("5 <= 5", false);
+        result = runExpression("5 <= 5", "trap 0", false);
         assertNotEquals("0", result);
 
-        result = runExpression("5 <= 6", false);
+        result = runExpression("5 <= 6", "trap 0", false);
         assertNotEquals("0", result);
 
-        result = runExpression("6 <= 5", false);
+        result = runExpression("6 <= 5", "trap 0", false);
         assertEquals("0", result);
 
-        result = runExpression("1 == 1", false);
+        result = runExpression("1 == 1", "trap 0", false);
         assertNotEquals("0", result);
 
-        result = runExpression("1 == 1 && 1 != 0", false);
+        result = runExpression("1 == 1 && 1 != 0", "trap 0", false);
         assertNotEquals("1", result);
     }
 

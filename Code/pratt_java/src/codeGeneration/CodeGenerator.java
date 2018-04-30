@@ -49,7 +49,7 @@ public class CodeGenerator implements Visitor {
     public void visit(BooleanExpression e) {
         // If e.name than "-1" else "0"
         String val = e.name ? "-1" : "0";
-        programWriter.addToOutput("ldc " + val);
+        programWriter.addToOutput("ldc", val);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CharacterExpression e) {
-
+        programWriter.addToOutput("ldc", Integer.toString( (int) e.name));
     }
 
     @Override
