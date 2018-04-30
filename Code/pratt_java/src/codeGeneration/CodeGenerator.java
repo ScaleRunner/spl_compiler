@@ -1,8 +1,6 @@
 package codeGeneration;
 
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.LinkedList;
 import java.util.List;
 
 import lexer.TokenType;
@@ -15,48 +13,31 @@ import util.Node;
 import util.Visitor;
 
 public class CodeGenerator implements Visitor {
-    private List<String> output;
 
-    public List<String> getOutput() {
-        return output;
+    private final ProgramWriter programWriter;
+
+    public CodeGenerator(String filepath) {
+        this.programWriter = new ProgramWriter(filepath);
     }
 
-    public CodeGenerator() {
-        output = new LinkedList<>();
-    }
-
-    public void generateCode(List<Declaration> nodes, String outputFilename, String postamble)
+    public void generateCode(List<Declaration> nodes, String postamble)
             throws FileNotFoundException {
         for(Node n : nodes){
             n.accept(this);
         }
 
         if (postamble != null) {
-            output.add(postamble);
+            programWriter.addToOutput(postamble);
         }
-        writeToFile(outputFilename);
+        programWriter.writeToFile();
     }
 
-    private void writeToFile(String filename) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(filename);
-        for (String line : output) {
-            out.println(line);
-        }
-        out.close();
-    }
-
-    public void generateCode(Node n, String outputFilename)
-            throws FileNotFoundException {
-        generateCode(n, outputFilename, null);
-    }
-
-    public void generateCode(Node n, String outputFilename,
-                             String postamble) throws FileNotFoundException {
+    public void generateCode(Node n, String postamble) throws FileNotFoundException {
         n.accept(this);
         if (postamble != null) {
-            output.add(postamble);
+            programWriter.addToOutput(postamble);
         }
-        writeToFile(outputFilename);
+        programWriter.writeToFile();
     }
 
     @Override
@@ -68,7 +49,7 @@ public class CodeGenerator implements Visitor {
     public void visit(BooleanExpression e) {
         // If e.name than "-1" else "0"
         String val = e.name ? "-1" : "0";
-        output.add("ldc " + val);
+        programWriter.addToOutput("ldc " + val);
     }
 
     @Override
@@ -88,7 +69,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IntegerExpression e) {
-        output.add("ldc " + e.name);
+        programWriter.addToOutput("ldc " + e.name);
     }
 
     @Override
@@ -108,47 +89,47 @@ public class CodeGenerator implements Visitor {
         switch (e.operator) {
             // arithmetic binary functions
             case TOK_PLUS:
-                output.add("add");
+                programWriter.addToOutput("add");
                 break;
             case TOK_MULT:
-                output.add("mul");
+                programWriter.addToOutput("mul");
                 break;
             case TOK_MINUS:
-                output.add("sub");
+                programWriter.addToOutput("sub");
                 break;
             case TOK_MOD:
-                output.add("mod");
+                programWriter.addToOutput("mod");
                 break;
             case TOK_DIV:
-                output.add("div");
+                programWriter.addToOutput("div");
                 break;
 
             // Boolean
             case TOK_AND:
-                output.add("and");
+                programWriter.addToOutput("and");
                 break;
             case TOK_OR:
-                output.add("or");
+                programWriter.addToOutput("or");
                 break;
 
             // Comparison
             case TOK_EQ:
-                output.add("eq");
+                programWriter.addToOutput("eq");
                 break;
             case TOK_NEQ:
-                output.add("ne");
+                programWriter.addToOutput("ne");
                 break;
             case TOK_LT:
-                output.add("lt");
+                programWriter.addToOutput("lt");
                 break;
             case TOK_GT:
-                output.add("gt");
+                programWriter.addToOutput("gt");
                 break;
             case TOK_LEQ:
-                output.add("le");
+                programWriter.addToOutput("le");
                 break;
             case TOK_GEQ:
-                output.add("ge");
+                programWriter.addToOutput("ge");
                 break;
 
             default:
@@ -166,10 +147,10 @@ public class CodeGenerator implements Visitor {
         this.visit(e.right);
 
         if(e.operator == TokenType.TOK_MINUS)
-            output.add("neg");
+            programWriter.addToOutput("neg");
         else if(e.operator == TokenType.TOK_NOT){
-            output.add("ldc 1");
-            output.add("xor");
+            programWriter.addToOutput("ldc 1");
+            programWriter.addToOutput("xor");
         }
         else
             throw new CodeGenerationException("Invalid operator", e);

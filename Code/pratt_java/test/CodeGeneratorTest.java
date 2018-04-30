@@ -52,9 +52,9 @@ public class CodeGeneratorTest {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         List<Declaration> nodes = p.parseSPL();
-        CodeGenerator gen = new CodeGenerator();
+        CodeGenerator gen = new CodeGenerator("test.ssm");
         try {
-            gen.generateCode(nodes, "test.ssm", "trap 0");
+            gen.generateCode(nodes, "trap 0");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -65,9 +65,9 @@ public class CodeGeneratorTest {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         Node n = p.parseExpression();
-        CodeGenerator gen = new CodeGenerator();
+        CodeGenerator gen = new CodeGenerator("test.ssm");
         try {
-            gen.generateCode(n, "test.ssm", "trap 0");
+            gen.generateCode(n, "trap 0");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
