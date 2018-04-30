@@ -149,8 +149,7 @@ public class CodeGenerator implements Visitor {
         if(e.operator == TokenType.TOK_MINUS)
             programWriter.addToOutput("neg");
         else if(e.operator == TokenType.TOK_NOT){
-            programWriter.addToOutput("ldc 1");
-            programWriter.addToOutput("xor");
+            programWriter.addToOutput("not");
         }
         else
             throw new CodeGenerationException("Invalid operator", e);
