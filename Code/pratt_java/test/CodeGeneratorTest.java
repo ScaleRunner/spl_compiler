@@ -10,7 +10,8 @@ import java.util.List;
 
 import codeGeneration.CodeGenerator;
 import codeGeneration.Command;
-import compiler.CompileException;
+import codeGeneration.CompileException;
+import codeGeneration.ProgramWriter;
 import lexer.Lexer;
 import org.junit.Test;
 
@@ -76,6 +77,7 @@ public class CodeGeneratorTest {
         tc.typecheck(n);
 
         CodeGenerator gen = new CodeGenerator("test.ssm");
+        ProgramWriter.testProgram = true;
         try {
             gen.generateCode(n, postamble);
         } catch (FileNotFoundException e) {
@@ -105,8 +107,8 @@ public class CodeGeneratorTest {
 
     @Test
     public void testCharacterConstant(){
-        String result = runExpression("'a'",new Command("trap", "0"), false);
-        assertEquals("a", result);
+        String result = runExpression("'a'",new Command("trap", "1"), false);
+        assertEquals("amachine halted", result);
     }
 
     @Test
@@ -208,17 +210,18 @@ public class CodeGeneratorTest {
 
     @Test
     public void testMultipleFunWithArguments(){
-        String result = runSPL("main()::->Void{\n" +
+        String result = runSPL(
+                "multBy2( n ) :: Int -> Int {\n" +
+                "Int d = 9;\n" +
+                "d = 2;"+ //+ Try this later
+                "return n * 2;\n" +
+                "}"+
+                "main()::->Void{\n" +
                 "Int a = 3+ 2;\n" +
                 "Int b = 5+ 3;\n" +
                 "Int c = b;\n" +
                 "c = multBy2(c);\n" +
                 //"return;" + Fix later
-                "}"+
-                "multBy2( n ) :: Int -> Int {\n" +
-                "Int d = 9;\n" +
-                "d = 2;"+ //+ Try this later
-                "return n * 2;\n" +
                 "}", null,false);
         assertEquals("8", result);
     }
@@ -300,6 +303,21 @@ public class CodeGeneratorTest {
 
         String result = runSPL(program, null,false);
         assertEquals("120", result);
+    }
+
+    @Test
+    public void testSimple(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simple.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("25", result);
+    }
+
+    @Test(expected = CompileException.class)
+    public void testNoMain(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/no_main.spl");
+
+        runSPL(program, null,false);
     }
 
 }

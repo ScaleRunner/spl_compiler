@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
-import codeGeneration.writer.ProgramWriter;
 import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
@@ -203,7 +202,7 @@ public class CodeGenerator implements Visitor {
                 break;
 
             default:
-                throw new CodeGenerationException(String.format("Invalid operator '%s'.", e.operator), e);
+                throw new CompileException(String.format("Invalid operator '%s'.", e.operator), e);
         }
     }
 
@@ -222,7 +221,7 @@ public class CodeGenerator implements Visitor {
             programWriter.addToOutput(currentBranch, new Command("not"));
         }
         else
-            throw new CodeGenerationException("Invalid operator", e);
+            throw new CompileException("Invalid operator", e);
     }
 
     @Override
@@ -334,18 +333,14 @@ public class CodeGenerator implements Visitor {
      *
      * The program layout should be as such:
      *      func:       ...
-     *                  ....    |
+     *      func_loop:  ....    |
      *                  ....    |- Here comes the condition check
      *                  ....    |
      *                  brf func_end
-     *      func_loop:  ....    |
+     *                  ....    |
      *                  ....    |- Here comes the body of the loop
      *                  ....    |
-     *
-     *                  ....    |
-     *                  ....    | - Here comes the condition check
-     *                  ....    |
-     *                  brt func_loop
+     *                  bra func_loop
      *
      *      func_end:   ....    |
      *                  ....    | - Here comes the rest of the function 'func'

@@ -1,0 +1,11 @@
+Int a = 5;
+
+sum(x, y) :: Int Int -> Int {
+    return x + y;
+}
+
+main()::->Void
+{
+    Int times = sum(a, a);
+    print(times);
+}

@@ -1,0 +1,5 @@
+Int a = 5;
+
+add(x, y) :: Int Int -> Int {
+	return x+y;
+}

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import compiler.CompileException;
+import codeGeneration.CompileException;
 import lexer.TokenType;
 import parser.types.*;
 import parser.declarations.Declaration;
@@ -357,7 +357,7 @@ public class Typechecker implements Visitor {
 			this.visit(s);
 			if(s instanceof ReturnStatement){
 				if(blockType != Types.voidType){ // i.e. you already saw a return statement
-					throw new CompileException("Having two return statements is not allowed.");
+					throw new CompileException("Having two return statements is not allowed.", s);
 				}
 				ReturnStatement ret = (ReturnStatement) s;
 				blockType = ret.arg.getType();
