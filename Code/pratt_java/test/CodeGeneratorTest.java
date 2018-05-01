@@ -225,10 +225,17 @@ public class CodeGeneratorTest {
 
     @Test
     public void testFunCallNoAssign(){
-        String result = runSPL("multBy2( n ) :: Int -> Int {\n" +
+        String result = runSPL("multBy3( n, m ) :: Int -> Int {\n" +
+                "Int f = 9;\n" +
+                "Int g = 3;" +
+                "g = 2;"+ //+ Try this later
+                "return n * 3;\n" +
+                "}"+
+                "multBy2( n ) :: Int -> Int {\n" +
                 "Int d = 9;\n" +
+                "Int e = 3;" +
                 "d = 2;"+ //+ Try this later
-                "return n * 2;\n" +
+                "return multBy3(n * 2, 1);\n" +
                 "}"+
                 "main()::->Void{\n" +
                 "Int a = 3+ 2;\n" +
