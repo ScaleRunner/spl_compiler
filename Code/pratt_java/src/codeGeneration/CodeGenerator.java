@@ -409,7 +409,8 @@ public class CodeGenerator implements Visitor {
         if(!currentBranch.equals("main")){
             if(s.arg instanceof CallExpression)
                 programWriter.addToOutput(currentBranch, new Command("ldr",  "RR"));
-            programWriter.addToOutput(currentBranch, new Command("str", "RR"));
+            else
+                programWriter.addToOutput(currentBranch, new Command("str", "RR"));
             programWriter.addToOutput(currentBranch, new Command("unlink"));
             programWriter.addToOutput(currentBranch, new Command("ret"));
         }
