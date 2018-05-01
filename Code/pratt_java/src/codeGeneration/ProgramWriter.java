@@ -21,10 +21,13 @@ public class ProgramWriter {
 
     private final Map<String, List<Command>> branchMap;
 
+    public static boolean testProgram;
+
     public ProgramWriter(String filepath){
         this.filepath = filepath;
         this.branchMap = new HashMap<>();
         this.branchNames = new ArrayList<>();
+        testProgram = false;
     }
 
     public void addToOutput(String branchName, Command command){
@@ -54,7 +57,7 @@ public class ProgramWriter {
         PrintWriter out = new PrintWriter(filepath);
 
         // Check if there is a main function
-        if(!branchNames.contains("main")){
+        if(!branchNames.contains("main") && !testProgram){
             throw new CompileException("An SPL program requires a main function.", new IdentifierExpression("The whole program"));
         }
 
