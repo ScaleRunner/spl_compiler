@@ -37,11 +37,12 @@ public class CodeGenerator implements Visitor {
     private int localVariableDeclarationOffset;
 
 
-    private HashMap<String, Integer> localVariablesPlusOffsettmp = new HashMap<>();
+    private HashMap<String, Integer> currentArgumentsPlusOffsettmp = new HashMap<>();
 
     private HashMap<String, Integer> currentlocalVariablesPlusOffset = new HashMap<>();
 
-    private HashMap<String, HashMap<String, Integer>> functionsEnvironment = new HashMap<>();
+    private HashMap<String, HashMap<String, Integer>> functionsLocalsEnvironment = new HashMap<>();
+    private HashMap<String, HashMap<String, Integer>> functionsArgsEnvironment = new HashMap<>();
     //need to work on it later
     private HashMap<String, Integer> argsPlusOffset = new HashMap<>();
 
@@ -92,7 +93,7 @@ public class CodeGenerator implements Visitor {
         for(Expression arg : e.args){
             this.visit(arg);
         }
-
+        currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(e.function_name.name);
         programWriter.addToOutput(currentBranch, new Command("bsr", e.function_name.name));
 
         //after funcall was visitted makes SP point to saved old MP
@@ -115,15 +116,19 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(IdentifierExpression e) {
         //If identifier is in the rhs of Assignment, we need to use an offset to load it to the stack;
-        if(functionsEnvironment.get(currentBranch) != null)
-            currentlocalVariablesPlusOffset = functionsEnvironment.get(currentBranch);
+        if(functionsLocalsEnvironment.get(currentBranch) != null)
+            currentlocalVariablesPlusOffset = functionsLocalsEnvironment.get(currentBranch);
         if(currentlocalVariablesPlusOffset != null) {
             if (!lsideIdentifier && (currentlocalVariablesPlusOffset.get(e.name) != null)) {
                 programWriter.addToOutput(currentBranch, new Command("ldl", Integer.toString(currentlocalVariablesPlusOffset.get(e.name)))); //Loads value from address
             }
             //we assume it's an argument
-            else if (!lsideIdentifier) {
-                programWriter.addToOutput(currentBranch, new Command("ldl",                 "-"+(Integer.toString(currentlocalVariablesPlusOffset.size() + 1)))); //Loads value from add
+            else if (!lsideIdentifier && currentArgumentsPlusOffsettmp.get(e.name) != null) {
+                //first arguments have higher offset;
+                                    //2                                   1
+                Integer offset = -currentArgumentsPlusOffsettmp.size() +currentArgumentsPlusOffsettmp.get(e.name)  ;
+                programWriter.addToOutput(currentBranch, new Command("ldl",  (Integer.toString(offset - 1)))); //Loads value from add
+                //-1 to go over return address;
             }
 
         }
@@ -239,30 +244,35 @@ public class CodeGenerator implements Visitor {
         //Check this later for 1 = 1;
         String name = ((IdentifierExpression) s.name).name;
 
-
-
         this.visit(s.right);
         if(s.right instanceof CallExpression ){
 
             programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
-            programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
+
 
 
         }
 
-        //programWriter.addToOutput(currentBranch, new Command("stl", "0"));
+        programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
 
     }
 
     @Override
     public void visit(CallStatement s) {
-
-//SAVES previous MP
+    int i = 0;
+    currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(s.function_name.name);
+    //SAVES previous MP
         //saves MP before putting arguments on stack
+
         programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
 
         for(Expression arg : s.args){
+
             this.visit(arg);
+
+        }
+        if(currentArgumentsPlusOffsettmp.size() != 0){
+            functionsArgsEnvironment.put(s.function_name.name, currentArgumentsPlusOffsettmp);
         }
         programWriter.addToOutput(currentBranch, new Command("bsr", s.function_name.name));
 
@@ -413,7 +423,12 @@ public class CodeGenerator implements Visitor {
         this.thenBranches = 0;
         this.loopBranches = 0;
         this.endBranches = 0;
-
+        int argOffset = 0;
+        currentArgumentsPlusOffsettmp = new HashMap<>();
+        for(IdentifierExpression arg: d.args){
+            currentArgumentsPlusOffsettmp.put(arg.name, argOffset);
+            argOffset++;
+        }
         currentlocalVariablesPlusOffset = new HashMap<>();
         int i = 0;
         currentBranch = d.funName.name;
@@ -431,7 +446,8 @@ public class CodeGenerator implements Visitor {
             this.visit(funStmt);
         }
 
-        functionsEnvironment.put(d.funName.name, currentlocalVariablesPlusOffset);
+        functionsLocalsEnvironment.put(d.funName.name, currentlocalVariablesPlusOffset);
+        functionsArgsEnvironment.put(d.funName.name, currentArgumentsPlusOffsettmp);
 
     }
 
