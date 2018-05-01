@@ -1,4 +1,4 @@
-package util;
+package typechecker;
 
 public class TypeError{
     private final String errorMessage;

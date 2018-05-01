@@ -594,12 +594,12 @@ public class ParserTest {
 
     @Test
     public void testReadCall() {
-        Lexer l = new Lexer("read(a)");
+        Lexer l = new Lexer("read(1)");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         Expression result = p.parseExpression();
 
-        Expression actual = new ReadExpression(new IdentifierExpression("a"));
+        Expression actual = new ReadExpression(new IntegerExpression(1));
 
         assertEquals(result, actual);
     }

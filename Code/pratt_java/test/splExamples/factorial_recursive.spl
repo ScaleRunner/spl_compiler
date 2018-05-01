@@ -1,0 +1,15 @@
+facR (n) :: Int -> Int {
+    if(n < 2) {
+        return 1;
+    } else {
+        return n * facR(n-1);
+    }
+}
+
+main()::->Void
+{
+    Int i = 5;
+    Int result = facR(i);
+    // result: 120
+    print(result);
+}

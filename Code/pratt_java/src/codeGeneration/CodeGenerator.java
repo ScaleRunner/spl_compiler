@@ -19,6 +19,20 @@ import util.Visitor;
 public class CodeGenerator implements Visitor {
 
     private final ProgramWriter programWriter;
+
+    // String which denotes the branch on which you are currently writing to
+    private String currentBranch = "root";
+
+    // Counters for the number of then branches in the current function.
+    // Needed if there are multiple or nested if conditions
+    private int thenBranches = 0;
+    // Counters for the number of end branches in the current function.
+    // Needed if there are multiple if conditions and/or while loops or nested if conditions
+    private int endBranches = 0;
+    // Counters for the number of loop branches in the current function.
+    // Needed if there are multiple and/or nested while loops
+    private int loopBranches = 0;
+
     //Controls what to do if identifier is in lhs of Assignment (stl)
     //Or rhs (load from MP + offset);
     private boolean lsideIdentifier = false;
@@ -31,8 +45,7 @@ public class CodeGenerator implements Visitor {
 
     HashMap<String, HashMap<String, Integer>> functionsEnvironment = new HashMap<>();
     //need to work on it later
-    HashMap<String, Integer> argsPlusOffset = new HashMap<>();
-
+    private HashMap<String, Integer> argsPlusOffset = new HashMap<>();
 
     private String currentBranch = "root";
 
@@ -194,6 +207,12 @@ public class CodeGenerator implements Visitor {
     }
 
     @Override
+    public void visit(ReadExpression e) {
+        String arg = e.arg.name == 0 ? "10": "11";
+        programWriter.addToOutput(currentBranch, new Command("trap", arg));
+    }
+
+    @Override
     public void visit(TupleExpression e) {
 
     }
@@ -251,14 +270,110 @@ public class CodeGenerator implements Visitor {
 
     }
 
+    /**
+     * For the if statement:
+     * - visit the condition
+     * - branch based on condition
+     * - create the branch for the then statement {branch}_then
+     * - create the branch for the else statement inside the original branch (i.e. directly underneath the brt check)
+     * - create the branch for what comes after the conditional statement {branch}_end
+     *
+     * The program layout should be as such:
+     *      func:       ...
+     *                  brt func_then
+     *                  ....    |
+     *                  ....    |- Here comes the else part
+     *                  ....    |
+     *                  bra func_end
+     *      func_then:  ....
+     *                  ....
+     *      func_end:   ....    |
+     *                  ....    | - Here comes the rest of the function 'func'
+     *                  ....    |
+     *
+     * Such that if the condition is true, you would go into the func_then branch and afterwards continue to the
+     * func_end branch, but if the condition was false, you would execute the else part and afterwards skip the
+     * func_then branch by immediately going to the func_end branch.
+     *
+     * TODO: If there would be a nested if, would this nice flowing through the next branch idea break?
+     *
+     * @param s
+     */
     @Override
     public void visit(ConditionalStatement s) {
 
     }
 
+    /**
+     * For the loop statement:
+     * - visit the condition
+     * - branch based on the condition
+     * - create the new branch loop
+     *
+     * The program layout should be as such:
+     *      func:       ...
+     *                  ....    |
+     *                  ....    |- Here comes the condition check
+     *                  ....    |
+     *                  brf func_end
+     *      func_loop:  ....    |
+     *                  ....    |- Here comes the body of the loop
+     *                  ....    |
+     *
+     *                  ....    |
+     *                  ....    | - Here comes the condition check
+     *                  ....    |
+     *                  brt func_loop
+     *
+     *      func_end:   ....    |
+     *                  ....    | - Here comes the rest of the function 'func'
+     *                  ....    |
+     *
+     * Such that if the condition is False, the program would go directly to the end of the function
+     * (i.e. skip the body). If the condition was True, the program would just continue into the body of the loop,
+     * after this body is done, check the condition again. This time, if the condition is True, repeat the branch
+     * func_loop. Otherwise, the program would continue to the branch func_end.
+     *
+     * TODO: If there would be a nested loop, would this nice flowing through the next branch idea break?
+     *      * Maybe not if we would print the func_end{number} in descending order?
+     *      * Meh, we probably have to do hard branching - i.e. if True go to this branch else go to this branch
+     *
+     * @param loopStatement
+     */
     @Override
-    public void visit(LoopStatement s) {
+    public void visit(LoopStatement loopStatement) {
 
+        //TODO: I think we should check the condition within the SSM right? Because now the condition can never change?
+        //Just tested this, and it does not work. The condition is indeff True or False.
+        // Could be because the Assignment is not even implemented yet ... :'D
+
+        //Bookkeeping: create branch names and adjust counters
+        String branchLoop = currentBranch + "_loop" + loopBranches;
+        String brachEnd = currentBranch + "_end" + endBranches;
+
+        this.loopBranches++;
+        this.endBranches++;
+
+        //Beginning of function:
+        // Visit the condition
+        this.visit(loopStatement.condition);
+
+        // Branch based on the condition
+        programWriter.addToOutput(currentBranch, new Command("brf", brachEnd));
+
+        // Create the loop branch and build it
+        currentBranch = branchLoop;
+        for(Statement s : loopStatement.body){
+            s.accept(this);
+        }
+
+        // Visit the condition again to check if the loop can be broken and branch on it
+        this.visit(loopStatement.condition);
+        programWriter.addToOutput(currentBranch, new Command("brt", branchLoop));
+
+        // We are out of the loop
+        // Create the end branch and continue building it
+        currentBranch = brachEnd;
     }
 
     @Override
@@ -294,6 +409,11 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunctionDeclaration d) {
+        // Reset the number of branches in this function
+        this.thenBranches = 0;
+        this.loopBranches = 0;
+        this.endBranches = 0;
+
         currentlocalVariablesPlusOffset = new HashMap<>();
         int i = 0;
         currentBranch = d.funName.name;

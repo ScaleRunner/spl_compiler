@@ -13,7 +13,6 @@ import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import util.Node;
-import util.TypeError;
 import util.Visitor;
 
 public class Typechecker implements Visitor {
@@ -31,10 +30,22 @@ public class Typechecker implements Visitor {
 		this.errors = new LinkedList<>();
 		this.env = new Environment();
 	}
+
 	public boolean typecheck(Node ast) {
 		ast.accept(this);
 		return errors.isEmpty();
 	}
+
+	public boolean typecheck(List<? extends Node> nodes){
+	    boolean correct = true;
+	    for(Node n : nodes){
+	        if(!typecheck(n)){
+	            correct = false;
+            }
+        }
+        printErrors();
+	    return correct;
+    }
 
 	public List<TypeError> getErrors() {
 		return errors;
@@ -306,6 +317,22 @@ public class Typechecker implements Visitor {
 		} else {
 			error(String.format("Unsupported prefix operator '%s' for type '%s'",e.operator.getValue(), e.right.getType()), e);
 		}
+	}
+
+	@Override
+	public void visit(ReadExpression e) {
+		this.visit(e.arg);
+		if(e.arg.getType() != Types.intType){
+		    error(String.format("Invalid argument type for function 'read'.\n\tExpected Type: %s\n\tActual Type: %s",
+                    Types.intType, e.arg.getType()), e);
+        }
+        if(e.arg.name == 0){
+		    e.setType(Types.intType);
+        } else if(e.arg.name == 1){
+		    e.setType(Types.charType);
+        } else {
+		    error(String.format("Invalid argument for 'read'.\n\tExpected: {0, 1}\n\tActual: %s", e.arg.name), e);
+        }
 	}
 
 	@Override

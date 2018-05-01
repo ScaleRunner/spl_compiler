@@ -16,7 +16,9 @@ import org.junit.Test;
 
 import parser.Parser;
 import parser.declarations.Declaration;
+import typechecker.Typechecker;
 import util.Node;
+import util.ReadSPL;
 
 public class CodeGeneratorTest {
 
@@ -54,6 +56,9 @@ public class CodeGeneratorTest {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         List<Declaration> nodes = p.parseSPL();
+        Typechecker tc = new Typechecker();
+        tc.typecheck(nodes);
+
         CodeGenerator gen = new CodeGenerator("test.ssm");
         try {
             gen.generateCode(nodes, postamble);
@@ -67,6 +72,9 @@ public class CodeGeneratorTest {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         Node n = p.parseExpression();
+        Typechecker tc = new Typechecker();
+        tc.typecheck(n);
+
         CodeGenerator gen = new CodeGenerator("test.ssm");
         try {
             gen.generateCode(n, postamble);
@@ -159,31 +167,43 @@ public class CodeGeneratorTest {
         assertEquals("2", result);
 
         result = runExpression("5 > 3", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("5 < 3", new Command("trap", "0"), false);
         assertEquals("0", result);
 
         result = runExpression("5 >= 5", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("5 >= 6", new Command("trap", "0"), false);
         assertEquals("0", result);
 
         result = runExpression("5 <= 5", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("5 <= 6", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("6 <= 5", new Command("trap", "0"), false);
         assertEquals("0", result);
 
         result = runExpression("1 == 1", new Command("trap", "0"), false);
-        assertNotEquals("0", result);
+        assertEquals("-1", result);
 
         result = runExpression("1 == 1 && 1 != 0", new Command("trap", "0"), false);
-        assertNotEquals("1", result);
+        assertEquals("-1", result);
+    }
+
+    @Test
+    public void testReadInteger(){
+        String result = runExpression("read(0)", new Command("trap", "0"), false);
+        assertEquals("Please enter an integer: ", result);
+    }
+
+    @Test
+    public void testReadChar(){
+        String result = runExpression("read(1)", new Command("trap", "1"), false);
+        assertEquals("Please enter a character: ", result);
     }
 
     @Test
@@ -204,6 +224,31 @@ public class CodeGeneratorTest {
     }
 
     @Test
+    public void testWhileLoop_conditionTrue(){
+        //TODO: This one loops (see loopStatement TODO)
+        String result = runSPL("main()::->Void{\n" +
+                "Bool a = True; " +
+                "while(a){" +
+                "    a = False;" +
+                "}" +
+                "print(a);" +
+                "}", null,false);
+        assertEquals("0", result);
+    }
+
+    @Test
+    public void testWhileLoop_conditionFalse(){
+        String result = runSPL("main()::->Void{\n" +
+                "Bool a = True; " +
+                "while(!a){" +
+                "    a = False;" +
+                "}" +
+                "print(a);" +
+                "}", null,false);
+        assertEquals("-1", result);
+    }
+
+    @Test
     public void testSingleFunLocalVarDecl(){
         String result = runSPL("main()::->Void{\n" +
                 "Int a = 3+ 2;\n" +
@@ -214,6 +259,23 @@ public class CodeGeneratorTest {
         assertEquals("5", result);
     }
 
+    @Test
+    public void FactorialImperative(){
+        String result = runSPL("main()::->Void{\n" +
+                "Int a = 3+ 2;\n" +
+                "Int b = 5+ 3;\n" +
+                "Int c = b;\n" +
+                "print(a);\n" +
+                "}", null,false);
+        assertEquals("5", result);
+    }
 
+    @Test
+    public void FactorialRecursive(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/factorial_recursive.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("120", result);
+    }
 
 }

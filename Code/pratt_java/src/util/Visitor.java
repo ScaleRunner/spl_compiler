@@ -31,6 +31,8 @@ public interface Visitor {
 
     void visit(PrefixExpression e);
 
+    void visit(ReadExpression e);
+
     void visit(TupleExpression e);
 
     // Statements
