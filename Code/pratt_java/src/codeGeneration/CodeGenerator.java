@@ -38,12 +38,12 @@ public class CodeGenerator implements Visitor {
     private int localVariableDeclarationOffset;
 
 
-    HashMap<String, Integer> currentArgumentsPlusOffsettmp = new HashMap<>();
+    private HashMap<String, Integer> currentArgumentsPlusOffsettmp = new HashMap<>();
 
-    HashMap<String, Integer> currentlocalVariablesPlusOffset = new HashMap<>();
+    private HashMap<String, Integer> currentlocalVariablesPlusOffset = new HashMap<>();
 
-    HashMap<String, HashMap<String, Integer>> functionsLocalsEnvironment = new HashMap<>();
-    HashMap<String, HashMap<String, Integer>> functionsArgsEnvironment = new HashMap<>();
+    private HashMap<String, HashMap<String, Integer>> functionsLocalsEnvironment = new HashMap<>();
+    private HashMap<String, HashMap<String, Integer>> functionsArgsEnvironment = new HashMap<>();
     //need to work on it later
     private HashMap<String, Integer> argsPlusOffset = new HashMap<>();
 
@@ -99,10 +99,12 @@ public class CodeGenerator implements Visitor {
 
         //after funcall was visitted makes SP point to saved old MP
 
-        programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
-        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(e.args.size())));
-        programWriter.addToOutput(currentBranch, new Command("sub"));
-        programWriter.addToOutput(currentBranch, new Command("str", "SP"));
+//        programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
+//        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(e.args.size())));
+//        programWriter.addToOutput(currentBranch, new Command("sub"));
+        programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
+
+        //programWriter.addToOutput(currentBranch, new Command("str", "SP"));
         //stores old MP in MP
         programWriter.addToOutput(currentBranch, new Command("str", "MP"));
 
@@ -286,6 +288,8 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(currentBranch, new Command("str", "MP"));
 
 
+
+
     }
 
     /**
@@ -408,7 +412,9 @@ public class CodeGenerator implements Visitor {
         if(s.arg != null)
             this.visit(s.arg);
         if(!currentBranch.equals("main")){
-            programWriter.addToOutput(currentBranch, new Command("str RR"));
+            if(s.arg instanceof CallExpression)
+                programWriter.addToOutput(currentBranch, new Command("ldr",  "RR"));
+            programWriter.addToOutput(currentBranch, new Command("str", "RR"));
             programWriter.addToOutput(currentBranch, new Command("unlink"));
             programWriter.addToOutput(currentBranch, new Command("ret"));
         }

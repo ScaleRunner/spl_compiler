@@ -241,7 +241,7 @@ public class CodeGeneratorTest {
                 "Int a = 3+ 2;\n" +
                 "Int b = 5+ 3;\n" +
                 "Int c = b;\n" +
-                "multBy2(c);\n" +
+                "c =multBy2(c);\n" +
                 //"return;" + Fix later
                 "}", null,false);
         assertEquals("8", result);
