@@ -192,10 +192,12 @@ public class CodeGeneratorTest {
                 "Int a = 3+ 2;\n" +
                 "Int b = 5+ 3;\n" +
                 "Int c = b;\n" +
-                "multBy2(c);\n" +
-                "return;" +
+                "c = multBy2(c);\n" +
+                //"return;" + Fix later
                 "}"+
                 "multBy2( n ) :: Int -> Int {\n" +
+                "Int d = 9;\n" +
+                "d = 2;"+ //+ Try this later
                 "return n * 2;\n" +
                 "}", null,false);
         assertEquals("8", result);

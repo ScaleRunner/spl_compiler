@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import codeGeneration.writer.ProgramWriter;
+import jdk.nashorn.internal.codegen.CompilerConstants;
 import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
@@ -22,9 +23,16 @@ public class CodeGenerator implements Visitor {
     //Or rhs (load from MP + offset);
     private boolean lsideIdentifier = false;
     private int localVariableDeclarationOffset;
-    HashMap<String, Integer> localVariablesPlusOffset = new HashMap<>();
+
+
+    HashMap<String, Integer> localVariablesPlusOffsettmp = new HashMap<>();
+
+    HashMap<String, Integer> currentlocalVariablesPlusOffset = new HashMap<>();
+
+    HashMap<String, HashMap<String, Integer>> functionsEnvironment = new HashMap<>();
     //need to work on it later
     HashMap<String, Integer> argsPlusOffset = new HashMap<>();
+
 
     private String currentBranch = "root";
 
@@ -66,12 +74,13 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
-        lsideIdentifier = true;
+
         for(Expression arg : e.args){
             this.visit(arg);
         }
-        lsideIdentifier = false;
+
         programWriter.addToOutput(currentBranch, new Command("bsr", e.function_name.name));
+
     }
 
     @Override
@@ -82,15 +91,17 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(IdentifierExpression e) {
         //If identifier is in the rhs of Assignment, we need to use an offset to load it to the stack;
-        if(!lsideIdentifier && (localVariablesPlusOffset.get(e.name) !=null)){
-            programWriter.addToOutput(currentBranch,
-                    new Command("ldr", "MP")); //Loads value from MP (assuming MP is in origin)
-            programWriter.addToOutput(currentBranch,
-                    new Command("ldc",
-                            Integer.toString(localVariablesPlusOffset.get(e.name)))
-            ); // Loads offset FromOrigin
-            programWriter.addToOutput(currentBranch, new Command("add"));// With this address we can load variable
-            programWriter.addToOutput(currentBranch, new Command("lda", "0")); //Loads value from address
+        if(functionsEnvironment.get(currentBranch) != null)
+            currentlocalVariablesPlusOffset = functionsEnvironment.get(currentBranch);
+        if(currentlocalVariablesPlusOffset != null) {
+            if (!lsideIdentifier && (currentlocalVariablesPlusOffset.get(e.name) != null)) {
+                programWriter.addToOutput(currentBranch, new Command("ldl", Integer.toString(currentlocalVariablesPlusOffset.get(e.name)))); //Loads value from address
+            }
+            //we assume it's an argument
+            else if (!lsideIdentifier) {
+                programWriter.addToOutput(currentBranch, new Command("ldl",                 "-"+(Integer.toString(currentlocalVariablesPlusOffset.size() + 1)))); //Loads value from add
+            }
+
         }
     }
 
@@ -195,14 +206,49 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(AssignStatement s) {
 
+        //Check this later for 1 = 1;
+        String name = ((IdentifierExpression) s.name).name;
+
+        if(s.right instanceof CallExpression ){
+            //SAVES previous MP
+            //saves MP before putting arguments on stack
+            programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
+
+        }
+
+        this.visit(s.right);
+        if(s.right instanceof CallExpression ){
+            //after funcall was visitted makes SP point to saved old MP
+            CallExpression aux = (CallExpression) s.right;
+            programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
+            programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(aux.args.size())));
+            programWriter.addToOutput(currentBranch, new Command("sub"));
+            programWriter.addToOutput(currentBranch, new Command("str", "SP"));
+
+            //stores old MP in MP
+            programWriter.addToOutput(currentBranch, new Command("str", "MP"));
+
+
+            programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
+            programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
+
+
+        }
+
+        //programWriter.addToOutput(currentBranch, new Command("stl", "0"));
+
     }
 
     @Override
     public void visit(CallStatement s) {
+
+
         for(Expression arg : s.args){
             this.visit(arg);
         }
         programWriter.addToOutput(currentBranch, new Command("bsr", s.function_name.name));
+
+
     }
 
     @Override
@@ -230,7 +276,15 @@ public class CodeGenerator implements Visitor {
     public void visit(ReturnStatement s) {
         if(s.arg != null)
             this.visit(s.arg);
+    if(currentBranch != "main"){
+        programWriter.addToOutput(currentBranch, new Command("str RR"));
+        programWriter.addToOutput(currentBranch, new Command("unlink"));
+        programWriter.addToOutput(currentBranch, new Command("ret"));
 
+    }
+    else{
+        programWriter.addToOutput(currentBranch, new Command("halt"));
+    }
     }
 
     @Override
@@ -240,9 +294,11 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunctionDeclaration d) {
-
+        currentlocalVariablesPlusOffset = new HashMap<>();
         int i = 0;
         currentBranch = d.funName.name;
+//        if(d.funName.name != "main")
+//            programWriter.addToOutput(currentBranch, new Command("str", "RR"));
         if(d.decls.size() != 0)
             programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(d.decls.size()-1)));
 
@@ -254,6 +310,9 @@ public class CodeGenerator implements Visitor {
         for(Statement funStmt : d.stats){
             this.visit(funStmt);
         }
+
+        functionsEnvironment.put(d.funName.name, currentlocalVariablesPlusOffset);
+
     }
 
     @Override
@@ -263,7 +322,7 @@ public class CodeGenerator implements Visitor {
         lsideIdentifier = false;
         this.visit(d.right);
         programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(localVariableDeclarationOffset)));
-        localVariablesPlusOffset.put(d.left.name, localVariableDeclarationOffset);
+        currentlocalVariablesPlusOffset.put(d.left.name, localVariableDeclarationOffset);
     }
 
 }
