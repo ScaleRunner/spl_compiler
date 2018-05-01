@@ -396,28 +396,25 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PrintStatement s) {
-
         this.visit(s.arg);
         if(s.arg.getType() instanceof CharType)
             programWriter.addToOutput(currentBranch, new Command("trap", "1"));
         else
             programWriter.addToOutput(currentBranch, new Command("trap", "0"));
-
     }
 
     @Override
     public void visit(ReturnStatement s) {
         if(s.arg != null)
             this.visit(s.arg);
-    if(currentBranch != "main"){
-        programWriter.addToOutput(currentBranch, new Command("str RR"));
-        programWriter.addToOutput(currentBranch, new Command("unlink"));
-        programWriter.addToOutput(currentBranch, new Command("ret"));
-
-    }
-    else{
-        programWriter.addToOutput(currentBranch, new Command("halt"));
-    }
+        if(!currentBranch.equals("main")){
+            programWriter.addToOutput(currentBranch, new Command("str RR"));
+            programWriter.addToOutput(currentBranch, new Command("unlink"));
+            programWriter.addToOutput(currentBranch, new Command("ret"));
+        }
+        else{
+            programWriter.addToOutput(currentBranch, new Command("halt"));
+        }
     }
 
     @Override
