@@ -224,6 +224,23 @@ public class CodeGeneratorTest {
     }
 
     @Test
+    public void testFunCallNoAssign(){
+        String result = runSPL("multBy2( n ) :: Int -> Int {\n" +
+                "Int d = 9;\n" +
+                "d = 2;"+ //+ Try this later
+                "return n * 2;\n" +
+                "}"+
+                "main()::->Void{\n" +
+                "Int a = 3+ 2;\n" +
+                "Int b = 5+ 3;\n" +
+                "Int c = b;\n" +
+                "multBy2(c);\n" +
+                //"return;" + Fix later
+                "}", null,false);
+        assertEquals("8", result);
+    }
+
+    @Test
     public void testWhileLoop_conditionTrue(){
         //TODO: This one loops (see loopStatement TODO)
         String result = runSPL("main()::->Void{\n" +

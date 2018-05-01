@@ -47,7 +47,6 @@ public class CodeGenerator implements Visitor {
     //need to work on it later
     private HashMap<String, Integer> argsPlusOffset = new HashMap<>();
 
-    private String currentBranch = "root";
 
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath);
@@ -88,11 +87,25 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(CallExpression e) {
 
+        //SAVES previous MP
+        //saves MP before putting arguments on stack
+        programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
+
         for(Expression arg : e.args){
             this.visit(arg);
         }
 
         programWriter.addToOutput(currentBranch, new Command("bsr", e.function_name.name));
+
+        //after funcall was visitted makes SP point to saved old MP
+
+        programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
+        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(e.args.size())));
+        programWriter.addToOutput(currentBranch, new Command("sub"));
+        programWriter.addToOutput(currentBranch, new Command("str", "SP"));
+        //stores old MP in MP
+        programWriter.addToOutput(currentBranch, new Command("str", "MP"));
+
 
     }
 
@@ -228,25 +241,10 @@ public class CodeGenerator implements Visitor {
         //Check this later for 1 = 1;
         String name = ((IdentifierExpression) s.name).name;
 
-        if(s.right instanceof CallExpression ){
-            //SAVES previous MP
-            //saves MP before putting arguments on stack
-            programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
 
-        }
 
         this.visit(s.right);
         if(s.right instanceof CallExpression ){
-            //after funcall was visitted makes SP point to saved old MP
-            CallExpression aux = (CallExpression) s.right;
-            programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
-            programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(aux.args.size())));
-            programWriter.addToOutput(currentBranch, new Command("sub"));
-            programWriter.addToOutput(currentBranch, new Command("str", "SP"));
-
-            //stores old MP in MP
-            programWriter.addToOutput(currentBranch, new Command("str", "MP"));
-
 
             programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
             programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
@@ -261,11 +259,22 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(CallStatement s) {
 
+//SAVES previous MP
+        //saves MP before putting arguments on stack
+        programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
 
         for(Expression arg : s.args){
             this.visit(arg);
         }
         programWriter.addToOutput(currentBranch, new Command("bsr", s.function_name.name));
+
+        //after funcall was visitted makes SP point to saved old MP
+        programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
+        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(s.args.size())));
+        programWriter.addToOutput(currentBranch, new Command("sub"));
+        programWriter.addToOutput(currentBranch, new Command("str", "SP"));
+        //stores old MP in MP
+        programWriter.addToOutput(currentBranch, new Command("str", "MP"));
 
 
     }
