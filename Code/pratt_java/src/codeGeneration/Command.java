@@ -1,7 +1,5 @@
 package codeGeneration;
 
-import codeGeneration.writer.ProgramWriter;
-
 import java.util.ArrayList;
 import java.util.List;
 

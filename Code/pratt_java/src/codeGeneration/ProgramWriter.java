@@ -1,6 +1,7 @@
-package codeGeneration.writer;
+package codeGeneration;
 
 import codeGeneration.Command;
+import parser.expressions.IdentifierExpression;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -16,17 +17,21 @@ public class ProgramWriter {
 
     private final String filepath;
 
+    private final List<String> branchNames;
+
     private final Map<String, List<Command>> branchMap;
 
     public ProgramWriter(String filepath){
         this.filepath = filepath;
-        branchMap = new HashMap<>();
+        this.branchMap = new HashMap<>();
+        this.branchNames = new ArrayList<>();
     }
 
     public void addToOutput(String branchName, Command command){
         List<Command> branchCommands = branchMap.get(branchName);
         if(branchCommands == null){ //This branch did not exist yet
             branchCommands = new ArrayList<>();
+            branchNames.add(branchName);
         }
         branchCommands.add(command);
         branchMap.put(branchName, branchCommands);
@@ -42,37 +47,40 @@ public class ProgramWriter {
 
     /**
      * Gathers all commands with the same name and write them to the file.
+     * They are printed in the order that they are created.
      * @throws FileNotFoundException
      */
     public void writeToFile() throws FileNotFoundException {
         PrintWriter out = new PrintWriter(filepath);
 
-        List<Command> rootCommands = branchMap.remove("root");
-
-        if(rootCommands != null){
-            for(Command command : rootCommands){
-                out.println(writeCommand("", command));
-            }
+        // Check if there is a main function
+        if(!branchNames.contains("main")){
+            throw new CompileException("An SPL program requires a main function.", new IdentifierExpression("The whole program"));
         }
 
-        List<Command> mainCommands = branchMap.remove("main");
-        if(mainCommands != null)
-            out.println(writeCommand("", new Command("bra", "main")));
+        // You should always go to the main function after globals have been declared
+        addToOutput("root", new Command("bra", "main"));
 
-        for(Map.Entry<String, List<Command>> entry : branchMap.entrySet()){
-            String branchName = entry.getKey();
-            List<Command> commands = entry.getValue();
+        // 'root' should always go first
+        if(branchNames.indexOf("root") != 0){
+            branchNames.remove("root");
+            branchNames.add(0, "root");
+        }
 
+        // The main function should always end with the 'halt' instruction
+        addToOutput("main", new Command("halt"));
+
+        for(String branchName : branchNames){
+            List<Command> commands = branchMap.remove(branchName);
+
+            // We don't want the label 'root' to be printed
+            branchName = branchName.equals("root")? "" : branchName;
+
+            // Write the first command of a branch with the corresponding label
             out.println(writeCommand(branchName, commands.get(0)));
+
             for(int i = 1; i < commands.size(); i ++){
                 out.println(writeCommand("", commands.get(i)));
-            }
-        }
-
-        if(mainCommands != null){
-            out.println(writeCommand("main", mainCommands.get(0)));
-            for(int i = 1; i < mainCommands.size(); i ++){
-                out.println(writeCommand("", mainCommands.get(i)));
             }
         }
 
