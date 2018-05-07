@@ -1,9 +1,5 @@
 package codeGeneration;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-
 import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
@@ -13,6 +9,10 @@ import parser.statements.*;
 import parser.types.CharType;
 import util.Node;
 import util.Visitor;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.List;
 
 public class CodeGenerator implements Visitor {
 
@@ -248,15 +248,9 @@ public class CodeGenerator implements Visitor {
 
         this.visit(s.right);
         if(s.right instanceof CallExpression ){
-
             programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
-
-
-
         }
-
         programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
-
     }
 
     @Override
@@ -265,13 +259,10 @@ public class CodeGenerator implements Visitor {
     currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(s.function_name.name);
     //SAVES previous MP
         //saves MP before putting arguments on stack
-
         programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
 
         for(Expression arg : s.args){
-
             this.visit(arg);
-
         }
         if(currentArgumentsPlusOffsettmp.size() != 0){
             functionsArgsEnvironment.put(s.function_name.name, currentArgumentsPlusOffsettmp);
@@ -285,10 +276,6 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(currentBranch, new Command("str", "SP"));
         //stores old MP in MP
         programWriter.addToOutput(currentBranch, new Command("str", "MP"));
-
-
-
-
     }
 
     /**
@@ -301,6 +288,9 @@ public class CodeGenerator implements Visitor {
      *
      * The program layout should be as such:
      *      func:       ...
+     *                  ....    |
+     *                  ....    |- Here comes the condition check
+     *                  ....    |
      *                  brt func_then
      *                  ....    |
      *                  ....    |- Here comes the else part
@@ -318,11 +308,40 @@ public class CodeGenerator implements Visitor {
      *
      * TODO: If there would be a nested if, would this nice flowing through the next branch idea break?
      *
-     * @param s
+     * @param conditionalStatement: The AST node belonging to a conditionalStatement
      */
     @Override
-    public void visit(ConditionalStatement s) {
+    public void visit(ConditionalStatement conditionalStatement) {
+        //Bookkeeping: create branch names and adjust counters
+        String branchThen = currentBranch + "_then" + thenBranches;
+        String branchEnd = currentBranch + "_end" + endBranches;
+        this.thenBranches++;
+        this.endBranches++;
 
+        //Begin code generation for conditional statements
+        // Check condition
+        this.visit(conditionalStatement.condition);
+        // Branch based on condition
+        programWriter.addToOutput(currentBranch, new Command("brt", branchThen));
+
+        // Here you visit your else statements
+        for(Statement s : conditionalStatement.else_expression){
+            this.visit(s);
+        }
+        // You don't want to end up in the then statements, so skip ahead
+        programWriter.addToOutput(currentBranch, new Command("bra", branchEnd));
+
+        // Generate code for the then branch
+        currentBranch = branchThen;
+        for(Statement s : conditionalStatement.then_expression){
+            this.visit(s);
+        }
+
+        // Done with the conditional, continue generating the rest
+        currentBranch = branchEnd;
+
+        // Ensure that the endBranch exists:
+        programWriter.addToOutput(currentBranch, new Command("nop"));
     }
 
     /**
@@ -355,42 +374,37 @@ public class CodeGenerator implements Visitor {
      *      * Maybe not if we would print the func_end{number} in descending order?
      *      * Meh, we probably have to do hard branching - i.e. if True go to this branch else go to this branch
      *
-     * @param loopStatement
+     * @param loopStatement: the AST Node for the loopStatement
      */
     @Override
     public void visit(LoopStatement loopStatement) {
-
-        //TODO: I think we should check the condition within the SSM right? Because now the condition can never change?
-        //Just tested this, and it does not work. The condition is indeff True or False.
-        // Could be because the Assignment is not even implemented yet ... :'D
-
         //Bookkeeping: create branch names and adjust counters
         String branchLoop = currentBranch + "_loop" + loopBranches;
-        String brachEnd = currentBranch + "_end" + endBranches;
-
+        String branchEnd = currentBranch + "_end" + endBranches;
         this.loopBranches++;
         this.endBranches++;
 
-        //Beginning of function:
-        // Visit the condition
+        //Beginning of while
+        // Change branchname and visit the condition
+        currentBranch = branchLoop;
         this.visit(loopStatement.condition);
 
         // Branch based on the condition
-        programWriter.addToOutput(currentBranch, new Command("brf", brachEnd));
+        programWriter.addToOutput(currentBranch, new Command("brf", branchEnd));
 
-        // Create the loop branch and build it
-        currentBranch = branchLoop;
+        // Create the Loop Body
         for(Statement s : loopStatement.body){
             s.accept(this);
         }
 
-        // Visit the condition again to check if the loop can be broken and branch on it
-        this.visit(loopStatement.condition);
-        programWriter.addToOutput(currentBranch, new Command("brt", branchLoop));
+        // We are out of the loop, now branch back to the beginning to check the condition again
+        programWriter.addToOutput(currentBranch, new Command("bra", branchLoop));
 
-        // We are out of the loop
         // Create the end branch and continue building it
-        currentBranch = brachEnd;
+        currentBranch = branchEnd;
+
+        // Ensure that the endBranch exists:
+        programWriter.addToOutput(currentBranch, new Command("nop"));
     }
 
     @Override

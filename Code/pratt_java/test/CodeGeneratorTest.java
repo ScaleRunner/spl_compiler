@@ -1,25 +1,20 @@
-import static org.junit.Assert.*;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-
 import codeGeneration.CodeGenerator;
 import codeGeneration.Command;
 import codeGeneration.CompileException;
 import codeGeneration.ProgramWriter;
 import lexer.Lexer;
 import org.junit.Test;
-
 import parser.Parser;
 import parser.declarations.Declaration;
 import typechecker.Typechecker;
 import util.Node;
 import util.ReadSPL;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class CodeGeneratorTest {
 
@@ -276,6 +271,19 @@ public class CodeGeneratorTest {
     }
 
     @Test
+    public void testSimpleWhile(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simpleWhile.spl");
+
+        String result = runSPL(program, null,true);
+        assertEquals("10", result);
+
+        program = program.replaceAll("Int i = 0;", "Int i = 100;");
+
+        result = runSPL(program, null,false);
+        assertEquals("100", result);
+    }
+
+    @Test
     public void testSingleFunLocalVarDecl(){
         String result = runSPL("main()::->Void{\n" +
                 "Int a = 3+ 2;\n" +
@@ -311,6 +319,19 @@ public class CodeGeneratorTest {
 
         String result = runSPL(program, null,false);
         assertEquals("25", result);
+    }
+
+    @Test
+    public void testSimpleConditional(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simpleConditional.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("amachine halted", result);
+
+        program = program.replaceAll("Int i = 0;", "Int i = 100;");
+
+        result = runSPL(program, null,false);
+        assertEquals("bmachine halted", result);
     }
 
     @Test(expected = CompileException.class)
