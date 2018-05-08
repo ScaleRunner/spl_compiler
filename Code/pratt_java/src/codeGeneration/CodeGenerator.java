@@ -352,6 +352,7 @@ public class CodeGenerator implements Visitor {
      *
      * The program layout should be as such:
      *      func:       ...
+     *                  bra func_loop
      *      func_loop:  ....    |
      *                  ....    |- Here comes the condition check
      *                  ....    |
@@ -383,6 +384,8 @@ public class CodeGenerator implements Visitor {
         String branchEnd = currentBranch + "_end" + endBranches;
         this.loopBranches++;
         this.endBranches++;
+
+        programWriter.addToOutput(currentBranch, new Command("bra", branchLoop));
 
         //Beginning of while
         // Change branchname and visit the condition
