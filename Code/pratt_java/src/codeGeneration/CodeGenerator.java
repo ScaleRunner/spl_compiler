@@ -306,8 +306,6 @@ public class CodeGenerator implements Visitor {
      * func_end branch, but if the condition was false, you would execute the else part and afterwards skip the
      * func_then branch by immediately going to the func_end branch.
      *
-     * TODO: If there would be a nested if, would this nice flowing through the next branch idea break?
-     *
      * @param conditionalStatement: The AST node belonging to a conditionalStatement
      */
     @Override
@@ -370,10 +368,6 @@ public class CodeGenerator implements Visitor {
      * (i.e. skip the body). If the condition was True, the program would just continue into the body of the loop,
      * after this body is done, check the condition again. This time, if the condition is True, repeat the branch
      * func_loop. Otherwise, the program would continue to the branch func_end.
-     *
-     * TODO: If there would be a nested loop, would this nice flowing through the next branch idea break?
-     *      * Maybe not if we would print the func_end{number} in descending order?
-     *      * Meh, we probably have to do hard branching - i.e. if True go to this branch else go to this branch
      *
      * @param loopStatement: the AST Node for the loopStatement
      */

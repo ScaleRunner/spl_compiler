@@ -100,9 +100,6 @@ public class Parser {
         //registerPrefixExpression(TokenType.TOK_OPEN_CURLY, new BlockParselet());
         registerInfixExpression(TokenType.TOK_OPEN_PARENTHESIS, new CallParselet());
 
-        // Register Functions
-        //TODO: read()
-
         // Register Fields
         registerInfixExpression(TokenType.TOK_HD, new PostfixOperatorParselet(Precedence.POSTFIX));
         registerInfixExpression(TokenType.TOK_TL, new PostfixOperatorParselet(Precedence.POSTFIX));
