@@ -464,6 +464,12 @@ public class CodeGenerator implements Visitor {
             this.visit(funStmt);
         }
 
+        if(!d.funName.name.equals("main")) {
+            //TODO: Recursion Fix
+            programWriter.addToOutput(currentBranch, new Command("ajs", "-1"));
+            programWriter.addToOutput(currentBranch, new Command("ret"));
+        }
+
         functionsLocalsEnvironment.put(d.funName.name, currentlocalVariablesPlusOffset);
         functionsArgsEnvironment.put(d.funName.name, currentArgumentsPlusOffsettmp);
 
