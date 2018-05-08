@@ -38,6 +38,7 @@ public class CodeGeneratorTest {
             result = line = br.readLine();
             if (debug) {
                 do {
+                    result = result + line;
                     System.out.println(line);
                 } while ((line = br.readLine()) != null);
             }
@@ -332,6 +333,14 @@ public class CodeGeneratorTest {
 
         result = runSPL(program, null,false);
         assertEquals("bmachine halted", result);
+    }
+
+    @Test
+    public void nested_while_if(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/print_numbers_up_to.spl");
+
+        String result = runSPL(program, null,true);
+        assertEquals("001234567888machine halted", result);
     }
 
     @Test(expected = CompileException.class)
