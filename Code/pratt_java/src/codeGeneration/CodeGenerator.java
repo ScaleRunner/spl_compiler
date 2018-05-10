@@ -111,7 +111,7 @@ public class CodeGenerator implements Visitor {
         }
         currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(e.function_name.name);
         programWriter.addToOutput(currentBranch, new Command("bsr", e.function_name.name));
-        //TODO:FIGURE OUT WHY THIS IS HERE
+
         //REASON: restore old MP
         programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-1)));
 
@@ -121,20 +121,6 @@ public class CodeGenerator implements Visitor {
         //adjust SP
         //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
         programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
-
-        //after funcall was visitted makes SP point to saved old MP
-
-//        programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
-//        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(e.args.size())));
-//        programWriter.addToOutput(currentBranch, new Command("sub"));
-        //TODO:FIGURE OUT WHY THIS IS HERE
-        //REASON: restore old MP
-        //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-1)));
-
-        //programWriter.addToOutput(currentBranch, new Command("str", "SP"));
-        //stores old MP in MP
-        //programWriter.addToOutput(currentBranch, new Command("str", "MP"));
-
 
     }
 
@@ -161,7 +147,10 @@ public class CodeGenerator implements Visitor {
                 //-1 to go over return address;
             }
             else if (!lsideIdentifier && GlobalVariablesPlusOffset.get(e.name) != null){
-                programWriter.addToOutput(currentBranch, new Command("ldl", Integer.toString(GlobalVariablesPlusOffset.get(e.name)))); //Loads value from address
+                //loads register that points to first variable
+                programWriter.addToOutput(currentBranch, new Command("ldr", "R5")); //Loads value from address
+
+                programWriter.addToOutput(currentBranch, new Command("lda", Integer.toString(GlobalVariablesPlusOffset.get(e.name)))); //Loads value from address
             }
 
         }
@@ -312,7 +301,6 @@ public class CodeGenerator implements Visitor {
         }
         currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(s.function_name.name);
         programWriter.addToOutput(currentBranch, new Command("bsr", s.function_name.name));
-        //TODO:FIGURE OUT WHY THIS IS HERE
         //REASON: restore old MP
         programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-1)));
 
@@ -517,7 +505,7 @@ public class CodeGenerator implements Visitor {
         }
 
         if(!d.funName.name.equals("main")) {
-            //TODO: Recursion Fix
+            //Fixed recursion
             programWriter.addToOutput(currentBranch, new Command("ajs", "-1"));
             programWriter.addToOutput(currentBranch, new Command("ret"));
         }

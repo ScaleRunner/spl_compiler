@@ -328,7 +328,7 @@ public class CodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/simple.spl");
 
         String result = runSPL(program, null,false);
-        assertEquals("25", result);
+        assertEquals("15", result);
     }
 
     @Test
