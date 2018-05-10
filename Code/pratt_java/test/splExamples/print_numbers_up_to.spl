@@ -1,0 +1,51 @@
+print_numbers_up_to(i):: Int -> Void{
+/* Print all numbers up to n
+*/
+    Int n = 0;
+    while(n <= i){
+        if(n >= 4){                 // 4-8
+            if(n > 6){              // 7-8
+                if(n < 8){                  // 7
+                    print(7);
+                } else {                    // 8
+                    print(8);
+                }
+            } else {                // 4-6
+                if(n < 5){                  // 4
+                    print(4);
+                } else {            // 5-6
+                    if(n == 5){             // 5
+                        print(5);
+                    } else {                // 6
+                        print(6);
+                    }
+                }
+            }
+        } else {                    // 0-4
+            if(n <= 2){             // 0-2
+                if(n < 1){                  // 0
+                    print(0);
+                } else {            //1-2
+                    if(n != 1){
+                        print(2);           // 2
+                    } else {
+                        print(1);           // 1
+                    }
+                }
+            } else {                // 3-4
+                if(n < 4){
+                    print(3);               // 3
+                } else {
+                    print(4);               // 4
+                }
+            }
+        }
+
+        n = n + 1;
+    }
+}
+
+main()::->Void{
+    Int i = 10;
+    print_numbers_up_to(i);
+}

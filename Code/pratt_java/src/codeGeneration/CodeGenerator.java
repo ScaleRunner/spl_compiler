@@ -352,8 +352,6 @@ public class CodeGenerator implements Visitor {
      * func_end branch, but if the condition was false, you would execute the else part and afterwards skip the
      * func_then branch by immediately going to the func_end branch.
      *
-     * TODO: If there would be a nested if, would this nice flowing through the next branch idea break?
-     *
      * @param conditionalStatement: The AST node belonging to a conditionalStatement
      */
     @Override
@@ -398,6 +396,7 @@ public class CodeGenerator implements Visitor {
      *
      * The program layout should be as such:
      *      func:       ...
+     *                  bra func_loop
      *      func_loop:  ....    |
      *                  ....    |- Here comes the condition check
      *                  ....    |
@@ -416,10 +415,6 @@ public class CodeGenerator implements Visitor {
      * after this body is done, check the condition again. This time, if the condition is True, repeat the branch
      * func_loop. Otherwise, the program would continue to the branch func_end.
      *
-     * TODO: If there would be a nested loop, would this nice flowing through the next branch idea break?
-     *      * Maybe not if we would print the func_end{number} in descending order?
-     *      * Meh, we probably have to do hard branching - i.e. if True go to this branch else go to this branch
-     *
      * @param loopStatement: the AST Node for the loopStatement
      */
     @Override
@@ -429,6 +424,8 @@ public class CodeGenerator implements Visitor {
         String branchEnd = currentBranch + "_end" + endBranches;
         this.loopBranches++;
         this.endBranches++;
+
+        programWriter.addToOutput(currentBranch, new Command("bra", branchLoop));
 
         //Beginning of while
         // Change branchname and visit the condition
@@ -517,6 +514,12 @@ public class CodeGenerator implements Visitor {
         }
         for(Statement funStmt : d.stats){
             this.visit(funStmt);
+        }
+
+        if(!d.funName.name.equals("main")) {
+            //TODO: Recursion Fix
+            programWriter.addToOutput(currentBranch, new Command("ajs", "-1"));
+            programWriter.addToOutput(currentBranch, new Command("ret"));
         }
 
         functionsLocalsEnvironment.put(d.funName.name, currentlocalVariablesPlusOffset);
