@@ -382,5 +382,27 @@ public class CodeGeneratorTest {
         assertEquals("2", result);
     }
 
+    @Test
+    public void testSimpleTuple(){
+        String result = runSPL("(Int, Char) a =  (1,'a');\n" +
+                "main()::->Void{\n" +
+                "print(2);\n" +
+                "}", null,false);
+        assertEquals("2", result);
+    }
+
+    @Test
+    public void testTupleWithLists(){
+        String result = runSPL("[Int] a = 1:2:3:[];\n" +
+                "[Int] b = 3:4:5:[];\n" +
+                "[[Int]] c = a:b;\n" +
+                "main()::->Void{\n" +
+                "[Char] d = 'a':'b':'c':[];\n" +
+                "([[Int]],[Char]) e = (c, d);\n"+
+                "print(2);\n" +
+                "}", null,false);
+        assertEquals("2", result);
+    }
+
 
 }

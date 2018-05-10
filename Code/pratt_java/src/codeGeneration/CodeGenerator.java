@@ -260,6 +260,11 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(TupleExpression e) {
+        this.visit(e.left);
+        this.visit(e.right);
+        programWriter.addToOutput(currentBranch, new Command("stmh","2"));
+        programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
+        programWriter.addToOutput(currentBranch, new Command("sub"));
 
     }
 
