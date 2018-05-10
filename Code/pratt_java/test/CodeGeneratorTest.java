@@ -370,5 +370,17 @@ public class CodeGeneratorTest {
         assertEquals("2", result);
     }
 
+    @Test
+    public void testListsWithIdentfiers(){
+        String result = runSPL("[Int] a = 1:2:3:[];\n" +
+                "main()::->Void{\n" +
+                "[Int] b = 3:4:5:[];\n" +
+                "[[Int]] c = a:b;\n" +
+
+                "print(2);\n" +
+                "}", null,false);
+        assertEquals("2", result);
+    }
+
 
 }
