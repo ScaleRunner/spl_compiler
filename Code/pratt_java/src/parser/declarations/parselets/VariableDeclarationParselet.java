@@ -11,7 +11,7 @@ import parser.declarations.VariableDeclaration;
 
 public class VariableDeclarationParselet {
 
-    public VariableDeclaration parse(Parser parser,  Token token) {
+    public VariableDeclaration parse(Parser parser,  Token token, boolean isGlobal) {
         Type varType = new TypeParselet().parse(parser, token);
 
         if(parser.lookAhead(0).getType() != TokenType.TOK_IDENTIFIER)
@@ -25,7 +25,7 @@ public class VariableDeclarationParselet {
         Expression right = parser.parseExpression();
 
         if(parser.match(TokenType.TOK_EOL))
-            return new VariableDeclaration(varType,left, right);
+            return new VariableDeclaration(varType,left, right, isGlobal);
 
         throw new ParseException(parser, "Missing ';' at the end of the line.");
     }

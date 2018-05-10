@@ -896,7 +896,7 @@ public class ParserTest {
                                             TokenType.TOK_MULT,
                                             new IntegerExpression(2)
                                     )
-                            )
+                            ),true
                         )
                     );
         assertEquals(result, actual);
@@ -1034,8 +1034,8 @@ public class ParserTest {
         args.add(new IdentifierExpression("a"));
         args.add(new IdentifierExpression("b"));
 
-        decls.add(new VariableDeclaration(Types.intType, new IdentifierExpression("c"), new IntegerExpression(0) ));
-        decls.add(new VariableDeclaration(Types.varType(),new IdentifierExpression("useless"), new IntegerExpression(2) ));
+        decls.add(new VariableDeclaration(Types.intType, new IdentifierExpression("c"), new IntegerExpression(0), false ));
+        decls.add(new VariableDeclaration(Types.varType(),new IdentifierExpression("useless"), new IntegerExpression(2), false ));
 
 
         stats.add(new AssignStatement(

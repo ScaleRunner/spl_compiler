@@ -12,11 +12,13 @@ public class VariableDeclaration extends Declaration{
     public Type varType;
     public final IdentifierExpression left;
     public final Expression right;
+    public final boolean isGlobal;
 
-    public VariableDeclaration(Type varType, IdentifierExpression name, Expression right) {
+    public VariableDeclaration(Type varType, IdentifierExpression name, Expression right, boolean isGlobal) {
         this.varType = varType;
         this.left = name;
         this.right = right;
+        this.isGlobal = isGlobal;
     }
 
     @Override

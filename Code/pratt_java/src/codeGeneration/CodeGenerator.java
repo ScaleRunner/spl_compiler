@@ -11,6 +11,7 @@ import util.Node;
 import util.Visitor;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,16 +36,18 @@ public class CodeGenerator implements Visitor {
     //Or rhs (load from MP + offset);
     private boolean lsideIdentifier = false;
     private int localVariableDeclarationOffset;
+    private int globalVariableDeclarationOffset = 0;
 
+    boolean isFirstGlobalVariable = false;
 
     private HashMap<String, Integer> currentArgumentsPlusOffsettmp = new HashMap<>();
 
     private HashMap<String, Integer> currentlocalVariablesPlusOffset = new HashMap<>();
+    private HashMap<String, Integer> GlobalVariablesPlusOffset = new HashMap<>();
 
     private HashMap<String, HashMap<String, Integer>> functionsLocalsEnvironment = new HashMap<>();
     private HashMap<String, HashMap<String, Integer>> functionsArgsEnvironment = new HashMap<>();
-    //need to work on it later
-    private HashMap<String, Integer> argsPlusOffset = new HashMap<>();
+    int numberOfGlobals = 0;
 
 
     public CodeGenerator(String filepath) {
@@ -52,8 +55,21 @@ public class CodeGenerator implements Visitor {
     }
 
     public void generateCode(List<Declaration> nodes, Command postamble) throws FileNotFoundException {
+
+        for(Node n : nodes){
+            if(n instanceof VariableDeclaration)
+                if(((VariableDeclaration) n).isGlobal)
+                    numberOfGlobals++;
+        }
+
+        if(numberOfGlobals > 0)
+            isFirstGlobalVariable = true;
+
         for(Node n : nodes){
             n.accept(this);
+            if(n instanceof VariableDeclaration)
+                if(((VariableDeclaration) n).isGlobal)
+                    numberOfGlobals++;
         }
 
         if (postamble != null) {
@@ -95,17 +111,29 @@ public class CodeGenerator implements Visitor {
         }
         currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(e.function_name.name);
         programWriter.addToOutput(currentBranch, new Command("bsr", e.function_name.name));
+        //TODO:FIGURE OUT WHY THIS IS HERE
+        //REASON: restore old MP
+        programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-1)));
+
+        //programWriter.addToOutput(currentBranch, new Command("str", "SP"));
+        //stores old MP in MP
+        programWriter.addToOutput(currentBranch, new Command("str", "MP"));
+        //adjust SP
+        //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
+        programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
 
         //after funcall was visitted makes SP point to saved old MP
 
 //        programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
 //        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(e.args.size())));
 //        programWriter.addToOutput(currentBranch, new Command("sub"));
-        programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
+        //TODO:FIGURE OUT WHY THIS IS HERE
+        //REASON: restore old MP
+        //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-1)));
 
         //programWriter.addToOutput(currentBranch, new Command("str", "SP"));
         //stores old MP in MP
-        programWriter.addToOutput(currentBranch, new Command("str", "MP"));
+        //programWriter.addToOutput(currentBranch, new Command("str", "MP"));
 
 
     }
@@ -131,6 +159,9 @@ public class CodeGenerator implements Visitor {
                 Integer offset = -currentArgumentsPlusOffsettmp.size() +currentArgumentsPlusOffsettmp.get(e.name)  ;
                 programWriter.addToOutput(currentBranch, new Command("ldl",  (Integer.toString(offset - 1)))); //Loads value from add
                 //-1 to go over return address;
+            }
+            else if (!lsideIdentifier && GlobalVariablesPlusOffset.get(e.name) != null){
+                programWriter.addToOutput(currentBranch, new Command("ldl", Integer.toString(GlobalVariablesPlusOffset.get(e.name)))); //Loads value from address
             }
 
         }
@@ -245,37 +276,52 @@ public class CodeGenerator implements Visitor {
 
         //Check this later for 1 = 1;
         String name = ((IdentifierExpression) s.name).name;
+//        if(s.name instanceof IdentifierExpression){
+//            if(GlobalVariablesPlusOffset.get(name)!= null){
+//                //Load address of first global variable
+//
+//            }
+//        }
 
+
+        //Value is put on the stack
         this.visit(s.right);
-        if(s.right instanceof CallExpression ){
-            programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
+//        if(s.right instanceof CallExpression ){
+//            programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
+//        }
+        if(s.name instanceof IdentifierExpression){
+            if(GlobalVariablesPlusOffset.get(name)!= null){
+                //programWriter.addToOutput(currentBranch, new Command("ldr", "R5"));
+                //After value to be store is put in the stack we store it
+                programWriter.addToOutput(currentBranch, new Command("ldr", "R5"));
+                programWriter.addToOutput(currentBranch, new Command("sta", Integer.toString(GlobalVariablesPlusOffset.get(name))));
+            }
+            else
+                programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
         }
-        programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
     }
 
     @Override
     public void visit(CallStatement s) {
-    int i = 0;
-    currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(s.function_name.name);
-    //SAVES previous MP
+        //SAVES previous MP
         //saves MP before putting arguments on stack
         programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
 
         for(Expression arg : s.args){
             this.visit(arg);
         }
-        if(currentArgumentsPlusOffsettmp.size() != 0){
-            functionsArgsEnvironment.put(s.function_name.name, currentArgumentsPlusOffsettmp);
-        }
+        currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(s.function_name.name);
         programWriter.addToOutput(currentBranch, new Command("bsr", s.function_name.name));
+        //TODO:FIGURE OUT WHY THIS IS HERE
+        //REASON: restore old MP
+        programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-1)));
 
-        //after funcall was visitted makes SP point to saved old MP
-        programWriter.addToOutput(currentBranch, new Command("ldr", "SP"));
-        programWriter.addToOutput(currentBranch, new Command("ldc", Integer.toString(s.args.size())));
-        programWriter.addToOutput(currentBranch, new Command("sub"));
-        programWriter.addToOutput(currentBranch, new Command("str", "SP"));
+        //programWriter.addToOutput(currentBranch, new Command("str", "SP"));
         //stores old MP in MP
         programWriter.addToOutput(currentBranch, new Command("str", "MP"));
+        //adjust SP
+        //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
+        programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
     }
 
     /**
@@ -421,9 +467,7 @@ public class CodeGenerator implements Visitor {
         if(s.arg != null)
             this.visit(s.arg);
         if(!currentBranch.equals("main")){
-            if(s.arg instanceof CallExpression)
-                programWriter.addToOutput(currentBranch, new Command("ldr",  "RR"));
-            else
+            if(! (s.arg instanceof CallExpression))
                 programWriter.addToOutput(currentBranch, new Command("str", "RR"));
             programWriter.addToOutput(currentBranch, new Command("unlink"));
             programWriter.addToOutput(currentBranch, new Command("ret"));
@@ -441,6 +485,7 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(FunctionDeclaration d) {
         // Reset the number of branches in this function
+
         this.thenBranches = 0;
         this.loopBranches = 0;
         this.endBranches = 0;
@@ -457,6 +502,13 @@ public class CodeGenerator implements Visitor {
 //            programWriter.addToOutput(currentBranch, new Command("str", "RR"));
         if(d.decls.size() != 0)
             programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(d.decls.size()-1)));
+        else{
+            programWriter.addToOutput(currentBranch, new Command("link", "0"));
+//            programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
+//            programWriter.addToOutput(currentBranch, new Command("add"));
+            //programWriter.addToOutput(currentBranch, new Command("str", "MP"));
+        }
+
 
         for(Declaration varDec : d.decls){
             localVariableDeclarationOffset = i;
@@ -474,12 +526,30 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(VariableDeclaration d) {
+
+        if(isFirstGlobalVariable){
+            programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(numberOfGlobals-1)));
+            programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
+            programWriter.addToOutput(currentBranch, new Command("str", "R5"));
+            isFirstGlobalVariable = false;
+        }
+
         lsideIdentifier = true;
         this.visit(d.left);
         lsideIdentifier = false;
         this.visit(d.right);
-        programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(localVariableDeclarationOffset)));
-        currentlocalVariablesPlusOffset.put(d.left.name, localVariableDeclarationOffset);
+        if(d.isGlobal){
+
+
+            programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(globalVariableDeclarationOffset)));
+            GlobalVariablesPlusOffset.put(d.left.name, globalVariableDeclarationOffset);
+            globalVariableDeclarationOffset++;
+
+        }
+        else{
+            programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(localVariableDeclarationOffset)));
+            currentlocalVariablesPlusOffset.put(d.left.name, localVariableDeclarationOffset);
+        }
     }
 
 }

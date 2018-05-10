@@ -94,7 +94,7 @@ public class FunctionDeclarationParselet {
 
                             //if (prefix == null) throw new ParseException(this, token);
 
-                            funVarDecl.add(new VariableDeclarationParselet().parse(parser, parser.consume()));
+                            funVarDecl.add(new VariableDeclarationParselet().parse(parser, parser.consume(), false));
                         }
                         stats = parser.parseBlock();
                         if(stats.size() > 0){

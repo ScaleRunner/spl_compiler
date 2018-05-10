@@ -146,7 +146,8 @@ public class Parser {
                 token.getType() == TokenType.TOK_OPEN_BRACKETS ||
                 token.getType() == TokenType.TOK_OPEN_PARENTHESIS) {
 
-            return new VariableDeclarationParselet().parse(this, token);
+            //Assuming this only works for global, isGlobal should be true;
+            return new VariableDeclarationParselet().parse(this, token, true);
         }
 
         // Function declaration
