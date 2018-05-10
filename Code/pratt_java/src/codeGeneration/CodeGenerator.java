@@ -168,6 +168,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ListExpression e) {
+        //Empty list is null represented by 0
+        programWriter.addToOutput(currentBranch, new Command("ldc", "0"));
+        //programWriter.addToOutput(currentBranch, new Command("sth"));
 
     }
 
@@ -219,6 +222,11 @@ public class CodeGenerator implements Visitor {
                 break;
             case TOK_GEQ:
                 programWriter.addToOutput(currentBranch, new Command("ge"));
+                break;
+            case TOK_CONS:
+                programWriter.addToOutput(currentBranch, new Command("stmh", "2"));
+                programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
+                programWriter.addToOutput(currentBranch, new Command("sub"));
                 break;
 
             default:

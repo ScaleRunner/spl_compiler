@@ -286,6 +286,8 @@ public class TypecheckerTest {
 		}
 	}
 
+
+
     @Test
     public void testEmptyReturn() {
         Node e = typecheckStmt("return;");

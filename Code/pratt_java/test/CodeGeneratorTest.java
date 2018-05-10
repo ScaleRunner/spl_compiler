@@ -304,6 +304,8 @@ public class CodeGeneratorTest {
         assertEquals("5", result);
     }
 
+
+    //TODO: Actually test Factorial imperative
     @Test
     public void FactorialImperative(){
         String result = runSPL("main()::->Void{\n" +
@@ -358,5 +360,15 @@ public class CodeGeneratorTest {
 
         runSPL(program, null,false);
     }
+    @Test
+    public void testSimpleList(){
+        String result = runSPL("[Int] a = 1:2:3:[];\n" +
+                "main()::->Void{\n" +
+
+                "print(2);\n" +
+                "}", null,false);
+        assertEquals("2", result);
+    }
+
 
 }
