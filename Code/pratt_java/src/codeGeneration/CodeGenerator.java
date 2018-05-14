@@ -255,11 +255,11 @@ public class CodeGenerator implements Visitor {
             programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
         }
         else if(e.operator == TokenType.TOK_HD){
-
+            programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
             //programWriter.addToOutput(currentBranch, new Command("not"));
         }
         else if(e.operator == TokenType.TOK_TL){
-            //programWriter.addToOutput(currentBranch, new Command("not"));
+            programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
         }
 
     }

@@ -416,6 +416,7 @@ public class CodeGeneratorTest {
                 "([Int],[Char]) e = (b, l);\n"+
                 "[Int] f = e.fst;\n"+
                 "d = e.snd;\n"+
+                "f = b.tl;\n"+
                 "print(2);\n" +
                 "}", null,false);
         assertEquals("2", result);
