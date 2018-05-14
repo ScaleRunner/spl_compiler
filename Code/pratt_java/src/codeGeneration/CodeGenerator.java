@@ -7,6 +7,8 @@ import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import parser.types.CharType;
+import parser.types.FunType;
+import parser.types.Type;
 import util.Node;
 import util.Visitor;
 
@@ -49,6 +51,8 @@ public class CodeGenerator implements Visitor {
     private HashMap<String, HashMap<String, Integer>> functionsArgsEnvironment = new HashMap<>();
     int numberOfGlobals = 0;
 
+    private HashMap<String, Type> functionTypes = new HashMap<>();
+
 
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath);
@@ -60,6 +64,9 @@ public class CodeGenerator implements Visitor {
             if(n instanceof VariableDeclaration)
                 if(((VariableDeclaration) n).isGlobal)
                     numberOfGlobals++;
+            if(n instanceof FunctionDeclaration){
+                functionTypes.put(((FunctionDeclaration) n).funName.name, ((FunctionDeclaration) n).funType.returnType);
+            }
         }
 
         if(numberOfGlobals > 0)
@@ -120,7 +127,10 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(currentBranch, new Command("str", "MP"));
         //adjust SP
         //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
-        programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
+
+        //Only loads result from call if function is not void
+        if(functionTypes.get(e.function_name.name) != null)
+            programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
 
     }
 
@@ -236,6 +246,21 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PostfixExpression e) {
+        this.visit(e.left);
+        if(e.operator == TokenType.TOK_FST){
+            programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
+
+        }
+        else if(e.operator == TokenType.TOK_SND){
+            programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+        }
+        else if(e.operator == TokenType.TOK_HD){
+
+            //programWriter.addToOutput(currentBranch, new Command("not"));
+        }
+        else if(e.operator == TokenType.TOK_TL){
+            //programWriter.addToOutput(currentBranch, new Command("not"));
+        }
 
     }
 
@@ -465,7 +490,7 @@ public class CodeGenerator implements Visitor {
         if(s.arg != null)
             this.visit(s.arg);
         if(!currentBranch.equals("main")){
-            if(! (s.arg instanceof CallExpression))
+            if(!(s.arg instanceof CallExpression))
                 programWriter.addToOutput(currentBranch, new Command("str", "RR"));
             programWriter.addToOutput(currentBranch, new Command("unlink"));
             programWriter.addToOutput(currentBranch, new Command("ret"));

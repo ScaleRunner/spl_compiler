@@ -284,7 +284,8 @@ public class CodeGeneratorTest {
     public void testSimpleWhile(){
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/simpleWhile.spl");
 
-        String result = runSPL(program, null,true);
+
+        String result = runSPL(program, null,false);
         assertEquals("10", result);
 
         program = program.replaceAll("Int i = 0;", "Int i = 100;");
@@ -403,6 +404,24 @@ public class CodeGeneratorTest {
                 "}", null,false);
         assertEquals("2", result);
     }
+
+    @Test
+    public void testTupleFstSnd(){
+        String result = runSPL("[Int] a = 1:2:3:[];\n" +
+                "[Int] b = 3:4:5:[];\n" +
+                "[[Int]] c = a:b;\n" +
+                "[Char] l = 'd':'e':'f':[];\n" +
+                "main()::->Void{\n" +
+                "[Char] d = 'a':'b':'c':[];\n" +
+                "([Int],[Char]) e = (b, l);\n"+
+                "[Int] f = e.fst;\n"+
+                "d = e.snd;\n"+
+                "print(2);\n" +
+                "}", null,false);
+        assertEquals("2", result);
+    }
+
+
 
 
 }
