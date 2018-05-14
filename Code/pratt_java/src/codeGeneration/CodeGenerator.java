@@ -7,13 +7,12 @@ import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import parser.types.CharType;
-import parser.types.FunType;
+import parser.types.ListType;
 import parser.types.Type;
 import util.Node;
 import util.Visitor;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,7 +35,8 @@ public class CodeGenerator implements Visitor {
 
     //Controls what to do if identifier is in lhs of Assignment (stl)
     //Or rhs (load from MP + offset);
-    private boolean lsideIdentifier = false;
+    private boolean leftsideVarDeclaration = false;
+    private boolean leftsideAssignment = false;
     private int localVariableDeclarationOffset;
     private int globalVariableDeclarationOffset = 0;
 
@@ -145,21 +145,21 @@ public class CodeGenerator implements Visitor {
         if(functionsLocalsEnvironment.get(currentBranch) != null)
             currentlocalVariablesPlusOffset = functionsLocalsEnvironment.get(currentBranch);
         if(currentlocalVariablesPlusOffset != null) {
-            if (!lsideIdentifier && (currentlocalVariablesPlusOffset.get(e.name) != null)) {
+            if (!leftsideVarDeclaration && (currentlocalVariablesPlusOffset.get(e.name) != null)) {
                 programWriter.addToOutput(currentBranch, new Command("ldl", Integer.toString(currentlocalVariablesPlusOffset.get(e.name)))); //Loads value from address
             }
             //we assume it's an argument
-            else if (!lsideIdentifier && currentArgumentsPlusOffsettmp.get(e.name) != null) {
+            else if (!leftsideVarDeclaration && currentArgumentsPlusOffsettmp.get(e.name) != null) {
                 //first arguments have higher offset;
                                     //2                                   1
-                Integer offset = -currentArgumentsPlusOffsettmp.size() +currentArgumentsPlusOffsettmp.get(e.name)  ;
-                programWriter.addToOutput(currentBranch, new Command("ldl",  (Integer.toString(offset - 1)))); //Loads value from add
+                Integer offset = -currentArgumentsPlusOffsettmp.size() + currentArgumentsPlusOffsettmp.get(e.name);
+                programWriter.addToOutput(currentBranch, new Command("ldl", (Integer.toString(offset - 1)))); //Loads value from add
+
                 //-1 to go over return address;
             }
-            else if (!lsideIdentifier && GlobalVariablesPlusOffset.get(e.name) != null){
+            else if (!leftsideVarDeclaration && GlobalVariablesPlusOffset.get(e.name) != null){
                 //loads register that points to first variable
                 programWriter.addToOutput(currentBranch, new Command("ldr", "R5")); //Loads value from address
-
                 programWriter.addToOutput(currentBranch, new Command("lda", Integer.toString(GlobalVariablesPlusOffset.get(e.name)))); //Loads value from address
             }
 
@@ -246,20 +246,40 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PostfixExpression e) {
-        this.visit(e.left);
-        if(e.operator == TokenType.TOK_FST){
-            programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
 
+        this.visit(e.left);
+        if(!leftsideVarDeclaration ){
+
+            if(e.operator == TokenType.TOK_FST){
+                programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
+
+            }
+            else if(e.operator == TokenType.TOK_SND){
+                programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+            }
+            //The big question here is:
+            //All the rest of the things work using reference
+            //For head however, a copy is needed.
+            else if(e.operator == TokenType.TOK_HD){
+
+                programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
+                //If type of list is also a list, we need to put the head on the heap pointing to null
+                if(!leftsideVarDeclaration && !leftsideAssignment){
+
+                    if( ((ListType) e.left.getType()).listType instanceof ListType) {
+                        programWriter.addToOutput(currentBranch, new Command("lda", "0"));
+                        programWriter.addToOutput(currentBranch, new Command("ldc", "0"));
+                        programWriter.addToOutput(currentBranch, new Command("stmh", "2"));
+                    }
+                }
+                //programWriter.addToOutput(currentBranch, new Command("not"));
+            }
+            else if(e.operator == TokenType.TOK_TL){
+                programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+            }
         }
-        else if(e.operator == TokenType.TOK_SND){
-            programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
-        }
-        else if(e.operator == TokenType.TOK_HD){
-            programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
-            //programWriter.addToOutput(currentBranch, new Command("not"));
-        }
-        else if(e.operator == TokenType.TOK_TL){
-            programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+        else{
+
         }
 
     }
@@ -301,8 +321,9 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(AssignStatement s) {
 
-        //Check this later for 1 = 1;
-        String name = ((IdentifierExpression) s.name).name;
+        leftsideAssignment = true;
+        leftsideVarDeclaration = true;
+        this.visit(s.name);
 //        if(s.name instanceof IdentifierExpression){
 //            if(GlobalVariablesPlusOffset.get(name)!= null){
 //                //Load address of first global variable
@@ -312,11 +333,14 @@ public class CodeGenerator implements Visitor {
 
 
         //Value is put on the stack
+        leftsideAssignment = false;
+        leftsideVarDeclaration = false;
         this.visit(s.right);
 //        if(s.right instanceof CallExpression ){
 //            programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
 //        }
         if(s.name instanceof IdentifierExpression){
+            String name = ((IdentifierExpression) s.name).name;
             if(GlobalVariablesPlusOffset.get(name)!= null){
                 //programWriter.addToOutput(currentBranch, new Command("ldr", "R5"));
                 //After value to be store is put in the stack we store it
@@ -326,6 +350,14 @@ public class CodeGenerator implements Visitor {
             else
                 programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
         }
+        if(s.name instanceof PostfixExpression){
+            programWriter.addToOutput(currentBranch, new Command("swp"));
+            programWriter.addToOutput(currentBranch, new Command("sta", "0"));
+
+        }
+
+
+
     }
 
     @Override
@@ -563,9 +595,9 @@ public class CodeGenerator implements Visitor {
             isFirstGlobalVariable = false;
         }
 
-        lsideIdentifier = true;
+        leftsideVarDeclaration = true;
         this.visit(d.left);
-        lsideIdentifier = false;
+        leftsideVarDeclaration = false;
         this.visit(d.right);
         if(d.isGlobal){
 

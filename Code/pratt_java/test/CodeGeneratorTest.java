@@ -406,7 +406,7 @@ public class CodeGeneratorTest {
     }
 
     @Test
-    public void testTupleFstSnd(){
+    public void testTupleFstSndTL(){
         String result = runSPL("[Int] a = 1:2:3:[];\n" +
                 "[Int] b = 3:4:5:[];\n" +
                 "[[Int]] c = a:b;\n" +
@@ -422,6 +422,19 @@ public class CodeGeneratorTest {
         assertEquals("2", result);
     }
 
+    @Test
+    public void testListTLandHD(){
+        String result = runSPL("[Int] a = 1:2:3:[];\n" +
+                "[Int] b = 3:4:5:[];\n" +
+                "[[Int]] c = a:b;\n" +
+                //"[Char] l = 'd':'e':'f':[];\n" +
+                "main()::->Void{\n" +
+                //"[Char] d = 'a':'b':'c':[];\n"+
+                "b.tl.tl = a.tl;\n"+
+                "print(2);\n" +
+                "}", null,false);
+        assertEquals("2", result);
+    }
 
 
 

@@ -390,7 +390,11 @@ public class Typechecker implements Visitor {
 		//need a different check, due to id.field.
 		else if(s.name.getClass() == PostfixExpression.class){
 			this.visit((PostfixExpression)s.name);
-			if(!s.name.getType().equals(s.right.getType()))
+			if(s.name.getType() == null){
+				error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
+						s.right.getType(), s.name , s.name.getType(), s.right.getType()),s);
+			}
+			else if(!s.name.getType().equals(s.right.getType()))
 				error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
 						s.right.getType(), s.name , s.name.getType(), s.right.getType()),s);
 			s.setType(Types.voidType);
