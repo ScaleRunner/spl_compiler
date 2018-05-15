@@ -1,0 +1,5 @@
+main()::->Void
+{
+    [Int] empty = [];
+    print(isEmpty(empty));
+}

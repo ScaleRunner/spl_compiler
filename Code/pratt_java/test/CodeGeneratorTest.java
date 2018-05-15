@@ -351,6 +351,31 @@ public class CodeGeneratorTest {
         assertEquals("001234567888machine halted", result);
     }
 
+    @Test
+    public void test_empty(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/is_empty.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("-1", result);
+
+        String program2 = program.replaceAll("\\[Int] empty = \\[];", "[Int] empty = 1 : 2 : 3 : [];");
+
+        result = runSPL(program2, null,false);
+        assertEquals("0", result);
+
+
+        String program3 = program.replaceAll("\\[Int] empty = \\[];", "[Int] empty = 0 : [];");
+
+        result = runSPL(program3, null,false);
+        assertEquals("0", result);
+
+
+        String program4 = program.replaceAll("\\[Int] empty = \\[];", "[[Int]] empty = [] : [];");
+
+        result = runSPL(program4, null,false);
+        assertEquals("0", result);
+    }
+
     @Test(expected = CompileException.class)
     public void testNoMain(){
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/no_main.spl");
