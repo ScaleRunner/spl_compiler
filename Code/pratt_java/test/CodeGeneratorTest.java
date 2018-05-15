@@ -480,6 +480,14 @@ public class CodeGeneratorTest {
     }
 
     @Test
+    public void testSimpleFunctionList(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/listFunction.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("15", result);
+    }
+
+    @Test
     public void testAllTestsByMarkus() {
         Long sleepTime = 50L;
         try (Stream<Path> paths = Files.walk(Paths.get("./test/splExamples/markus/3-ok"))) {

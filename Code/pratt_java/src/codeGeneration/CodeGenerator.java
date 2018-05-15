@@ -274,9 +274,13 @@ public class CodeGenerator implements Visitor {
                 //If type of list is also a list, we need to put the head on the heap pointing to null
                 //programWriter.addToOutput(currentBranch, new Command("not"));
             } else if (e.operator == TokenType.TOK_TL) {
-//                programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
-//                programWriter.addToOutput(currentBranch, new Command("add"));
-                programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+                if(leftsideAssignment){
+                    programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
+                    programWriter.addToOutput(currentBranch, new Command("add"));
+                    programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
+                }
+                else
+                    programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
 
             }
         }
@@ -323,10 +327,13 @@ public class CodeGenerator implements Visitor {
         if(s.name instanceof IdentifierExpression)
             leftsideVarDeclaration = true;
             //leftsideAssignment = true;
-
+        leftsideAssignment = true;
         this.visit(s.name);
+        leftsideAssignment = false;
         if(s.name instanceof IdentifierExpression)
             leftsideVarDeclaration = false;
+        if(s.name instanceof PostfixExpression)
+            programWriter.removeLastCommand(currentBranch);
 //        if(s.name instanceof IdentifierExpression){
 //            if(GlobalVariablesPlusOffset.get(name)!= null){
 //                //Load address of first global variable

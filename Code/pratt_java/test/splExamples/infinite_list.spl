@@ -4,7 +4,7 @@ main()::->Void
     Int n = 10;
     var res = a;
     
-    a.tl.tl = a;
+    a.tl.tl.tl = a;
     
     while(n > 0){
         print(res.hd);
