@@ -1,0 +1,16 @@
+facI (n) :: Int -> Int {
+    var sum = 1;
+    while(n >= 1){
+        sum = sum * n;
+        n = n - 1;
+    }
+    return sum;
+}
+
+main()::->Void
+{
+    Int i = 5;
+    Int result = facI(i);
+    // result: 120
+    print(result);
+}

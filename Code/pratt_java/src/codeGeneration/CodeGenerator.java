@@ -353,7 +353,6 @@ public class CodeGenerator implements Visitor {
         if(s.name instanceof PostfixExpression){
             programWriter.addToOutput(currentBranch, new Command("swp"));
             programWriter.addToOutput(currentBranch, new Command("sta", "0"));
-
         }
 
 

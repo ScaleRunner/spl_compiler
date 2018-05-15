@@ -306,16 +306,12 @@ public class CodeGeneratorTest {
     }
 
 
-    //TODO: Actually test Factorial imperative
     @Test
     public void FactorialImperative(){
-        String result = runSPL("main()::->Void{\n" +
-                "Int a = 3+ 2;\n" +
-                "Int b = 5+ 3;\n" +
-                "Int c = b;\n" +
-                "print(a);\n" +
-                "}", null,false);
-        assertEquals("5", result);
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/factorial_imperative.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("120", result);
     }
 
     @Test
