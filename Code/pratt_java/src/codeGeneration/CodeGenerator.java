@@ -515,7 +515,7 @@ public class CodeGenerator implements Visitor {
         this.visit(s.arg);
         if(s.arg.getType() instanceof CharType)
             programWriter.addToOutput(currentBranch, new Command("trap", "1"));
-        else if(s.arg.getType() instanceof IntType)
+        else if(s.arg.getType() instanceof IntType || s.arg.getType() instanceof BoolType)
             programWriter.addToOutput(currentBranch, new Command("trap", "0"));
         else if(s.arg.getType() instanceof TupleType){
             programWriter.addToOutput(currentBranch, new Command("ldc", "28"));
