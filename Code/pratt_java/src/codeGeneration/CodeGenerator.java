@@ -72,10 +72,15 @@ public class CodeGenerator implements Visitor {
 
         for(Node n : nodes){
             n.accept(this);
-            if(n instanceof VariableDeclaration)
-                if(((VariableDeclaration) n).isGlobal)
+            if(n instanceof VariableDeclaration) {
+                if (((VariableDeclaration) n).isGlobal)
                     numberOfGlobals++;
+                if (((VariableDeclaration) n).varType instanceof ListType || ((VariableDeclaration) n).varType instanceof TupleType )
+                    numberOfGlobals++;
+            }
         }
+
+        programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(numberOfGlobals-1)));
 
         if (postamble != null) {
             programWriter.addToOutput("root", postamble);
@@ -269,7 +274,10 @@ public class CodeGenerator implements Visitor {
                 //If type of list is also a list, we need to put the head on the heap pointing to null
                 //programWriter.addToOutput(currentBranch, new Command("not"));
             } else if (e.operator == TokenType.TOK_TL) {
+//                programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
+//                programWriter.addToOutput(currentBranch, new Command("add"));
                 programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+
             }
         }
 
@@ -312,10 +320,13 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(AssignStatement s) {
+        if(s.name instanceof IdentifierExpression)
+            leftsideVarDeclaration = true;
+            //leftsideAssignment = true;
 
-        //leftsideAssignment = true;
-//        leftsideVarDeclaration = true;
         this.visit(s.name);
+        if(s.name instanceof IdentifierExpression)
+            leftsideVarDeclaration = false;
 //        if(s.name instanceof IdentifierExpression){
 //            if(GlobalVariablesPlusOffset.get(name)!= null){
 //                //Load address of first global variable
@@ -574,8 +585,9 @@ public class CodeGenerator implements Visitor {
         currentBranch = d.funName.name;
 //        if(d.funName.name != "main")
 //            programWriter.addToOutput(currentBranch, new Command("str", "RR"));
+
         if(d.decls.size() != 0)
-            programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(d.decls.size()-1)));
+            programWriter.addToOutput(currentBranch, new Command("link", Integer.toString((d.decls.size()-1))));
         else{
             programWriter.addToOutput(currentBranch, new Command("link", "0"));
 //            programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
@@ -608,7 +620,6 @@ public class CodeGenerator implements Visitor {
     public void visit(VariableDeclaration d) {
 
         if(isFirstGlobalVariable){
-            programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(numberOfGlobals-1)));
             programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
             programWriter.addToOutput(currentBranch, new Command("str", "R5"));
             isFirstGlobalVariable = false;
@@ -623,6 +634,8 @@ public class CodeGenerator implements Visitor {
 
             programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(globalVariableDeclarationOffset)));
             GlobalVariablesPlusOffset.put(d.left.name, globalVariableDeclarationOffset);
+            if(d.varType instanceof TupleType || d.varType instanceof ListType)
+                globalVariableDeclarationOffset++;
             globalVariableDeclarationOffset++;
 
         }
