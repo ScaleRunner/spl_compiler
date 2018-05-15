@@ -6,9 +6,7 @@ import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
-import parser.types.CharType;
-import parser.types.ListType;
-import parser.types.Type;
+import parser.types.*;
 import util.Node;
 import util.Visitor;
 
@@ -517,8 +515,25 @@ public class CodeGenerator implements Visitor {
         this.visit(s.arg);
         if(s.arg.getType() instanceof CharType)
             programWriter.addToOutput(currentBranch, new Command("trap", "1"));
-        else
+        else if(s.arg.getType() instanceof IntType)
             programWriter.addToOutput(currentBranch, new Command("trap", "0"));
+        else if(s.arg.getType() instanceof TupleType){
+            programWriter.addToOutput(currentBranch, new Command("ldc", "28"));
+            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+
+            programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
+            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+
+            this.visit(s.arg);
+            programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
+            programWriter.addToOutput(currentBranch, new Command("sub"));
+
+            programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
+            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+
+            programWriter.addToOutput(currentBranch, new Command("ldc", "29"));
+            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+        }
     }
 
     @Override
