@@ -4,10 +4,17 @@ main()::->Void
 	(Int, Int) b = (1, 2);
 	(Int, Char) c = (3, 'c');
 	
-	((Int, Int), (Char, Char)) d = ((1, 2), ('a', 'b'));
+	((Int, Int), (Char, Char)) d = (b, a);
+	
+	var e = (d, a);
+	var f = (e, e);
 	
     print(a);
 	print(b);
 	print(c);
 	print(d);
+	print(e);
+	print(f);
+	d.fst.fst = 4;
+	print(f);
 }

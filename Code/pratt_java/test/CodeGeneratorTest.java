@@ -386,7 +386,14 @@ public class CodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
 
         String result = runSPL(program, null,true);
-        assertEquals("('a', 'b')(1 , 2 )(3 , 'c')((1 , 2 ), ('a', 'b'))machine halted", result);
+        assertEquals("('a', 'b')" +
+                "(1 , 2 )" +
+                "(3 , 'c')" +
+                "((1 , 2 ), ('a', 'b'))" +
+                "(((1 , 2 ), ('a', 'b')), ('a', 'b'))" +
+                "((((1 , 2 ), ('a', 'b')), ('a', 'b')), (((1 , 2 ), ('a', 'b')), ('a', 'b')))" +
+                "((((4 , 2 ), ('a', 'b')), ('a', 'b')), (((4 , 2 ), ('a', 'b')), ('a', 'b')))" +
+                "machine halted", result);
     }
 
     @Test
