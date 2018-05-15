@@ -1,7 +1,7 @@
 sum(x) :: Int -> Int
 {
     Int result = 0;
-    if( x > 1 )
+    if( x > 0 )
     {
         result = x + sum(x - 1);
     }

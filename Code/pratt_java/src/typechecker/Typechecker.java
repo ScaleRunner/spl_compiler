@@ -1,19 +1,19 @@
 package typechecker;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import codeGeneration.CompileException;
 import lexer.TokenType;
-import parser.types.*;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
+import parser.types.*;
 import util.Node;
 import util.Visitor;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Typechecker implements Visitor {
 
@@ -460,8 +460,8 @@ public class Typechecker implements Visitor {
 	@Override
 	public void visit(PrintStatement s) {
 		this.visit(s.arg);
-		if(s.arg.getType() instanceof ListType || s.arg.getType() instanceof TupleType){
-			error("Print statements cannot handle lists or tuples.", s);
+		if(s.arg.getType() instanceof ListType){
+			error("Print statements cannot handle lists", s);
 		}
 		s.setType(s.arg.getType());
 	}

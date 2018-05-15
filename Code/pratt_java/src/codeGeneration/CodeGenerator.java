@@ -536,23 +536,69 @@ public class CodeGenerator implements Visitor {
         else if(s.arg.getType() instanceof IntType || s.arg.getType() instanceof BoolType)
             programWriter.addToOutput(currentBranch, new Command("trap", "0"));
         else if(s.arg.getType() instanceof TupleType){
-            programWriter.addToOutput(currentBranch, new Command("ldc", "28"));
-            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
-
-            programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
-            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
-
-            this.visit(s.arg);
-            programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
-            programWriter.addToOutput(currentBranch, new Command("sub"));
-
-            programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
-            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
-
-            programWriter.addToOutput(currentBranch, new Command("ldc", "29"));
-            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+            printTuple(s, (TupleType) s.arg.getType(), null);
         } else
             throw new CompileException(String.format("Printing is not supported for type %s", s.arg.getType()), s);
+    }
+
+    private void printTuple(PrintStatement s, TupleType t, Command preamble){
+        printCharacter('(');
+
+        // Printing the first element
+        programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
+        printElement(t.left);
+
+        printCharacter(',');
+//        printCharacter(' ');
+
+        programWriter.addToOutput(currentBranch, new Command("ldc", "32"));
+        programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+
+        // Printing the second element
+        this.visit(s.arg);
+        programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+        printElement(t.right);
+
+        printCharacter(')');
+    }
+
+    private void printElement(Type t){
+        if(t instanceof IntType)
+            programWriter.addToOutput(currentBranch, new Command("trap", "0"));
+        else if(t instanceof CharType){
+            printCharacter('\'');
+            programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+            printCharacter('\'');
+        }
+        else
+            throw new CompileException(String.format("Printing of Type %s is not yet supported.", t), null);
+    }
+
+    private void printCharacter(Character c){
+        switch (c){
+            case '(':
+                programWriter.addToOutput(currentBranch, new Command("ldc", "40"));
+                break;
+            case ')':
+                programWriter.addToOutput(currentBranch, new Command("ldc", "41"));
+                break;
+            case '[':
+                programWriter.addToOutput(currentBranch, new Command("ldc", "91"));
+                break;
+            case ']':
+                programWriter.addToOutput(currentBranch, new Command("ldc", "93"));
+                break;
+            case ',':
+                programWriter.addToOutput(currentBranch, new Command("ldc", "44"));
+                break;
+            case ' ':
+                programWriter.addToOutput(currentBranch, new Command("ldc", "32"));
+                break;
+            case '\'':
+                programWriter.addToOutput(currentBranch, new Command("ldc", "39"));
+                break;
+        }
+        programWriter.addToOutput(currentBranch, new Command("trap", "1"));
     }
 
     @Override
