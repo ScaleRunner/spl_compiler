@@ -376,6 +376,22 @@ public class CodeGeneratorTest {
         assertEquals("0", result);
     }
 
+    @Test
+    public void print(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
+
+        String result = runSPL(program, null,true);
+        assertEquals("-1", result);
+    }
+
+    @Test
+    public void infinite_lists(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/infinite_list.spl");
+
+        String result = runSPL(program, null,true);
+        assertEquals("-1", result);
+    }
+
     @Test(expected = CompileException.class)
     public void testNoMain(){
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/no_main.spl");

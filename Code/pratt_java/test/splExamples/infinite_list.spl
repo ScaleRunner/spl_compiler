@@ -1,0 +1,14 @@
+main()::->Void
+{
+    [Int] a = 1 : 2 : 3 : [];
+    Int n = 10;
+    var res = a;
+    
+    a.tl = a;
+    
+    while(n > 0){
+        print(res.hd);
+        res = res.tl;
+        n = n - 1;
+    }
+}
