@@ -11,6 +11,7 @@ import util.Node;
 import util.Visitor;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -530,47 +531,56 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PrintStatement s) {
-        this.visit(s.arg);
-        if(s.arg.getType() instanceof CharType)
+        if(s.arg.getType() instanceof CharType){
+            this.visit(s.arg);
             programWriter.addToOutput(currentBranch, new Command("trap", "1"));
-        else if(s.arg.getType() instanceof IntType || s.arg.getType() instanceof BoolType)
+        }
+        else if(s.arg.getType() instanceof IntType || s.arg.getType() instanceof BoolType) {
+            this.visit(s.arg);
             programWriter.addToOutput(currentBranch, new Command("trap", "0"));
+        }
         else if(s.arg.getType() instanceof TupleType){
-            printTuple(s, (TupleType) s.arg.getType(), null);
+            printTuple(s.arg, (TupleType) s.arg.getType(), new ArrayList<>());
         } else
             throw new CompileException(String.format("Printing is not supported for type %s", s.arg.getType()), s);
     }
 
-    private void printTuple(PrintStatement s, TupleType t, Command preamble){
+    private void printTuple(Expression e, TupleType t, List<Command> preamble){
+        this.visit(e);
         printCharacter('(');
 
         // Printing the first element
-        programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
-        printElement(t.left);
+        preamble.add(new Command("ldh", "0"));
+        printElement(e, t.left, preamble);
+        preamble.remove(preamble.size()-1);
 
         printCharacter(',');
-//        printCharacter(' ');
-
-        programWriter.addToOutput(currentBranch, new Command("ldc", "32"));
-        programWriter.addToOutput(currentBranch, new Command("trap", "1"));
+        printCharacter(' ');
 
         // Printing the second element
-        this.visit(s.arg);
-        programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
-        printElement(t.right);
+        this.visit(e);
+        preamble.add(new Command("ldh", "1"));
+        printElement(e, t.right, preamble);
+        preamble.remove(preamble.size()-1);
 
         printCharacter(')');
     }
 
-    private void printElement(Type t){
+    private void printElement(Expression e, Type t, List<Command> preamble){
+        if(preamble.size() > 0){
+            for(Command c : preamble){
+                programWriter.addToOutput(currentBranch, c);
+            }
+        }
         if(t instanceof IntType)
             programWriter.addToOutput(currentBranch, new Command("trap", "0"));
         else if(t instanceof CharType){
             printCharacter('\'');
             programWriter.addToOutput(currentBranch, new Command("trap", "1"));
             printCharacter('\'');
-        }
-        else
+        } else if(t instanceof TupleType){
+            printTuple(e, (TupleType) t, preamble);
+        } else
             throw new CompileException(String.format("Printing of Type %s is not yet supported.", t), null);
     }
 

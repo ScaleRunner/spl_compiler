@@ -382,11 +382,11 @@ public class CodeGeneratorTest {
 
     @Test
     public void print(){
-        // TODO: Not working yet
+        // TODO: Not working for Lists
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
 
         String result = runSPL(program, null,true);
-        assertEquals("(1,2) machine halted", result);
+        assertEquals("('a', 'b')(1 , 2 )(3 , 'c')((1 , 2 ), ('a', 'b'))machine halted", result);
     }
 
     @Test
