@@ -386,16 +386,15 @@ public class CodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
 
         String result = runSPL(program, null,true);
-        assertEquals("-1", result);
+        assertEquals("(1,2) machine halted", result);
     }
 
     @Test
     public void infinite_lists(){
-        // TODO: Not working yet
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/infinite_list.spl");
 
         String result = runSPL(program, null,true);
-        assertEquals("-1", result);
+        assertEquals("1 2 3 1 2 3 1 2 3 1 machine halted", result);
     }
 
     @Test(expected = CompileException.class)
@@ -404,6 +403,7 @@ public class CodeGeneratorTest {
 
         runSPL(program, null,false);
     }
+
     @Test
     public void testSimpleList(){
         String result = runSPL("[Int] a = 1:2:3:[];\n" +
@@ -484,7 +484,7 @@ public class CodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/listFunction.spl");
 
         String result = runSPL(program, null,false);
-        assertEquals("15", result);
+        assertEquals("7", result);
     }
 
     @Test
