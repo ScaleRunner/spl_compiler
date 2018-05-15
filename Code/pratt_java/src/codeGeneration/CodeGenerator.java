@@ -173,7 +173,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(isEmptyExpression e) {
-
+        this.visit(e.arg);
+        programWriter.addToOutput(currentBranch, new Command("ldc", "0"));
+        programWriter.addToOutput(currentBranch, new Command("eq"));
     }
 
     @Override
@@ -181,7 +183,6 @@ public class CodeGenerator implements Visitor {
         //Empty list is null represented by 0
         programWriter.addToOutput(currentBranch, new Command("ldc", "0"));
         //programWriter.addToOutput(currentBranch, new Command("sth"));
-
     }
 
     @Override
@@ -234,7 +235,9 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput(currentBranch, new Command("ge"));
                 break;
             case TOK_CONS:
+                // Store the last two elements on the stack and return the address of the last element
                 programWriter.addToOutput(currentBranch, new Command("stmh", "2"));
+                // We want the address of the first element, so subtract 1 from this address
                 programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
                 programWriter.addToOutput(currentBranch, new Command("sub"));
                 break;
