@@ -544,7 +544,8 @@ public class CodeGenerator implements Visitor {
 
             programWriter.addToOutput(currentBranch, new Command("ldc", "29"));
             programWriter.addToOutput(currentBranch, new Command("trap", "1"));
-        }
+        } else
+            throw new CompileException(String.format("Printing is not supported for type %s", s.arg.getType()), s);
     }
 
     @Override
