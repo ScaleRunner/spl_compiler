@@ -40,7 +40,7 @@ public class CodeGenerator implements Visitor {
     private int localVariableDeclarationOffset;
     private int globalVariableDeclarationOffset = 0;
 
-    boolean isFirstGlobalVariable = false;
+    private boolean isFirstGlobalVariable = false;
 
     private HashMap<String, Integer> currentArgumentsPlusOffsettmp = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class CodeGenerator implements Visitor {
 
     private HashMap<String, HashMap<String, Integer>> functionsLocalsEnvironment = new HashMap<>();
     private HashMap<String, HashMap<String, Integer>> functionsArgsEnvironment = new HashMap<>();
-    int numberOfGlobals = 0;
+    private int numberOfGlobals = 0;
 
     private HashMap<String, Type> functionTypes = new HashMap<>();
 
