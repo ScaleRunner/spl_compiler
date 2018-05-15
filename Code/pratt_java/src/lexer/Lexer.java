@@ -68,7 +68,7 @@ public class Lexer {
         Matcher m;
 
         Pattern inlineComment = Pattern.compile("//[^\\n]*\\n");
-        Pattern blockComment = Pattern.compile("/\\*[\\S\\s]+?\\*/");
+        Pattern blockComment = Pattern.compile("/\\*[\\S\\s]*?\\*/");
 
         //Remove Inline Comments
         m = inlineComment.matcher(input);
