@@ -264,14 +264,6 @@ public class CodeGenerator implements Visitor {
 
                 programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
                 //If type of list is also a list, we need to put the head on the heap pointing to null
-                if(!leftsideVarDeclaration && !leftsideAssignment){
-
-                    if( ((ListType) e.left.getType()).listType instanceof ListType) {
-                        programWriter.addToOutput(currentBranch, new Command("lda", "0"));
-                        programWriter.addToOutput(currentBranch, new Command("ldc", "0"));
-                        programWriter.addToOutput(currentBranch, new Command("stmh", "2"));
-                    }
-                }
                 //programWriter.addToOutput(currentBranch, new Command("not"));
             }
             else if(e.operator == TokenType.TOK_TL){
@@ -347,8 +339,18 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput(currentBranch, new Command("ldr", "R5"));
                 programWriter.addToOutput(currentBranch, new Command("sta", Integer.toString(GlobalVariablesPlusOffset.get(name))));
             }
-            else
+            else if(currentlocalVariablesPlusOffset.get(name)!= null) {
                 programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(currentlocalVariablesPlusOffset.get(name))));
+            }
+            else if (currentArgumentsPlusOffsettmp.get(name) != null) {
+                //first arguments have higher offset;
+                //2                                   1
+                Integer offset = -currentArgumentsPlusOffsettmp.size() + currentArgumentsPlusOffsettmp.get(name);
+
+                programWriter.addToOutput(currentBranch, new Command("stl", (Integer.toString(offset - 1)))); //Loads value from add
+
+                //-1 to go over return address;
+            }
         }
         if(s.name instanceof PostfixExpression){
             programWriter.addToOutput(currentBranch, new Command("swp"));
