@@ -3,8 +3,6 @@
 #
 *.ssm
 
-tomcat
-
 #
 # Default excludes
 #
@@ -22,7 +20,7 @@ tomcat
 *.ear
 *.sar
 *.class
-bin/
+bin
 
 # Maven 
 target/
