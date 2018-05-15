@@ -554,7 +554,7 @@ public class CodeGeneratorTest {
                         } else if(path.toString().contains("localVariablesSimple.spl")){
                             expected = "0 42 0 42 machine halted";
                         } else if(path.toString().contains("precedence.spl")){
-                            expected = "11 6 -1 -1 -1 5 -1 -2 5 1 -1 -1 0 -1 0 -1 -1 machine halted";
+                            expected = "11 6 -1 -1 -1 5 0 -2 5 1 -1 -1 0 -1 0 -1 -1 machine halted";
                         } else if(path.toString().contains("recursiveFunction.spl")){
                             expected = "6 10 5050 0 0 machine halted";
                         } else if(path.toString().contains("recursiveFunction2.spl")){
