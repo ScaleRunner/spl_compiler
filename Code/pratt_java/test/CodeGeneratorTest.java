@@ -7,7 +7,6 @@ import org.junit.ComparisonFailure;
 import org.junit.Test;
 import parser.Parser;
 import parser.declarations.Declaration;
-import parser.exceptions.ParseException;
 import typechecker.Typechecker;
 import util.Node;
 import util.ReadSPL;
@@ -482,7 +481,7 @@ public class CodeGeneratorTest {
 
     @Test
     public void testAllTestsByMarkus() {
-        Long sleepTime = 10L;
+        Long sleepTime = 50L;
         try (Stream<Path> paths = Files.walk(Paths.get("./test/splExamples/markus/3-ok"))) {
             paths.forEach(path ->{
                 if(Files.isRegularFile(path)){
@@ -505,20 +504,75 @@ public class CodeGeneratorTest {
                     String expected = "";
                     try {
                         if(path.toString().contains("assignments.spl")){
-                            expected = "";
-                        } else if(path.toString().contains("listsSimple.spl")){
-                            expected = "7 10 7 8 11 8 machine halted";
-                        } else if(path.toString().contains("while.spl")){
-                            expected = "0 1 2 3 4 5 6 7 8 9 10 9 8 7 6 5 4 3 2 1 machine halted";
+                            expected = "0 1 2 0 1 2 0 1 2 2 3 4 6 7 8 9 6 0 6 -7 machine halted";
+                        } else if(path.toString().contains("associativity.spl")){
+                            expected = "0 0 2 1 1 4 machine halted";
+                        } else if(path.toString().contains("comments.spl")){
+                            expected = "1 2 3 4 5 6 7 machine halted";
+                        } else if(path.toString().contains("functionArgumentsSimple.spl")){
+                            expected = "0 42 machine halted";
+                        } else if(path.toString().contains("functions.spl")){
+                            expected = "5 -1 1 5 -1 4 6 9 9 15 1 3 5 5 3 1 1 3 5 machine halted";
+                        } else if(path.toString().contains("functionsSimple.spl")){
+                            expected = "5 -1 1 5 -1 4 6 machine halted";
+                        } else if(path.toString().contains("globalVariables.spl")){
+                            expected = "5 3 15 0 6 4 42 -1 0 5 3 1 machine halted";
+                        } else if(path.toString().contains("globalVariablesSimple.spl")){
+                            expected = "0 42 machine halted";
+                        } else if(path.toString().contains("helloWorld.spl")){
+                            expected = "42 -1 0 machine halted";
+                        } else if(path.toString().contains("identifierNames.spl")){
+                            expected = "1 2 3 4 machine halted";
+                        } else if(path.toString().contains("ifThenElse.spl")){
+                            expected = "42 machine halted";
                         } else if(path.toString().contains("ifThenElse2.spl")){
                             expected = "42 20 machine halted";
-                        } else if(path.toString().contains("recursiveFunction.spl")){
-                            expected = "6 10 5050 0 0 machine halted";
+                        } else if(path.toString().contains("ifThenElseFalse.spl")){
+                            expected = "100 machine halted";
                         } else if(path.toString().contains("ifThenElseInFunction.spl")){
                             expected = "7 11 machine halted";
+                        } else if(path.toString().contains("ifThenElseScope.spl")){
+                            expected = "100 20 machine halted";
                         } else if(path.toString().contains("ifThenElseScopeFunArg.spl")){
-                            expected = "7 11 machine halted";
+                            expected = "100 20 machine halted";
+                        } else if(path.toString().contains("listFunction.spl")){
+                            expected = "7 8 9 10 7 8 9 10 machine halted";
+                        } else if(path.toString().contains("listFunction2.spl")){
+                            expected = "9 9 15 15 machine halted";
+                        } else if(path.toString().contains("listFunction3.spl")){
+                            expected = "42 machine halted";
+                        } else if(path.toString().contains("lists.spl")){
+                            expected = "-1 7 0 -1 2 7 0 7 7 2 7 machine halted";
+                        } else if(path.toString().contains("listsSimple.spl")){
+                            expected = "7 10 7 8 11 8 machine halted";
+                        } else if(path.toString().contains("listsSimple2.spl")){
+                            expected = "7 8 machine halted";
+                        } else if(path.toString().contains("listsSimple3.spl")){
+                            expected = "8 machine halted";
+                        } else if(path.toString().contains("localVariables.spl")){
+                            expected = "5 3 15 0 6 4 42 -1 0 5 3 1 machine halted";
+                        } else if(path.toString().contains("localVariablesSimple.spl")){
+                            expected = "0 42 0 42 machine halted";
+                        } else if(path.toString().contains("precedence.spl")){
+                            expected = "11 6 -1 -1 -1 5 0 -2 5 1 -1 -1 0 -1 0 -1 -1 machine halted";
+                        } else if(path.toString().contains("recursiveFunction.spl")){
+                            expected = "6 10 5050 0 0 machine halted";
+                        } else if(path.toString().contains("recursiveFunction2.spl")){
+                            expected = "6 10 5050 0 0 machine halted";
+                        } else if(path.toString().contains("simpleArithmetic.spl")){
+                            expected = "3 6 4 -4 33 0 -1 0 -1 0 -1 0 -5 5 -5 5 0 -1 0 -1 machine halted";
+                        } else if(path.toString().contains("tuples.spl")){
+                            expected = "5 3 15 0 5 3 42 -1 0 5 3 1 machine halted";
+                        } else if(path.toString().contains("tuplesSimple.spl")){
+                            expected = "5 3 10 -1 -1 0 0 20 machine halted";
+                        } else if(path.toString().contains("tuplesSimple2.spl")){
+                            expected = "5 machine halted";
+                        } else if(path.toString().contains("while.spl")){
+                            expected = "0 1 2 3 4 5 6 7 8 9 10 9 8 7 6 5 4 3 2 1 machine halted";
+                        } else {
+                            expected = "File is not in tests";
                         }
+
                         assertEquals(expected, result);
                     } catch (ComparisonFailure f){
                         System.err.println(String.format("Test Failed! \n\tExpected:%s\n\tActual:\t %s", expected, result));
