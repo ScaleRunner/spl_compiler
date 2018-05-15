@@ -569,7 +569,11 @@ public class Typechecker implements Visitor {
 				}
 
 
-            }
+            }else if (d.varType instanceof  ListType){
+				if(inferEmptyListType(d.right.getType(), d.varType, d.right) != null){
+					d.right.setType(d.varType);
+				}
+			}
 		}
 		if(d.varType.equals(d.right.getType()) || d.varType instanceof VarType) {
             if(env.get(d.left.name) != null){

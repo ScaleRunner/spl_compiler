@@ -249,33 +249,32 @@ public class CodeGenerator implements Visitor {
     public void visit(PostfixExpression e) {
 
         this.visit(e.left);
-        if(!leftsideVarDeclaration ){
+//        if(leftsideVarDeclaration) {
+//            programWriter.addToOutput(currentBranch, new Command("lda", "0"));
+//        }
+//        if(!leftsideVarDeclaration ) {
 
-            if(e.operator == TokenType.TOK_FST){
+            if (e.operator == TokenType.TOK_FST) {
                 programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
 
-            }
-            else if(e.operator == TokenType.TOK_SND){
+            } else if (e.operator == TokenType.TOK_SND) {
                 programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
             }
             //The big question here is:
             //All the rest of the things work using reference
             //For head however, a copy is needed.
-            else if(e.operator == TokenType.TOK_HD){
+            else if (e.operator == TokenType.TOK_HD) {
 
                 programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
                 //If type of list is also a list, we need to put the head on the heap pointing to null
                 //programWriter.addToOutput(currentBranch, new Command("not"));
-            }
-            else if(e.operator == TokenType.TOK_TL){
+            } else if (e.operator == TokenType.TOK_TL) {
                 programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
             }
         }
-        else{
 
-        }
 
-    }
+//    }
 
     @Override
     public void visit(PrefixExpression e) {
@@ -314,8 +313,8 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(AssignStatement s) {
 
-        leftsideAssignment = true;
-        leftsideVarDeclaration = true;
+        //leftsideAssignment = true;
+//        leftsideVarDeclaration = true;
         this.visit(s.name);
 //        if(s.name instanceof IdentifierExpression){
 //            if(GlobalVariablesPlusOffset.get(name)!= null){
@@ -326,8 +325,8 @@ public class CodeGenerator implements Visitor {
 
 
         //Value is put on the stack
-        leftsideAssignment = false;
-        leftsideVarDeclaration = false;
+//        leftsideAssignment = false;
+        //leftsideVarDeclaration = false;
         this.visit(s.right);
 //        if(s.right instanceof CallExpression ){
 //            programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
@@ -354,6 +353,7 @@ public class CodeGenerator implements Visitor {
             }
         }
         if(s.name instanceof PostfixExpression){
+//            this.visit(s.right);
             programWriter.addToOutput(currentBranch, new Command("swp"));
             programWriter.addToOutput(currentBranch, new Command("sta", "0"));
         }

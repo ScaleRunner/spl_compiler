@@ -362,6 +362,15 @@ public class TypecheckerTest {
         assertTypecheckFailure();
     }
 
+    @Test
+    public void testEmptyListCompatibility() {
+        typecheckSPL("[[Int]] a = []:[];\n"+
+                "main()::->Void{\n"+
+                "print(0);\n"+
+                "}");
+        assertTypecheckSuccess();
+    }
+
 	@Test
 	public void testisEmptyExpr() {
 		Node e = typecheckExpr("isEmpty(1:2:[])");
