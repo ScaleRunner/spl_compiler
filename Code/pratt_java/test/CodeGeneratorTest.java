@@ -3,16 +3,22 @@ import codeGeneration.Command;
 import codeGeneration.CompileException;
 import codeGeneration.ProgramWriter;
 import lexer.Lexer;
+import org.junit.ComparisonFailure;
 import org.junit.Test;
 import parser.Parser;
 import parser.declarations.Declaration;
+import parser.exceptions.ParseException;
 import typechecker.Typechecker;
 import util.Node;
 import util.ReadSPL;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,13 +40,12 @@ public class CodeGeneratorTest {
             BufferedReader br = new BufferedReader(isr);
 
             String line;
-            String result;
-            result = line = br.readLine();
+            String result = br.readLine();
             if (debug) {
-                do {
-                    result = result + line;
-                    System.out.println(line);
-                } while ((line = br.readLine()) != null);
+                while ((line = br.readLine()) != null){
+                    result = result + " " + line;
+//                    System.out.println(line);
+                }
             }
             return result;
 
@@ -348,7 +353,7 @@ public class CodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/print_numbers_up_to.spl");
 
         String result = runSPL(program, null,true);
-        assertEquals("001234567888machine halted", result);
+        assertEquals("0 1 2 3 4 5 6 7 8 8 8 machine halted", result);
     }
 
     @Test
@@ -378,6 +383,7 @@ public class CodeGeneratorTest {
 
     @Test
     public void print(){
+        // TODO: Not working yet
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
 
         String result = runSPL(program, null,true);
@@ -386,6 +392,7 @@ public class CodeGeneratorTest {
 
     @Test
     public void infinite_lists(){
+        // TODO: Not working yet
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/infinite_list.spl");
 
         String result = runSPL(program, null,true);
@@ -473,6 +480,55 @@ public class CodeGeneratorTest {
         assertEquals("2", result);
     }
 
+    @Test
+    public void testAllTestsByMarkus() {
+        Long sleepTime = 10L;
+        try (Stream<Path> paths = Files.walk(Paths.get("./test/splExamples/markus/3-ok"))) {
+            paths.forEach(path ->{
+                if(Files.isRegularFile(path)){
+                    try {
+                        // To not mess up printing
+                        Thread.sleep( sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
+                    System.out.println(path.toString());
+                    String s = ReadSPL.readLineByLineJava8(path.toString());
+                    try {
+                        // To not mess up printing
+                        Thread.sleep( sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    String result = runSPL(s, null, true);
+                    String expected = "";
+                    try {
+                        if(path.toString().contains("assignments.spl")){
+                            expected = "";
+                        } else if(path.toString().contains("listsSimple.spl")){
+                            expected = "7 10 7 8 11 8 machine halted";
+                        } else if(path.toString().contains("while.spl")){
+                            expected = "0 1 2 3 4 5 6 7 8 9 10 9 8 7 6 5 4 3 2 1 machine halted";
+                        } else if(path.toString().contains("ifThenElse2.spl")){
+                            expected = "42 20 machine halted";
+                        } else if(path.toString().contains("recursiveFunction.spl")){
+                            expected = "6 10 5050 0 0 machine halted";
+                        } else if(path.toString().contains("ifThenElseInFunction.spl")){
+                            expected = "7 11 machine halted";
+                        } else if(path.toString().contains("ifThenElseScopeFunArg.spl")){
+                            expected = "7 11 machine halted";
+                        }
+                        assertEquals(expected, result);
+                    } catch (ComparisonFailure f){
+                        System.err.println(String.format("Test Failed! \n\tExpected:%s\n\tActual:\t %s", expected, result));
+                    }
+
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
