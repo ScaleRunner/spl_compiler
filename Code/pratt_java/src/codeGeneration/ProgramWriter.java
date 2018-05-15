@@ -1,6 +1,5 @@
 package codeGeneration;
 
-import codeGeneration.Command;
 import parser.expressions.IdentifierExpression;
 
 import java.io.FileNotFoundException;
@@ -37,6 +36,15 @@ public class ProgramWriter {
             branchNames.add(branchName);
         }
         branchCommands.add(command);
+        branchMap.put(branchName, branchCommands);
+    }
+
+    public void removeLastCommand(String branchName){
+        List<Command> branchCommands = branchMap.get(branchName);
+        if(branchCommands == null){ //This branch did not exist yet
+            throw new CompileException("This branch did not exist yet", null);
+        }
+        branchCommands.remove(branchCommands.size()-1);
         branchMap.put(branchName, branchCommands);
     }
 
