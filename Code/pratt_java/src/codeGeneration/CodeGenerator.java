@@ -75,12 +75,10 @@ public class CodeGenerator implements Visitor {
             if(n instanceof VariableDeclaration) {
                 if (((VariableDeclaration) n).isGlobal)
                     numberOfGlobals++;
-                if (((VariableDeclaration) n).varType instanceof ListType || ((VariableDeclaration) n).varType instanceof TupleType )
-                    numberOfGlobals++;
-            }
+                }
         }
 
-        programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(numberOfGlobals-1)));
+
 
         if (postamble != null) {
             programWriter.addToOutput("root", postamble);
@@ -132,7 +130,7 @@ public class CodeGenerator implements Visitor {
         //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
 
         //Only loads result from call if function is not void
-        if(functionTypes.get(e.function_name.name) != null)
+        if(!(functionTypes.get(e.function_name.name) instanceof VoidType))
             programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
 
     }
@@ -263,7 +261,14 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
 
             } else if (e.operator == TokenType.TOK_SND) {
-                programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+                if(leftsideAssignment){
+                    programWriter.addToOutput(currentBranch, new Command("ldc", "1"));
+                    programWriter.addToOutput(currentBranch, new Command("add"));
+                    programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
+                }
+                else
+                    programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
+                //programWriter.addToOutput(currentBranch, new Command("ldh", "1"));
             }
             //The big question here is:
             //All the rest of the things work using reference
@@ -399,7 +404,8 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(currentBranch, new Command("str", "MP"));
         //adjust SP
         //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
-        programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
+        if(!(functionTypes.get(s.function_name.name) instanceof VoidType))
+            programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
     }
 
     /**
@@ -615,8 +621,11 @@ public class CodeGenerator implements Visitor {
 
         if(!d.funName.name.equals("main")) {
             //Fixed recursion
-            programWriter.addToOutput(currentBranch, new Command("ajs", "-1"));
+            programWriter.addToOutput(currentBranch, new Command("unlink"));
+            //programWriter.addToOutput(currentBranch, new Command("ajs", "-1"));
             programWriter.addToOutput(currentBranch, new Command("ret"));
+
+            //currentlocalVariablesPlusOffset.ge currentlocalVariablesPlusOffset.size()
         }
 
         functionsLocalsEnvironment.put(d.funName.name, currentlocalVariablesPlusOffset);
@@ -628,6 +637,7 @@ public class CodeGenerator implements Visitor {
     public void visit(VariableDeclaration d) {
 
         if(isFirstGlobalVariable){
+            programWriter.addToOutput(currentBranch, new Command("link", Integer.toString(numberOfGlobals-1)));
             programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
             programWriter.addToOutput(currentBranch, new Command("str", "R5"));
             isFirstGlobalVariable = false;
@@ -642,8 +652,6 @@ public class CodeGenerator implements Visitor {
 
             programWriter.addToOutput(currentBranch, new Command("stl", Integer.toString(globalVariableDeclarationOffset)));
             GlobalVariablesPlusOffset.put(d.left.name, globalVariableDeclarationOffset);
-            if(d.varType instanceof TupleType || d.varType instanceof ListType)
-                globalVariableDeclarationOffset++;
             globalVariableDeclarationOffset++;
 
         }
