@@ -1,5 +1,20 @@
 main()::->Void
 {
-    (Int, Int) a = (1, 2);
+    (Char, Char) a = ('a', 'b');
+	(Int, Int) b = (1, 2);
+	(Int, Char) c = (3, 'c');
+	
+	((Int, Int), (Char, Char)) d = (b, a);
+	
+	var e = (d, a);
+	var f = (e, e);
+	
     print(a);
+	print(b);
+	print(c);
+	print(d);
+	print(e);
+	print(f);
+	d.fst.fst = 4;
+	print(f);
 }

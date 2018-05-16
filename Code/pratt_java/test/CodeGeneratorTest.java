@@ -382,16 +382,22 @@ public class CodeGeneratorTest {
 
     @Test
     public void print(){
-        // TODO: Not working yet
+        // TODO: Not working for Lists
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
 
         String result = runSPL(program, null,true);
-        assertEquals("-1", result);
+        assertEquals("('a', 'b')" +
+                "(1 , 2 )" +
+                "(3 , 'c')" +
+                "((1 , 2 ), ('a', 'b'))" +
+                "(((1 , 2 ), ('a', 'b')), ('a', 'b'))" +
+                "((((1 , 2 ), ('a', 'b')), ('a', 'b')), (((1 , 2 ), ('a', 'b')), ('a', 'b')))" +
+                "((((4 , 2 ), ('a', 'b')), ('a', 'b')), (((4 , 2 ), ('a', 'b')), ('a', 'b')))" +
+                "machine halted", result);
     }
 
     @Test
     public void infinite_lists(){
-        // TODO: Not working yet
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/infinite_list.spl");
 
         String result = runSPL(program, null,true);
@@ -404,6 +410,7 @@ public class CodeGeneratorTest {
 
         runSPL(program, null,false);
     }
+
     @Test
     public void testSimpleList(){
         String result = runSPL("[Int] a = 1:2:3:[];\n" +
