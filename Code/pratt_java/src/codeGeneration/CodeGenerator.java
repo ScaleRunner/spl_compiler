@@ -122,7 +122,7 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(currentBranch, new Command("bsr", e.function_name.name));
 
         //REASON: restore old MP
-        programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-1)));
+        programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-currentArgumentsPlusOffsettmp.size())));
 
         //programWriter.addToOutput(currentBranch, new Command("str", "SP"));
         //stores old MP in MP
@@ -398,7 +398,7 @@ public class CodeGenerator implements Visitor {
         currentArgumentsPlusOffsettmp = functionsArgsEnvironment.get(s.function_name.name);
         programWriter.addToOutput(currentBranch, new Command("bsr", s.function_name.name));
         //REASON: restore old MP
-        programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-1)));
+        programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-currentArgumentsPlusOffsettmp.size())));
 
         //programWriter.addToOutput(currentBranch, new Command("str", "SP"));
         //stores old MP in MP
@@ -671,6 +671,10 @@ public class CodeGenerator implements Visitor {
             this.visit(varDec);
             i++;
         }
+
+        functionsLocalsEnvironment.put(d.funName.name, currentlocalVariablesPlusOffset);
+        functionsArgsEnvironment.put(d.funName.name, currentArgumentsPlusOffsettmp);
+
         for(Statement funStmt : d.stats){
             this.visit(funStmt);
         }
@@ -684,8 +688,7 @@ public class CodeGenerator implements Visitor {
             //currentlocalVariablesPlusOffset.ge currentlocalVariablesPlusOffset.size()
         }
 
-        functionsLocalsEnvironment.put(d.funName.name, currentlocalVariablesPlusOffset);
-        functionsArgsEnvironment.put(d.funName.name, currentArgumentsPlusOffsettmp);
+
 
     }
 

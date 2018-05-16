@@ -211,7 +211,7 @@ public class CodeGeneratorTest {
     @Test
     public void testMultipleFunWithArguments(){
         String result = runSPL(
-                "multBy2( n ) :: Int -> Int {\n" +
+                "multBy2( n, m ) :: Int Int -> Int {\n" +
                 "Int d = 9;\n" +
                 "d = 2;"+ //+ Try this later
                 "return n * 2;\n" +
@@ -220,8 +220,8 @@ public class CodeGeneratorTest {
                 "Int a = 3+ 2;\n" +
                 "Int b = 5+ 3;\n" +
                 "Int c = b;\n" +
-                "c = multBy2(c);\n" +
-                "print(multBy2(c));\n" +
+                "c = multBy2(c, c);\n" +
+                "print(multBy2(c,c));\n" +
 
                         //"return;" + Fix later
                 "}", null,false);
@@ -428,9 +428,9 @@ public class CodeGeneratorTest {
                 "[Int] b = 3:4:5:[];\n" +
                 "[[Int]] c = a:b;\n" +
 
-                "print(2);\n" +
+                "print(a.hd);\n" +
                 "}", null,false);
-        assertEquals("2", result);
+        assertEquals("1", result);
     }
 
     @Test
