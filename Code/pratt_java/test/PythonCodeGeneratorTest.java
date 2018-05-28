@@ -61,10 +61,10 @@ public class PythonCodeGeneratorTest {
         return executePython();
     }
 
-    private List<String> runExpression(String program){
+    private List<String> runStatement(String program){
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
-        Node n = p.parseExpression();
+        Node n = p.parseStatement();
         Typechecker tc = new Typechecker();
         tc.typecheck(n);
 
@@ -79,122 +79,122 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testIntegerConstant(){
-        List<String> result = runExpression("42");
+        List<String> result = runStatement("print(42);");
         assertEquals("42", result.get(0));
-    }
+}
 
     @Test
     public void testBoolean(){
-        List<String> result = runExpression("True");
+        List<String> result = runStatement("print(True);");
         assertEquals("True", result.get(0));
 
-        result = runExpression("False");
+        result = runStatement("print(False);");
         assertEquals("False", result.get(0));
 
-        result = runExpression("True != False");
+        result = runStatement("print(True != False);");
         assertEquals("True", result.get(0));
     }
 
     @Test
     public void testCharacterConstant(){
-        List<String> result = runExpression("'a'");
-        assertEquals("amachine halted", result.get(0));
+        List<String> result = runStatement("print('a');");
+        assertEquals("a", result.get(0));
     }
 
     @Test
     public void testPrefix(){
-        List<String> result = runExpression("--1");
+        List<String> result = runStatement("print(--1);");
         assertEquals("1", result.get(0));
 
-        result = runExpression("!True");
+        result = runStatement("print(!True);");
         assertEquals("False", result.get(0));
 
-        result = runExpression("!False");
+        result = runStatement("print(!False);");
         assertEquals("True", result.get(0));
     }
 
     @Test
     public void testAddition(){
-        List<String> result = runExpression("4 + 2");
+        List<String> result = runStatement("print(4 + 2);");
         assertEquals("6", result.get(0));
     }
 
     @Test
     public void testAdditionVsMultiplicationPrecedence(){
-        List<String> result = runExpression("4 + 2 * 3 + 2");
+        List<String> result = runStatement("print(4 + 2 * 3 + 2);");
         assertEquals("12", result.get(0));
     }
 
     @Test
     public void testSubtraction(){
-        List<String> result = runExpression("42-45");
+        List<String> result = runStatement("print(42-45);");
         assertEquals("-3", result.get(0));
     }
 
     @Test
     public void testSubtractionAssociativity(){
-        List<String> result = runExpression("6 - 3 - 2");
+        List<String> result = runStatement("print(6 - 3 - 2);");
         assertEquals("1", result.get(0));
-        result = runExpression("6 - (3 - 2)");
+        result = runStatement("print(6 - (3 - 2));");
         assertEquals("5", result.get(0));
-        result = runExpression("(6 - 3) - 2");
+        result = runStatement("print((6 - 3) - 2);");
         assertEquals("1", result.get(0));
     }
 
     @Test
     public void testAllBinaryOps(){
-        List<String> result = runExpression("42-45");
+        List<String> result = runStatement("print(42-45);");
         assertEquals("-3", result.get(0));
 
-        result = runExpression("7+3");
+        result = runStatement("print(7+3);");
         assertEquals("10", result.get(0));
 
-        result = runExpression("7*3");
+        result = runStatement("print(7*3);");
         assertEquals("21", result.get(0));
 
-        result = runExpression("6/3");
+        result = runStatement("print(6/3);");
         assertEquals("2", result.get(0));
 
-        result = runExpression("5%3");
+        result = runStatement("print(5%3);");
         assertEquals("2", result.get(0));
 
-        result = runExpression("5 > 3");
+        result = runStatement("print(5 > 3);");
         assertEquals("-1", result.get(0));
 
-        result = runExpression("5 < 3");
+        result = runStatement("print(5 < 3);");
         assertEquals("0", result.get(0));
 
-        result = runExpression("5 >= 5");
+        result = runStatement("print(5 >= 5);");
         assertEquals("-1", result.get(0));
 
-        result = runExpression("5 >= 6");
+        result = runStatement("print(5 >= 6);");
         assertEquals("0", result.get(0));
 
-        result = runExpression("5 <= 5");
+        result = runStatement("print(5 <= 5);");
         assertEquals("-1", result.get(0));
 
-        result = runExpression("5 <= 6");
+        result = runStatement("print(5 <= 6);");
         assertEquals("-1", result.get(0));
 
-        result = runExpression("6 <= 5");
+        result = runStatement("print(6 <= 5);");
         assertEquals("0", result.get(0));
 
-        result = runExpression("1 == 1");
+        result = runStatement("print(1 == 1);");
         assertEquals("-1", result.get(0));
 
-        result = runExpression("1 == 1 && 1 != 0");
+        result = runStatement("print(1 == 1 && 1 != 0);");
         assertEquals("-1", result.get(0));
     }
 
     @Test
     public void testReadInteger(){
-        List<String> result = runExpression("read(0)");
+        List<String> result = runStatement("read(0)");
         assertEquals("Please enter an integer: ", result.get(0));
     }
 
     @Test
     public void testReadChar(){
-        List<String> result = runExpression("read(1)");
+        List<String> result = runStatement("read(1)");
         assertEquals("Please enter a character: ", result.get(0));
     }
 
