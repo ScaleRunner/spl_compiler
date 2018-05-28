@@ -78,6 +78,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(OperatorExpression e) {
+        programWriter.addToOutput("(", false);
         this.visit(e.left);
         switch (e.operator) {
             // arithmetic binary functions
@@ -132,6 +133,7 @@ public class CodeGenerator implements Visitor {
                 throw new CompileException(String.format("Invalid operator '%s'.", e.operator), e);
         }
         this.visit(e.right);
+        programWriter.addToOutput(")", false);
     }
 
     @Override
