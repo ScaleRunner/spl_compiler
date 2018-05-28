@@ -1,4 +1,4 @@
-package codeGeneration;
+package codeGeneration.ssm;
 
 import java.util.ArrayList;
 import java.util.List;

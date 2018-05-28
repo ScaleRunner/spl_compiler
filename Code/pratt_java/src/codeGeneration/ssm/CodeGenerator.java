@@ -1,5 +1,6 @@
-package codeGeneration;
+package codeGeneration.ssm;
 
+import codeGeneration.CompileException;
 import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;

@@ -1,7 +1,7 @@
-import codeGeneration.CodeGenerator;
-import codeGeneration.Command;
 import codeGeneration.CompileException;
-import codeGeneration.ProgramWriter;
+import codeGeneration.ssm.CodeGenerator;
+import codeGeneration.ssm.Command;
+import codeGeneration.ssm.ProgramWriter;
 import lexer.Lexer;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
