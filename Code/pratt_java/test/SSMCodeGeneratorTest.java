@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
-public class CodeGeneratorTest {
+public class SSMCodeGeneratorTest {
 
     private String runSSM(boolean debug) {
         try {
