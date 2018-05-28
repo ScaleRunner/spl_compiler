@@ -41,7 +41,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BooleanExpression e) {
-        //TODO
+        String line = e.name ? "True" : "False";
+        programWriter.addToOutput(line, false);
     }
 
     @Override
@@ -51,17 +52,17 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CharacterExpression e) {
-        //TODO
+        programWriter.addToOutput(String.format("'%c'", e.name), false);
     }
 
     @Override
     public void visit(IdentifierExpression e) {
-        //TODO
+        programWriter.addToOutput(e.name, false);
     }
 
     @Override
     public void visit(IntegerExpression e) {
-        //TODO
+        programWriter.addToOutput(String.valueOf(e.name), false);
     }
 
     @Override
@@ -81,47 +82,47 @@ public class CodeGenerator implements Visitor {
         switch (e.operator) {
             // arithmetic binary functions
             case TOK_PLUS:
-                programWriter.addToOutput("+");
+                programWriter.addToOutput("+", false);
                 break;
             case TOK_MULT:
-                programWriter.addToOutput("*");
+                programWriter.addToOutput("*", false);
                 break;
             case TOK_MINUS:
-                programWriter.addToOutput("-");
+                programWriter.addToOutput("-", false);
                 break;
             case TOK_MOD:
-                programWriter.addToOutput("%");
+                programWriter.addToOutput("%", false);
                 break;
             case TOK_DIV:
-                programWriter.addToOutput("/");
+                programWriter.addToOutput("/", false);
                 break;
 
             // Boolean
             case TOK_AND:
-                programWriter.addToOutput("and");
+                programWriter.addToOutput("and", false);
                 break;
             case TOK_OR:
-                programWriter.addToOutput("or");
+                programWriter.addToOutput("or", false);
                 break;
 
             // Comparison
             case TOK_EQ:
-                programWriter.addToOutput("is");
+                programWriter.addToOutput("is", false);
                 break;
             case TOK_NEQ:
-                programWriter.addToOutput("not is");
+                programWriter.addToOutput("is not", false);
                 break;
             case TOK_LT:
-                programWriter.addToOutput("<");
+                programWriter.addToOutput("<", false);
                 break;
             case TOK_GT:
-                programWriter.addToOutput(">");
+                programWriter.addToOutput(">", false);
                 break;
             case TOK_LEQ:
-                programWriter.addToOutput("<=");
+                programWriter.addToOutput("<=", false);
                 break;
             case TOK_GEQ:
-                programWriter.addToOutput(">=");
+                programWriter.addToOutput(">=", false);
                 break;
             case TOK_CONS:
                 // TODO: do this
@@ -159,11 +160,11 @@ public class CodeGenerator implements Visitor {
     public void visit(PrefixExpression e) {
         switch (e.operator) {
             case TOK_MINUS:
-                programWriter.addToOutput("-");
+                programWriter.addToOutput("-", false);
                 break;
 
             case TOK_NOT:
-                programWriter.addToOutput("not");
+                programWriter.addToOutput("not", false);
                 break;
         }
         this.visit(e.right);
@@ -206,7 +207,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PrintStatement s) {
-        //TODO
+        programWriter.addToOutput("print(", false);
+        this.visit(s.arg);
+        programWriter.addToOutput(")", true);
     }
 
     @Override
