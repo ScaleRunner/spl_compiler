@@ -94,7 +94,7 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput("%", false);
                 break;
             case TOK_DIV:
-                programWriter.addToOutput("/", false);
+                programWriter.addToOutput("//", false);
                 break;
 
             // Boolean
