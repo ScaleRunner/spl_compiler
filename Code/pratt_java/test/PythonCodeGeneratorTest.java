@@ -41,7 +41,7 @@ public class PythonCodeGeneratorTest {
 
             return result;
         } catch (IOException e) {
-            throw new CompileException("Stream could not be opened/closed");
+            throw new CompileException("Stream could not be opened/closedn\n" + e.getMessage());
         }
     }
 
@@ -81,7 +81,7 @@ public class PythonCodeGeneratorTest {
     public void testIntegerConstant(){
         List<String> result = runStatement("print(42);");
         assertEquals("42", result.get(0));
-}
+    }
 
     @Test
     public void testBoolean(){
@@ -159,31 +159,31 @@ public class PythonCodeGeneratorTest {
         assertEquals("2", result.get(0));
 
         result = runStatement("print(5 > 3);");
-        assertEquals("-1", result.get(0));
+        assertEquals("True", result.get(0));
 
         result = runStatement("print(5 < 3);");
-        assertEquals("0", result.get(0));
+        assertEquals("False", result.get(0));
 
         result = runStatement("print(5 >= 5);");
-        assertEquals("-1", result.get(0));
+        assertEquals("True", result.get(0));
 
         result = runStatement("print(5 >= 6);");
-        assertEquals("0", result.get(0));
+        assertEquals("False", result.get(0));
 
         result = runStatement("print(5 <= 5);");
-        assertEquals("-1", result.get(0));
+        assertEquals("True", result.get(0));
 
         result = runStatement("print(5 <= 6);");
-        assertEquals("-1", result.get(0));
+        assertEquals("True", result.get(0));
 
         result = runStatement("print(6 <= 5);");
-        assertEquals("0", result.get(0));
+        assertEquals("False", result.get(0));
 
         result = runStatement("print(1 == 1);");
-        assertEquals("-1", result.get(0));
+        assertEquals("True", result.get(0));
 
         result = runStatement("print(1 == 1 && 1 != 0);");
-        assertEquals("-1", result.get(0));
+        assertEquals("True", result.get(0));
     }
 
     @Test
