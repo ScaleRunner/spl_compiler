@@ -209,17 +209,46 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallStatement s) {
-        //TODO
+        this.visit(s.function_name);
+        programWriter.addToOutput("(", false);
+        for(int i = 0; i < s.args.size(); i ++){
+            this.visit(s.args.get(i));
+            if(i < s.args.size() - 1)
+                programWriter.addToOutput(",", true);
+        }
+        programWriter.addToOutput(")", false, true);
     }
 
     @Override
     public void visit(ConditionalStatement conditionalStatement) {
-        //TODO
+        programWriter.addToOutput("if", true);
+        this.visit(conditionalStatement.condition);
+        programWriter.addToOutput(":", false, true);
+        programWriter.addIndent();
+        for(Statement s : conditionalStatement.then_expression){
+            visit(s);
+        }
+        programWriter.removeIndent();
+        if(conditionalStatement.else_expression.size() > 0){
+            programWriter.addToOutput("else:", false, true);
+            programWriter.addIndent();
+            for(Statement s : conditionalStatement.else_expression){
+                visit(s);
+            }
+            programWriter.removeIndent();
+        }
     }
 
     @Override
     public void visit(LoopStatement loopStatement) {
-        //TODO
+        programWriter.addToOutput("while", true, false);
+        this.visit(loopStatement.condition);
+        programWriter.addToOutput(":", false, true);
+        programWriter.addIndent();
+        for(Statement s: loopStatement.body){
+            this.visit(s);
+        }
+        programWriter.removeIndent();
     }
 
     @Override
