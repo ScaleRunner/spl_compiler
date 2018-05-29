@@ -46,7 +46,7 @@ public class ProgramWriter {
     }
 
     public void removeIndent(){
-        this.currIndent = this.currIndent.replace(this.indent, "");
+        this.currIndent = this.currIndent.replaceFirst(this.indent, "");
     }
 
     public void printLast(){
