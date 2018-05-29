@@ -7,13 +7,10 @@ import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
-import parser.types.EmptyListType;
 import util.Node;
 import util.Visitor;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CodeGenerator implements Visitor {
@@ -30,20 +27,15 @@ public class CodeGenerator implements Visitor {
     private String variablePost = null;
     private boolean useNested = false;
 
-    private List<String> variablesDeclaredInFunction;
-    private List<String> variablesUsedAsGlobal;
-    private boolean notUsedAsGlobal;
-
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath, "\t");
-        this.variablesDeclaredInFunction = new ArrayList<>();
-        this.variablesUsedAsGlobal = new ArrayList<>();
     }
 
     public void generateCode(List<Declaration> nodes) throws FileNotFoundException {
         for(Node n : nodes){
             n.accept(this);
         }
+
         programWriter.writeToFile();
     }
 
@@ -66,10 +58,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
-        this.notUsedAsGlobal = true;
         this.visit(e.function_name);
-        this.notUsedAsGlobal = false;
-
         programWriter.addToOutput("(", false);
         for(int i = 0; i < e.args.size(); i ++){
             this.visit(e.args.get(i));
@@ -88,10 +77,6 @@ public class CodeGenerator implements Visitor {
     public void visit(IdentifierExpression e) {
         if(lhsAssignment && postCall >1){
             variablePost = e.name;
-        }
-        if(!this.notUsedAsGlobal && !this.variablesDeclaredInFunction.contains(e.name)
-                && !this.variablesUsedAsGlobal.contains(e.name)){
-            this.variablesUsedAsGlobal.add(e.name);
         }
         programWriter.addToOutput(e.name, false);
     }
@@ -121,27 +106,27 @@ public class CodeGenerator implements Visitor {
         switch (e.operator) {
             // arithmetic binary functions
             case TOK_PLUS:
-                programWriter.addToOutput(" +", true);
+                programWriter.addToOutput("+", true);
                 break;
             case TOK_MULT:
-                programWriter.addToOutput(" *", true);
+                programWriter.addToOutput("*", true);
                 break;
             case TOK_MINUS:
-                programWriter.addToOutput(" -", true);
+                programWriter.addToOutput("-", true);
                 break;
             case TOK_MOD:
-                programWriter.addToOutput(" %", true);
+                programWriter.addToOutput("%", true);
                 break;
             case TOK_DIV:
-                programWriter.addToOutput(" //", true);
+                programWriter.addToOutput("//", true);
                 break;
 
             // Boolean
             case TOK_AND:
-                programWriter.addToOutput(" and", true);
+                programWriter.addToOutput("and", true);
                 break;
             case TOK_OR:
-                programWriter.addToOutput(" or", true);
+                programWriter.addToOutput("or", true);
                 break;
 
             // Comparison
@@ -152,31 +137,26 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput(" is not", true);
                 break;
             case TOK_LT:
-                programWriter.addToOutput(" <", true);
+                programWriter.addToOutput("<", true);
                 break;
             case TOK_GT:
-                programWriter.addToOutput(" >", true);
+                programWriter.addToOutput(">", true);
                 break;
             case TOK_LEQ:
-                programWriter.addToOutput(" <=", true);
+                programWriter.addToOutput("<=", true);
                 break;
             case TOK_GEQ:
-                programWriter.addToOutput(" >=", true);
+                programWriter.addToOutput(">=", true);
                 break;
             case TOK_CONS:
                 programWriter.addToOutput("[", false);
                 this.visit(e.left);
                 programWriter.addToOutput("]", true);
 
-                programWriter.addToOutput(" +", true);
+                programWriter.addToOutput("+", true);
 
-                if(e.right.getType() instanceof EmptyListType){
-                    programWriter.addToOutput("[", false);
-                    this.visit(e.left);
-                    programWriter.addToOutput("]", true);
-                } else {
-                    this.visit(e.right);
-                }
+                this.visit(e.right);
+
                 break;
 
             default:
@@ -205,10 +185,12 @@ public class CodeGenerator implements Visitor {
         switch (e.operator) {
             case TOK_FST:
                 programWriter.addToOutput("[0]", false, false);
+                //nested = false;
                 break;
 
             case TOK_SND:
                 programWriter.addToOutput("[1]", false, false);
+                //nested = false;
                 break;
 
             case TOK_HD:
@@ -308,10 +290,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallStatement s) {
-        this.notUsedAsGlobal = true;
         this.visit(s.function_name);
-        this.notUsedAsGlobal = false;
-
         programWriter.addToOutput("(", false);
         for(int i = 0; i < s.args.size(); i ++){
             this.visit(s.args.get(i));
@@ -374,10 +353,6 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunctionDeclaration d) {
-        this.variablesUsedAsGlobal.clear();
-        this.variablesDeclaredInFunction.clear();
-        this.notUsedAsGlobal = true;
-
         programWriter.addToOutput( "def", true, false);
         this.visit(d.funName);
         int n_args = d.args.size();
@@ -393,11 +368,8 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(":",false, true);
         programWriter.addIndent();
         for(VariableDeclaration vd: d.decls){
-            variablesDeclaredInFunction.add(vd.left.name);
             this.visit(vd);
         }
-
-        this.notUsedAsGlobal = false;
         for(Statement s:d.stats){
             countNestedTail = 0;
             countNestedHead = 0;
@@ -405,13 +377,8 @@ public class CodeGenerator implements Visitor {
             postCall = 0;
             this.visit(s);
         }
-
-        Collections.reverse(this.variablesUsedAsGlobal); // Add them in order used
-        for(String globalVar : this.variablesUsedAsGlobal){
-            programWriter.addGlobal(globalVar);
-        }
-
         programWriter.removeIndent();
+
     }
 
     @Override
@@ -421,4 +388,5 @@ public class CodeGenerator implements Visitor {
         this.visit(d.right);
         programWriter.addToOutput( "", false, true);
     }
+
 }
