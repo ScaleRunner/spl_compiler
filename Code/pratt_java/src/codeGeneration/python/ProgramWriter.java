@@ -30,6 +30,8 @@ public class ProgramWriter {
     }
 
     public void addToOutput(String line, boolean space, boolean EoL){
+        if(line.contains("def") && this.program.size() != 0)
+            this.program.add(""); // Blank line for visual pleasure
         this.currLine += space ? line + " " : line;
         if(EoL){
             this.program.add(this.currIndent + this.currLine);
@@ -67,6 +69,7 @@ public class ProgramWriter {
             throw new CompileException("Every SPL program needs a main function");
 
         if(!testProgram){
+            out.println(""); // Insert blank line for visual pleasure
             out.println("if __name__ == '__main__':");
             out.println(indent + "main()");
 
