@@ -47,7 +47,14 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
-        //TODO
+        this.visit(e.function_name);
+        programWriter.addToOutput("(", false);
+        for(int i = 0; i < e.args.size(); i ++){
+            this.visit(e.args.get(i));
+            if(i < e.args.size() - 1)
+                programWriter.addToOutput(", ", false);
+        }
+        programWriter.addToOutput(")", false);
     }
 
     @Override

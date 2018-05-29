@@ -8,8 +8,8 @@ facR (n) :: Int -> Int {
 
 main()::->Void
 {
-    Int i = 5;
-    Int result = facR(i);
+    var i = 5;
+    var result = facR(i);
     // result: 120
     print(result);
 }
