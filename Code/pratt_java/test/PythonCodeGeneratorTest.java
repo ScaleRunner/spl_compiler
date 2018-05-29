@@ -8,6 +8,7 @@ import org.junit.Test;
 import parser.Parser;
 import parser.declarations.Declaration;
 import typechecker.Typechecker;
+import util.CheckPythonVersion;
 import util.Node;
 import util.ReadSPL;
 
@@ -24,16 +25,19 @@ import static org.junit.Assert.assertEquals;
 public class PythonCodeGeneratorTest {
 
     private List<String> executePython() {
+        String pythonVersion = CheckPythonVersion.getPythonVersion();
         try {
             List<String> command = new ArrayList<>();
-            command.add("python");
+            command.add(pythonVersion);
             command.add("test.py");
             ProcessBuilder builder = new ProcessBuilder(command);
+            builder = builder.redirectErrorStream(true);
             final Process process = builder.start();
-            process.waitFor();
             InputStream is = process.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
+
+            process.waitFor();
 
             List<String> result = new ArrayList<>();
             String line;
@@ -200,13 +204,13 @@ public class PythonCodeGeneratorTest {
     @Test
     public void testReadInteger(){
         List<String> result = runStatement("read(0)");
-        assertEquals("Please enter an integer: ", result.get(0));
+        assertEquals("Please enter an integer: ", result.toString());
     }
 
     @Test
     public void testReadChar(){
         List<String> result = runStatement("read(1)");
-        assertEquals("Please enter a character: ", result.get(0));
+        assertEquals("Please enter a character: ", result.toString());
     }
 
     @Test
@@ -218,6 +222,12 @@ public class PythonCodeGeneratorTest {
     @Test
     public void testNotEmpty(){
         List<String> result = runStatement("print(isEmpty(1 : []));");
+        assertEquals("False", result.get(0));
+    }
+
+    @Test
+    public void testEmptyEmpty(){
+        List<String> result = runStatement("print(isEmpty([] : []));");
         assertEquals("False", result.get(0));
     }
 
@@ -397,40 +407,38 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/is_empty.spl");
 
         List<String> result = runCode(program);
-        assertEquals("[]", result.get(0));
+        assertEquals("True", result.get(0));
 
         String program2 = program.replaceAll("\\[Int] empty = \\[];", "[Int] empty = 1 : 2 : 3 : [];");
 
         result = runCode(program2);
-        assertEquals("[1, 2, 3]", result.get(0));
+        assertEquals("False", result.get(0));
 
 
         String program3 = program.replaceAll("\\[Int] empty = \\[];", "[Int] empty = 0 : [];");
 
         result = runCode(program3);
-        assertEquals("[0]", result.get(0));
+        assertEquals("False", result.get(0));
 
 
         String program4 = program.replaceAll("\\[Int] empty = \\[];", "[[Int]] empty = [] : [];");
 
         result = runCode(program4);
-        assertEquals("[[]]", result.get(0));
+        assertEquals("False", result.get(0));
     }
 
     @Test
     public void print(){
-        // TODO: Not working for Lists
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
 
         List<String> result = runCode(program);
-        assertEquals("('a', 'b')" +
-                "(1 , 2 )" +
-                "(3 , 'c')" +
-                "((1 , 2 ), ('a', 'b'))" +
-                "(((1 , 2 ), ('a', 'b')), ('a', 'b'))" +
-                "((((1 , 2 ), ('a', 'b')), ('a', 'b')), (((1 , 2 ), ('a', 'b')), ('a', 'b')))" +
-                "((((4 , 2 ), ('a', 'b')), ('a', 'b')), (((4 , 2 ), ('a', 'b')), ('a', 'b')))" +
-                "machine halted", result.get(0));
+        assertEquals("[('a', 'b'), " +
+                        "(1, 2), " +
+                        "(3, 'c'), " +
+                        "((1, 2), ('a', 'b')), " +
+                        "(((1, 2), ('a', 'b')), ('a', 'b')), " +
+                        "((((1, 2), ('a', 'b')), ('a', 'b')), (((1, 2), ('a', 'b')), ('a', 'b')))]"
+                , result.toString());
     }
 
     @Test
@@ -438,7 +446,7 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/infinite_list.spl");
 
         List<String> result = runCode(program);
-        assertEquals("1 2 3 1 2 3 1 2 3 1 machine halted", result.get(0));
+        assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3, 1]", result.toString());
     }
 
     @Test(expected = CompileException.class)
@@ -464,7 +472,6 @@ public class PythonCodeGeneratorTest {
                 "main()::->Void{\n" +
                 "[Int] b = 3:4:5:[];\n" +
                 "[[Int]] c = a:b;\n" +
-
                 "print(a.hd);\n" +
                 "}");
         assertEquals("1", result.get(0));
@@ -502,13 +509,11 @@ public class PythonCodeGeneratorTest {
                 "[Char] d = 'a':'b':'c':[];\n" +
                 "([Int],[Char]) e = (b, l);\n"+
                 "[Int] f = e.fst;\n"+
-                "print(f);\n" +
                 "d = e.snd;\n"+
-                "print(d);\n" +
                 "f = b.tl;\n"+
-                "print(f);\n" +
+                "print(2);\n" +
                 "}");
-        assertEquals("[[3, 4, 5], ['d', 'e', 'f'], [4, 5]]", result.toString());
+        assertEquals("2", result.get(0));
     }
 
     @Test
@@ -525,14 +530,13 @@ public class PythonCodeGeneratorTest {
         assertEquals("2", result.get(0));
     }
 
-    //Don't remember what this was
-//    @Test
-//    public void testSimpleFunctionList(){
-//        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariables.spl");
-//
-//        List<String> result = runCode(program);
-//        assertEquals("15", result.get(0));
-//    }
+    @Test
+    public void testMarkus(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariablesSimple.spl");
+
+        List<String> result = runCode(program);
+        assertEquals("[0, 42]", result.toString());
+    }
 
     @Test
     public void testAllTestsByMarkus() {
@@ -559,76 +563,76 @@ public class PythonCodeGeneratorTest {
                     String expected = "";
                     try {
                         if(path.toString().contains("assignments.spl")){
-                            expected = "0 1 2 0 1 2 0 1 2 2 3 4 6 7 8 9 6 0 6 -7 machine halted";
+                            expected = "[0, 1, 2, 0, 1, 2, 0, 1, 2, 2, 3, 4, 6, 7, 8, 9, 6, 0, 6, -7]";
                         } else if(path.toString().contains("associativity.spl")){
-                            expected = "0 0 2 1 1 4 machine halted";
+                            expected = "[0, 0, 2, 1, 1, 4]";
                         } else if(path.toString().contains("comments.spl")){
-                            expected = "1 2 3 4 5 6 7 machine halted";
+                            expected = "[1, 2, 3, 4, 5, 6, 7]";
                         } else if(path.toString().contains("functionArgumentsSimple.spl")){
-                            expected = "0 42 machine halted";
+                            expected = "[0, 42]";
                         } else if(path.toString().contains("functions.spl")){
-                            expected = "5 -1 1 5 -1 4 6 9 9 15 1 3 5 5 3 1 1 3 5 machine halted";
+                            expected = "[5, True, 1, 5, True, 4, 6, 9, 9, 15, 1, 3, 5, 5, 3, 1, 1, 3, 5]";
                         } else if(path.toString().contains("functionsSimple.spl")){
-                            expected = "5 -1 1 5 -1 4 6 machine halted";
+                            expected = "[5, True, 1, 5, True, 4, 6]";
                         } else if(path.toString().contains("globalVariables.spl")){
-                            expected = "5 3 15 0 6 4 42 -1 0 5 3 1 machine halted";
+                            expected = "[5, 3, 15, False, 6, 4, 42, True, False, 5, 3, 1]";
                         } else if(path.toString().contains("globalVariablesSimple.spl")){
-                            expected = "0 42 machine halted";
+                            expected = "[0, 42]";
                         } else if(path.toString().contains("helloWorld.spl")){
-                            expected = "42 -1 0 machine halted";
+                            expected = "[42, True, False]";
                         } else if(path.toString().contains("identifierNames.spl")){
-                            expected = "1 2 3 4 machine halted";
+                            expected = "[1, 2, 3, 4]";
                         } else if(path.toString().contains("ifThenElse.spl")){
-                            expected = "42 machine halted";
+                            expected = "[42]";
                         } else if(path.toString().contains("ifThenElse2.spl")){
-                            expected = "42 20 machine halted";
+                            expected = "[42, 20]";
                         } else if(path.toString().contains("ifThenElseFalse.spl")){
-                            expected = "100 machine halted";
+                            expected = "[100]";
                         } else if(path.toString().contains("ifThenElseInFunction.spl")){
-                            expected = "7 11 machine halted";
+                            expected = "[7, 11]";
                         } else if(path.toString().contains("ifThenElseScope.spl")){
-                            expected = "100 20 machine halted";
+                            expected = "[100, 20]";
                         } else if(path.toString().contains("ifThenElseScopeFunArg.spl")){
-                            expected = "100 20 machine halted";
+                            expected = "[100, 20]";
                         } else if(path.toString().contains("listFunction.spl")){
-                            expected = "7 8 9 10 7 8 9 10 machine halted";
+                            expected = "[7, 8, 9, 10, 7, 8, 9, 10]";
                         } else if(path.toString().contains("listFunction2.spl")){
-                            expected = "9 9 15 15 machine halted";
+                            expected = "[9, 9, 15, 15]";
                         } else if(path.toString().contains("listFunction3.spl")){
-                            expected = "42 machine halted";
+                            expected = "[42]";
                         } else if(path.toString().contains("lists.spl")){
-                            expected = "-1 7 0 -1 2 7 0 7 7 2 7 machine halted";
+                            expected = "[True, 7, False, True, 2, 7, False, 7, 7, 2, 7]";
                         } else if(path.toString().contains("listsSimple.spl")){
-                            expected = "7 10 7 8 11 8 machine halted";
+                            expected = "[7, 10, 7, 8, 11, 8]";
                         } else if(path.toString().contains("listsSimple2.spl")){
-                            expected = "7 8 machine halted";
+                            expected = "[7, 8]";
                         } else if(path.toString().contains("listsSimple3.spl")){
-                            expected = "8 machine halted";
+                            expected = "[8]";
                         } else if(path.toString().contains("localVariables.spl")){
-                            expected = "5 3 15 0 6 4 42 -1 0 5 3 1 machine halted";
+                            expected = "[5, 3, 15, False, 6, 4, 42, True, False, 5, 3, 1]";
                         } else if(path.toString().contains("localVariablesSimple.spl")){
-                            expected = "0 42 0 42 machine halted";
+                            expected = "[0, 42, 0, 42]";
                         } else if(path.toString().contains("precedence.spl")){
-                            expected = "11 6 -1 -1 -1 5 0 -2 5 1 -1 -1 0 -1 0 -1 -1 machine halted";
+                            expected = "[11, 6, True, True, True, 5, False, -2, 5, 1, True, True, False, True, False, True, True]";
                         } else if(path.toString().contains("recursiveFunction.spl")){
-                            expected = "6 10 5050 0 0 machine halted";
+                            expected = "[6, 10, 5050, 0, 0]";
                         } else if(path.toString().contains("recursiveFunction2.spl")){
-                            expected = "6 10 5050 0 0 machine halted";
+                            expected = "[6, 10, 5050, 0, 0]";
                         } else if(path.toString().contains("simpleArithmetic.spl")){
-                            expected = "3 6 4 -4 33 0 -1 0 -1 0 -1 0 -5 5 -5 5 0 -1 0 -1 machine halted";
+                            expected = "[3, 6, 4, -4, 33, False, True, False, True, False, True, False, -5, 5, -5, 5, False, True, False, True]";
                         } else if(path.toString().contains("tuples.spl")){
-                            expected = "5 3 15 0 5 3 42 -1 0 5 3 1 machine halted";
+                            expected = "[5, 3, 15, False, 5, 3, 42, True, False, 5, 3, 1]";
                         } else if(path.toString().contains("tuplesSimple.spl")){
-                            expected = "5 3 10 -1 -1 0 0 20 machine halted";
+                            expected = "[5, 3, 10, True, True, False, False, 20]";
                         } else if(path.toString().contains("tuplesSimple2.spl")){
-                            expected = "5 machine halted";
+                            expected = "[5]";
                         } else if(path.toString().contains("while.spl")){
-                            expected = "0 1 2 3 4 5 6 7 8 9 10 9 8 7 6 5 4 3 2 1 machine halted";
+                            expected = "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]";
                         } else {
                             expected = "File is not in tests";
                         }
 
-                        assertEquals(expected, result.get(0));
+                        assertEquals(expected, result.toString());
                     } catch (ComparisonFailure f){
                         System.err.println(String.format("Test Failed! \n\tExpected:%s\n\tActual:\t %s", expected, result));
                     }
