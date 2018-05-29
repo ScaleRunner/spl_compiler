@@ -7,7 +7,6 @@ import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
-import parser.types.EmptyListType;
 import util.Node;
 import util.Visitor;
 
@@ -16,7 +15,17 @@ import java.util.List;
 
 public class CodeGenerator implements Visitor {
 
+    private boolean lhsAssignment = false;
     private final ProgramWriter programWriter;
+
+    int countNestedTail = 0;
+    int countNestedHead = 0;
+    int totalNestedHDTL = 0;
+    private boolean nestedTL = false;
+    private boolean nestedHD = false;
+    int postCall = 0;
+    private String variablePost = null;
+    private boolean useNested = false;
 
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath, "\t");
@@ -66,6 +75,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IdentifierExpression e) {
+        if(lhsAssignment && postCall >1){
+            variablePost = e.name;
+        }
         programWriter.addToOutput(e.name, false);
     }
 
@@ -157,22 +169,77 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PostfixExpression e) {
+
+        /*
+        * This version uses the number of nested tails as index of array;
+        * Therefore, nested tails + head, only works if the element of the list in the given index (number of nested tl's) is a list
+        * */
+        if(postCall == 0){
+            countNestedTail =0;
+            countNestedHead=0;
+        }
+        postCall++;
+
         this.visit(e.left);
+
         switch (e.operator) {
             case TOK_FST:
                 programWriter.addToOutput("[0]", false, false);
+                //nested = false;
                 break;
 
             case TOK_SND:
                 programWriter.addToOutput("[1]", false, false);
+                //nested = false;
                 break;
 
             case TOK_HD:
-                programWriter.addToOutput("[0]", false, false);
+                if(!lhsAssignment)
+                    programWriter.addToOutput("[0]", false, false);
+                else {
+
+                    countNestedHead++;
+                    totalNestedHDTL++;
+                    if(nestedTL){
+                        nestedTL = false;
+                        programWriter.addToOutput("["+countNestedTail+"]", false, false);
+                        useNested = true;
+                        countNestedTail = 0;
+                    }
+                    if(totalNestedHDTL < postCall){
+                        nestedHD = true;
+                    }
+                    else if (totalNestedHDTL == postCall){
+                        programWriter.addToOutput("[0]", false, false);
+                        nestedHD = false;
+                    }
+
+                }
                 break;
 
             case TOK_TL:
-                programWriter.addToOutput("[1:]", false, false);
+                if(!lhsAssignment)
+                    programWriter.addToOutput("[1:]", false, false);
+                else{
+                    countNestedTail++;
+                    totalNestedHDTL++;
+                    if(nestedHD){
+                        nestedHD = false;
+                        for(int i =0; i< countNestedHead; i++){
+                            programWriter.addToOutput("[0]", false, false);
+                        }
+
+                        useNested = true;
+                        countNestedHead = 0;
+                    }
+                    if(totalNestedHDTL < postCall){
+                        nestedTL = true;
+                    }
+                    else if (totalNestedHDTL == postCall){
+                        programWriter.addToOutput(" ["+countNestedTail+"]", false, false);
+                        nestedTL = false;
+                    }
+                }
                 break;
         }
     }
@@ -213,7 +280,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(AssignStatement s) {
+        lhsAssignment = true;
         this.visit(s.name);
+        lhsAssignment = false;
         programWriter.addToOutput( " =", true, false);
         this.visit(s.right);
         programWriter.addToOutput( "", false, true);
@@ -302,6 +371,10 @@ public class CodeGenerator implements Visitor {
             this.visit(vd);
         }
         for(Statement s:d.stats){
+            countNestedTail = 0;
+            countNestedHead = 0;
+            totalNestedHDTL = 0;
+            postCall = 0;
             this.visit(s);
         }
         programWriter.removeIndent();
