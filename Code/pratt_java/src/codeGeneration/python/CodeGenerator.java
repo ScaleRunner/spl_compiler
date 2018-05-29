@@ -226,12 +226,27 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunctionDeclaration d) {
-        //TODO
+        programWriter.addToOutput( "def ", false);
+        this.visit(d.funName);
+        int n_args = d.args.size();
+        for(IdentifierExpression a:d.args){
+            this.visit(a);
+            if(n_args >1) {
+                programWriter.addToOutput(", ", false);
+            }
+        }
+        programWriter.addToOutput(":",true);
+        programWriter.addToOutput(":",true);
+        programWriter.addIndent();
+        this.visit(d.funName);
     }
 
     @Override
     public void visit(VariableDeclaration d) {
-        //TODO
+        this.visit(d.left);
+        programWriter.addToOutput( " = ", false);
+        this.visit(d.right);
+        programWriter.addToOutput( "", true);
     }
 
 }
