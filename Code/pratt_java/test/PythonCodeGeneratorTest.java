@@ -1,5 +1,6 @@
 import codeGeneration.CompileException;
 import codeGeneration.python.CodeGenerator;
+import codeGeneration.python.ProgramWriter;
 import lexer.Lexer;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
@@ -69,6 +70,7 @@ public class PythonCodeGeneratorTest {
         tc.typecheck(n);
 
         CodeGenerator gen = new CodeGenerator("test.py");
+        ProgramWriter.testProgram = true;
         try {
             gen.generateCode(n);
         } catch (FileNotFoundException e) {
