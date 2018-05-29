@@ -2,6 +2,7 @@ import codeGeneration.CompileException;
 import codeGeneration.python.CodeGenerator;
 import codeGeneration.python.ProgramWriter;
 import lexer.Lexer;
+import org.junit.After;
 import org.junit.ComparisonFailure;
 import org.junit.Test;
 import parser.Parser;
@@ -29,6 +30,7 @@ public class PythonCodeGeneratorTest {
             command.add("test.py");
             ProcessBuilder builder = new ProcessBuilder(command);
             final Process process = builder.start();
+            process.waitFor();
             InputStream is = process.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
@@ -43,6 +45,8 @@ public class PythonCodeGeneratorTest {
             return result;
         } catch (IOException e) {
             throw new CompileException("Stream could not be opened/closedn\n" + e.getMessage());
+        } catch (InterruptedException e) {
+            throw new CompileException("Python stopped abruptly\n" + e.getMessage());
         }
     }
 
@@ -77,6 +81,11 @@ public class PythonCodeGeneratorTest {
             e.printStackTrace();
         }
         return executePython();
+    }
+
+    @After
+    public void resetState(){
+        ProgramWriter.testProgram = false;
     }
 
     @Test
