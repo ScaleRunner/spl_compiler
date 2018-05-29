@@ -231,7 +231,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ReturnStatement s) {
-        //TODO
+        programWriter.addToOutput("return", true, false);
+        this.visit(s.arg);
+        programWriter.addToOutput("", false, true);
     }
 
     @Override
