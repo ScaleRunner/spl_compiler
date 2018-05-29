@@ -199,6 +199,25 @@ public class PythonCodeGeneratorTest {
     }
 
     @Test
+    public void testVariableDeclaration(){
+        List<String> result = runCode(
+                "multBy2( n, m ) :: -> Void {\n" +
+                        "Int d = 9;\n" +
+                        "d = 2;"+ //+ Try this later
+                        "print(d);\n" +
+                        "}"+
+                        "main()::->Void{\n" +
+                        "Int a = 3+ 2;\n" +
+                        "Int b = 5+ 3;\n" +
+                        "Int c = b;\n" +
+                        "print(c);\n" +
+
+                        //"return;" + Fix later
+                        "}");
+        assertEquals("32", result.get(0));
+    }
+
+    @Test
     public void testMultipleFunWithArguments(){
         List<String> result = runCode(
                 "multBy2( n, m ) :: Int Int -> Int {\n" +

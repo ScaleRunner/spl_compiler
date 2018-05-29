@@ -64,7 +64,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IdentifierExpression e) {
-        programWriter.addToOutput(e.name, true);
+        programWriter.addToOutput(e.name, false);
     }
 
     @Override
@@ -196,7 +196,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(AssignStatement s) {
-        //TODO
+        this.visit(s.name);
+        programWriter.addToOutput( " =", true, false);
+        this.visit(s.right);
+        programWriter.addToOutput( "", false, true);
     }
 
     @Override
@@ -233,27 +236,36 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunctionDeclaration d) {
-        programWriter.addToOutput( "def ", false);
+        programWriter.addToOutput( "def", true, false);
         this.visit(d.funName);
         int n_args = d.args.size();
+        programWriter.addToOutput( "(", false, false);
         for(IdentifierExpression a:d.args){
             this.visit(a);
             if(n_args >1) {
-                programWriter.addToOutput(", ", false);
+                programWriter.addToOutput(",", true);
             }
+            n_args--;
         }
-        programWriter.addToOutput(":",true);
-        programWriter.addToOutput(":",true);
+        programWriter.addToOutput( ")", false, false);
+        programWriter.addToOutput(":",false, true);
         programWriter.addIndent();
-        this.visit(d.funName);
+        for(VariableDeclaration vd: d.decls){
+            this.visit(vd);
+        }
+        for(Statement s:d.stats){
+            this.visit(s);
+        }
+        programWriter.removeIndent();
+
     }
 
     @Override
     public void visit(VariableDeclaration d) {
         this.visit(d.left);
-        programWriter.addToOutput( " = ", false);
+        programWriter.addToOutput( " =", true, false);
         this.visit(d.right);
-        programWriter.addToOutput( "", true);
+        programWriter.addToOutput( "", false, true);
     }
 
 }
