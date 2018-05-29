@@ -160,19 +160,19 @@ public class CodeGenerator implements Visitor {
         this.visit(e.left);
         switch (e.operator) {
             case TOK_FST:
-                //TODO
+                programWriter.addToOutput("[0]", false, false);
                 break;
 
             case TOK_SND:
-                //TODO
+                programWriter.addToOutput("[1]", false, false);
                 break;
 
             case TOK_HD:
-                //TODO
+                programWriter.addToOutput("[0]", false, false);
                 break;
 
             case TOK_TL:
-                //TODO
+                programWriter.addToOutput("[1:]", false, false);
                 break;
         }
     }
