@@ -51,9 +51,14 @@ public class ProgramWriter {
         this.currIndent = this.currIndent.replaceFirst(this.indent, "");
     }
 
-    public void printLast(){
-        String lastLine = this.program.remove(program.size());
-        this.program.add(String.format("print(%s)", lastLine));
+    public void addGlobal(String globalVariable){
+        for(int i = this.program.size()-1; i >= 0; i--){
+            String line = this.program.get(i);
+            if(line.contains("def ")){
+                this.program.add(i+1, this.currIndent + "global " + globalVariable);
+                break;
+            }
+        }
     }
 
     public void writeToFile() throws FileNotFoundException {
