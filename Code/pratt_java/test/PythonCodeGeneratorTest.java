@@ -278,7 +278,6 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testWhileLoop_conditionTrue(){
-        //TODO: This one loops (see loopStatement TODO)
         List<String> result = runCode("main()::->Void{\n" +
                 "Bool a = True; " +
                 "while(a){" +
@@ -286,7 +285,7 @@ public class PythonCodeGeneratorTest {
                 "}" +
                 "print(a);" +
                 "}");
-        assertEquals("0", result.get(0));
+        assertEquals("False", result.get(0));
     }
 
     @Test
@@ -298,7 +297,7 @@ public class PythonCodeGeneratorTest {
                 "}" +
                 "print(a);" +
                 "}");
-        assertEquals("-1", result.get(0));
+        assertEquals("True", result.get(0));
     }
 
     @Test
