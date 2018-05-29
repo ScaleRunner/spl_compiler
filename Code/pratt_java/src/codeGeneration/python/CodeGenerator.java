@@ -42,27 +42,34 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(BooleanExpression e) {
         String line = e.name ? "True" : "False";
-        programWriter.addToOutput(line, false);
+        programWriter.addToOutput(line, true);
     }
 
     @Override
     public void visit(CallExpression e) {
-        //TODO
+        this.visit(e.function_name);
+        programWriter.addToOutput("(", false);
+        for(int i = 0; i < e.args.size(); i ++){
+            this.visit(e.args.get(i));
+            if(i < e.args.size() - 1)
+                programWriter.addToOutput(",", true);
+        }
+        programWriter.addToOutput(")", false);
     }
 
     @Override
     public void visit(CharacterExpression e) {
-        programWriter.addToOutput(String.format("'%c'", e.name), false);
+        programWriter.addToOutput(String.format("'%c'", e.name), true);
     }
 
     @Override
     public void visit(IdentifierExpression e) {
-        programWriter.addToOutput(e.name, false);
+        programWriter.addToOutput(e.name, true);
     }
 
     @Override
     public void visit(IntegerExpression e) {
-        programWriter.addToOutput(String.valueOf(e.name), false);
+        programWriter.addToOutput(String.valueOf(e.name), true);
     }
 
     @Override
@@ -83,47 +90,47 @@ public class CodeGenerator implements Visitor {
         switch (e.operator) {
             // arithmetic binary functions
             case TOK_PLUS:
-                programWriter.addToOutput("+", false);
+                programWriter.addToOutput("+", true);
                 break;
             case TOK_MULT:
-                programWriter.addToOutput("*", false);
+                programWriter.addToOutput("*", true);
                 break;
             case TOK_MINUS:
-                programWriter.addToOutput("-", false);
+                programWriter.addToOutput("-", true);
                 break;
             case TOK_MOD:
-                programWriter.addToOutput("%", false);
+                programWriter.addToOutput("%", true);
                 break;
             case TOK_DIV:
-                programWriter.addToOutput("//", false);
+                programWriter.addToOutput("//", true);
                 break;
 
             // Boolean
             case TOK_AND:
-                programWriter.addToOutput("and", false);
+                programWriter.addToOutput("and", true);
                 break;
             case TOK_OR:
-                programWriter.addToOutput("or", false);
+                programWriter.addToOutput("or", true);
                 break;
 
             // Comparison
             case TOK_EQ:
-                programWriter.addToOutput("is", false);
+                programWriter.addToOutput("is", true);
                 break;
             case TOK_NEQ:
-                programWriter.addToOutput("is not", false);
+                programWriter.addToOutput("is not", true);
                 break;
             case TOK_LT:
-                programWriter.addToOutput("<", false);
+                programWriter.addToOutput("<", true);
                 break;
             case TOK_GT:
-                programWriter.addToOutput(">", false);
+                programWriter.addToOutput(">", true);
                 break;
             case TOK_LEQ:
-                programWriter.addToOutput("<=", false);
+                programWriter.addToOutput("<=", true);
                 break;
             case TOK_GEQ:
-                programWriter.addToOutput(">=", false);
+                programWriter.addToOutput(">=", true);
                 break;
             case TOK_CONS:
                 // TODO: do this
@@ -166,7 +173,7 @@ public class CodeGenerator implements Visitor {
                 break;
 
             case TOK_NOT:
-                programWriter.addToOutput("not", false);
+                programWriter.addToOutput("not", true);
                 break;
         }
         this.visit(e.right);
@@ -211,7 +218,7 @@ public class CodeGenerator implements Visitor {
     public void visit(PrintStatement s) {
         programWriter.addToOutput("print(", false);
         this.visit(s.arg);
-        programWriter.addToOutput(")", true);
+        programWriter.addToOutput(")", true, true);
     }
 
     @Override

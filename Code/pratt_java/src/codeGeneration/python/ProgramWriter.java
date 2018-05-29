@@ -25,12 +25,16 @@ public class ProgramWriter {
         this.currLine = "";
     }
 
-    public void addToOutput(String line, boolean EoL){
-        this.currLine += line + " ";
+    public void addToOutput(String line, boolean space, boolean EoL){
+        this.currLine += space ? line + " " : line;
         if(EoL){
             this.program.add(this.currIndent + this.currLine);
             this.currLine = "";
         }
+    }
+
+    public void addToOutput(String line, boolean space){
+        addToOutput(line, space, false);
     }
 
     public void addIndent(){
