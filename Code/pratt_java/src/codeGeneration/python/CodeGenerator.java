@@ -94,27 +94,27 @@ public class CodeGenerator implements Visitor {
         switch (e.operator) {
             // arithmetic binary functions
             case TOK_PLUS:
-                programWriter.addToOutput("+", true);
+                programWriter.addToOutput(" +", true);
                 break;
             case TOK_MULT:
-                programWriter.addToOutput("*", true);
+                programWriter.addToOutput(" *", true);
                 break;
             case TOK_MINUS:
-                programWriter.addToOutput("-", true);
+                programWriter.addToOutput(" -", true);
                 break;
             case TOK_MOD:
-                programWriter.addToOutput("%", true);
+                programWriter.addToOutput(" %", true);
                 break;
             case TOK_DIV:
-                programWriter.addToOutput("//", true);
+                programWriter.addToOutput(" //", true);
                 break;
 
             // Boolean
             case TOK_AND:
-                programWriter.addToOutput("and", true);
+                programWriter.addToOutput(" and", true);
                 break;
             case TOK_OR:
-                programWriter.addToOutput("or", true);
+                programWriter.addToOutput(" or", true);
                 break;
 
             // Comparison
@@ -125,26 +125,31 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput(" is not", true);
                 break;
             case TOK_LT:
-                programWriter.addToOutput("<", true);
+                programWriter.addToOutput(" <", true);
                 break;
             case TOK_GT:
-                programWriter.addToOutput(">", true);
+                programWriter.addToOutput(" >", true);
                 break;
             case TOK_LEQ:
-                programWriter.addToOutput("<=", true);
+                programWriter.addToOutput(" <=", true);
                 break;
             case TOK_GEQ:
-                programWriter.addToOutput(">=", true);
+                programWriter.addToOutput(" >=", true);
                 break;
             case TOK_CONS:
                 programWriter.addToOutput("[", false);
                 this.visit(e.left);
                 programWriter.addToOutput("]", true);
 
-                programWriter.addToOutput("+", true);
+                programWriter.addToOutput(" +", true);
 
-                this.visit(e.right);
-
+                if(e.right.getType() instanceof EmptyListType){
+                    programWriter.addToOutput("[", false);
+                    this.visit(e.left);
+                    programWriter.addToOutput("]", true);
+                } else {
+                    this.visit(e.right);
+                }
                 break;
 
             default:
