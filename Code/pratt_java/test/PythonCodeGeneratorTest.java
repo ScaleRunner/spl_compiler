@@ -502,11 +502,13 @@ public class PythonCodeGeneratorTest {
                 "[Char] d = 'a':'b':'c':[];\n" +
                 "([Int],[Char]) e = (b, l);\n"+
                 "[Int] f = e.fst;\n"+
+                "print(f);\n" +
                 "d = e.snd;\n"+
+                "print(d);\n" +
                 "f = b.tl;\n"+
-                "print(2);\n" +
+                "print(f);\n" +
                 "}");
-        assertEquals("2", result.get(0));
+        assertEquals("[[3, 4, 5], ['d', 'e', 'f'], [4, 5]]", result.toString());
     }
 
     @Test
