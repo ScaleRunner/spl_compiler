@@ -218,6 +218,12 @@ public class PythonCodeGeneratorTest {
     }
 
     @Test
+    public void testTuple(){
+        List<String> result = runStatement("print((1, 2));");
+        assertEquals("(1, 2)", result.get(0));
+    }
+
+    @Test
     public void testMultipleFunWithArguments(){
         List<String> result = runCode(
                 "multBy2( n, m ) :: Int Int -> Int {\n" +
