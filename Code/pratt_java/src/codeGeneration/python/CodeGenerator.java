@@ -181,12 +181,17 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ReadExpression e) {
-        //TODO
+        String type = e.arg.name == 1 ? "a character" : "an integer";
+        programWriter.addToOutput(String.format("read('Please enter %s:')", type), false, true);
     }
 
     @Override
     public void visit(TupleExpression e) {
-        //TODO
+        programWriter.addToOutput("(", false);
+        this.visit(e.left);
+        programWriter.addToOutput(",", true);
+        this.visit(e.right);
+        programWriter.addToOutput(")", false);
     }
 
     @Override
@@ -196,7 +201,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(AssignStatement s) {
-        //TODO
+        this.visit(s.name);
+        programWriter.addToOutput("=", true);
+        this.visit(s.right);
+        programWriter.addToOutput("", false, true);
     }
 
     @Override
