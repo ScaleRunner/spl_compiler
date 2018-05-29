@@ -1,11 +1,13 @@
 package codeGeneration.python;
 
 import codeGeneration.CompileException;
+import lexer.TokenType;
 import parser.declarations.Declaration;
 import parser.declarations.FunctionDeclaration;
 import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
+import parser.types.EmptyListType;
 import util.Node;
 import util.Visitor;
 
@@ -80,13 +82,15 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ListExpression e) {
-        //TODO
+        programWriter.addToOutput("[]", false);
     }
 
     @Override
     public void visit(OperatorExpression e) {
         programWriter.addToOutput("(", false);
-        this.visit(e.left);
+        if(e.operator != TokenType.TOK_CONS) // we need to do it separately for lists
+            this.visit(e.left);
+
         switch (e.operator) {
             // arithmetic binary functions
             case TOK_PLUS:
@@ -115,10 +119,10 @@ public class CodeGenerator implements Visitor {
 
             // Comparison
             case TOK_EQ:
-                programWriter.addToOutput("is", true);
+                programWriter.addToOutput(" is", true);
                 break;
             case TOK_NEQ:
-                programWriter.addToOutput("is not", true);
+                programWriter.addToOutput(" is not", true);
                 break;
             case TOK_LT:
                 programWriter.addToOutput("<", true);
@@ -133,13 +137,21 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput(">=", true);
                 break;
             case TOK_CONS:
-                // TODO: do this
+                programWriter.addToOutput("[", false);
+                this.visit(e.left);
+                programWriter.addToOutput("]", true);
+
+                programWriter.addToOutput("+", true);
+
+                this.visit(e.right);
+
                 break;
 
             default:
                 throw new CompileException(String.format("Invalid operator '%s'.", e.operator), e);
         }
-        this.visit(e.right);
+        if(e.operator != TokenType.TOK_CONS) // we need to do it separately for lists
+            this.visit(e.right);
         programWriter.addToOutput(")", false);
     }
 
@@ -173,7 +185,7 @@ public class CodeGenerator implements Visitor {
                 break;
 
             case TOK_NOT:
-                programWriter.addToOutput("not", true);
+                programWriter.addToOutput(" not", true);
                 break;
         }
         this.visit(e.right);
