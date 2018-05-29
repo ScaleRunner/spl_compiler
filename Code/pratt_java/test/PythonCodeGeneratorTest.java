@@ -355,12 +355,12 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/simpleConditional.spl");
 
         List<String> result = runCode(program);
-        assertEquals("amachine halted", result.get(0));
+        assertEquals("a", result.get(0));
 
         program = program.replaceAll("Int i = 0;", "Int i = 100;");
 
         result = runCode(program);
-        assertEquals("bmachine halted", result.get(0));
+        assertEquals("b", result.get(0));
     }
 
     @Test
@@ -368,7 +368,7 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/print_numbers_up_to.spl");
 
         List<String> result = runCode(program);
-        assertEquals("0 1 2 3 4 5 6 7 8 8 8 machine halted", result.get(0));
+        assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8]", result.toString());
     }
 
     @Test
@@ -376,24 +376,24 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8("./test/splExamples/is_empty.spl");
 
         List<String> result = runCode(program);
-        assertEquals("-1", result.get(0));
+        assertEquals("[]", result.get(0));
 
         String program2 = program.replaceAll("\\[Int] empty = \\[];", "[Int] empty = 1 : 2 : 3 : [];");
 
         result = runCode(program2);
-        assertEquals("0", result.get(0));
+        assertEquals("[1, 2, 3]", result.get(0));
 
 
         String program3 = program.replaceAll("\\[Int] empty = \\[];", "[Int] empty = 0 : [];");
 
         result = runCode(program3);
-        assertEquals("0", result.get(0));
+        assertEquals("[0]", result.get(0));
 
 
         String program4 = program.replaceAll("\\[Int] empty = \\[];", "[[Int]] empty = [] : [];");
 
         result = runCode(program4);
-        assertEquals("0", result.get(0));
+        assertEquals("[[]]", result.get(0));
     }
 
     @Test
