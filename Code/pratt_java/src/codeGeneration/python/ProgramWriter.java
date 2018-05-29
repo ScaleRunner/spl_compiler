@@ -1,5 +1,7 @@
 package codeGeneration.python;
 
+import codeGeneration.CompileException;
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ public class ProgramWriter {
 
     // Token used for indentation
     private final String indent;
+
+    public static boolean testProgram = false;
 
     public ProgramWriter(String filepath, String indent){
         this.filepath = filepath;
@@ -51,9 +55,21 @@ public class ProgramWriter {
     }
 
     public void writeToFile() throws FileNotFoundException {
+        boolean main = false;
+
         PrintWriter out = new PrintWriter(filepath);
-        for(String line : program){
+        for(String line : program) {
             out.println(line);
+            if (line.contains("def main"))
+                main = true;
+        }
+        if(!main && !testProgram)
+            throw new CompileException("Every SPL program needs a main function");
+
+        if(!testProgram){
+            out.println("if __name__ == '__main__':");
+            out.println(indent + "main()");
+
         }
         out.close();
     }
