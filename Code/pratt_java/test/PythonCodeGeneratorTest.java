@@ -201,6 +201,18 @@ public class PythonCodeGeneratorTest {
     }
 
     @Test
+    public void testEmpty(){
+        List<String> result = runStatement("print(isEmpty([]));");
+        assertEquals("True", result.get(0));
+    }
+
+    @Test
+    public void testNotEmpty(){
+        List<String> result = runStatement("print(isEmpty(1 : []));");
+        assertEquals("False", result.get(0));
+    }
+
+    @Test
     public void testVariableDeclaration(){
         List<String> result = runCode(
                 "multBy2( n, m ) :: -> Void {\n" +

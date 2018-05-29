@@ -76,8 +76,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(isEmptyExpression e) {
+        programWriter.addToOutput("not", true);
         this.visit(e.arg);
-        // TODO: the rest
     }
 
     @Override
