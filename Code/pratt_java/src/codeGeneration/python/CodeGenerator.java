@@ -12,21 +12,28 @@ import util.Node;
 import util.Visitor;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CodeGenerator implements Visitor {
 
     private final ProgramWriter programWriter;
 
+    private List<String> variablesDeclaredInFunction;
+    private List<String> variablesUsedAsGlobal;
+    private boolean notUsedAsGlobal;
+
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath, "\t");
+        this.variablesDeclaredInFunction = new ArrayList<>();
+        this.variablesUsedAsGlobal = new ArrayList<>();
     }
 
     public void generateCode(List<Declaration> nodes) throws FileNotFoundException {
         for(Node n : nodes){
             n.accept(this);
         }
-
         programWriter.writeToFile();
     }
 
@@ -49,7 +56,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
+        this.notUsedAsGlobal = true;
         this.visit(e.function_name);
+        this.notUsedAsGlobal = false;
+
         programWriter.addToOutput("(", false);
         for(int i = 0; i < e.args.size(); i ++){
             this.visit(e.args.get(i));
@@ -66,6 +76,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IdentifierExpression e) {
+        if(!this.notUsedAsGlobal && !this.variablesDeclaredInFunction.contains(e.name)
+                && !this.variablesUsedAsGlobal.contains(e.name)){
+            this.variablesUsedAsGlobal.add(e.name);
+        }
         programWriter.addToOutput(e.name, false);
     }
 
@@ -226,7 +240,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallStatement s) {
+        this.notUsedAsGlobal = true;
         this.visit(s.function_name);
+        this.notUsedAsGlobal = false;
+
         programWriter.addToOutput("(", false);
         for(int i = 0; i < s.args.size(); i ++){
             this.visit(s.args.get(i));
@@ -289,6 +306,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunctionDeclaration d) {
+        this.variablesUsedAsGlobal.clear();
+        this.variablesDeclaredInFunction.clear();
+        this.notUsedAsGlobal = true;
+
         programWriter.addToOutput( "def", true, false);
         this.visit(d.funName);
         int n_args = d.args.size();
@@ -304,13 +325,21 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(":",false, true);
         programWriter.addIndent();
         for(VariableDeclaration vd: d.decls){
+            variablesDeclaredInFunction.add(vd.left.name);
             this.visit(vd);
         }
+
+        this.notUsedAsGlobal = false;
         for(Statement s:d.stats){
             this.visit(s);
         }
-        programWriter.removeIndent();
 
+        Collections.reverse(this.variablesUsedAsGlobal); // Add them in order used
+        for(String globalVar : this.variablesUsedAsGlobal){
+            programWriter.addGlobal(globalVar);
+        }
+
+        programWriter.removeIndent();
     }
 
     @Override
@@ -320,5 +349,4 @@ public class CodeGenerator implements Visitor {
         this.visit(d.right);
         programWriter.addToOutput( "", false, true);
     }
-
 }
