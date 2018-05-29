@@ -30,6 +30,8 @@ public class ProgramWriter {
     }
 
     public void addToOutput(String line, boolean space, boolean EoL){
+        if(line.contains("def") && this.program.size() != 0)
+            this.program.add(""); // Blank line for visual pleasure
         this.currLine += space ? line + " " : line;
         if(EoL){
             this.program.add(this.currIndent + this.currLine);
@@ -49,9 +51,14 @@ public class ProgramWriter {
         this.currIndent = this.currIndent.replaceFirst(this.indent, "");
     }
 
-    public void printLast(){
-        String lastLine = this.program.remove(program.size());
-        this.program.add(String.format("print(%s)", lastLine));
+    public void addGlobal(String globalVariable){
+        for(int i = this.program.size()-1; i >= 0; i--){
+            String line = this.program.get(i);
+            if(line.contains("def ")){
+                this.program.add(i+1, this.currIndent + "global " + globalVariable);
+                break;
+            }
+        }
     }
 
     public void writeToFile() throws FileNotFoundException {
@@ -67,6 +74,7 @@ public class ProgramWriter {
             throw new CompileException("Every SPL program needs a main function");
 
         if(!testProgram){
+            out.println(""); // Insert blank line for visual pleasure
             out.println("if __name__ == '__main__':");
             out.println(indent + "main()");
 
