@@ -451,10 +451,25 @@ public class LexerTest {
 //        System.out.println(lexedTokenized);
     }
 
-    @Test(expected = TokenException.class)
+    @Test
     public void testWrongField() {
         Lexer l = new Lexer("a + True + 1 + b.hdd");
-        List<Token> lexedTokenized = l.tokenize();
+        l.tokenize();
+        assertEquals(1, l.getErrors().size());
+    }
+
+    @Test
+    public void testDoubleError() {
+        Lexer l = new Lexer("'a + True + 1 + b.hdd");
+        l.tokenize();
+        assertEquals(2, l.getErrors().size());
+    }
+
+    @Test
+    public void testFalseCharacter() {
+        Lexer l = new Lexer("'_'");
+        l.tokenize();
+        assertEquals(1, l.getErrors().size());
     }
 
     @Test

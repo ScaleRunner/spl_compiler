@@ -11,10 +11,12 @@ public class Lexer {
     private String input;
     private int currentPosition = 0;
     private final Map<String, Token> keywordMap;
+    private final List<TokenException> exceptions;
 
     public Lexer(String inp) {
         this.input = inp;
         this.keywordMap = setupKeywordMap();
+        this.exceptions = new ArrayList<>();
         removeComments();
     }
 
@@ -53,11 +55,21 @@ public class Lexer {
 
     public List<Token> tokenize(){
         List<Token> tokenizedInput = new ArrayList<>();
-        Token tok;
+        Token tok = new TokenOther(null);
         do{
-            tok = nextToken();
-            tokenizedInput.add(tok);
+            try {
+                tok = nextToken();
+                tokenizedInput.add(tok);
+            } catch (TokenException tokenException){
+                this.exceptions.add(tokenException);
+            }
         } while(tok.getType() != TokenType.TOK_EOF);
+
+        if(this.exceptions.size() > 0){
+            for(TokenException e : this.exceptions){
+                e.printStackTrace();
+            }
+        }
         return tokenizedInput;
     }
 
@@ -104,15 +116,21 @@ public class Lexer {
 
         if (match('\'')) {
             currentPosition++;
-            if(Character.isLetterOrDigit(input.charAt(currentPosition))){
-                char c = input.charAt(currentPosition);
+            char c = input.charAt(currentPosition);
+            if(Character.isLetterOrDigit(c)){
                 currentPosition++;
                 if(match('\'')){
                     currentPosition++;
                     return new TokenChar(c);
                 }
+                throw new TokenException(String.format("Unfinished Char expression, you probably forgot an apostrophe in \"'%s\".", c));
             }
-            throw new TokenException("Unfinished Char expression, you probably forgot an apostrophe.");
+            // Clean-up
+            currentPosition++;
+            if(match('\'')){
+                currentPosition++;
+            }
+            throw new TokenException(String.format("Expected to find a Character, found input \"'%s\"", c));
         }
 
         if (match('+')) {
@@ -312,5 +330,9 @@ public class Lexer {
 
         // Identifier is not a keyword, so we treat it as an identifier
         return new TokenIdentifier(result);
+    }
+
+    public List<TokenException> getErrors(){
+        return this.exceptions;
     }
 }
