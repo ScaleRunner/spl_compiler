@@ -276,7 +276,6 @@ public class Lexer {
             return lexIdentifier();
         }
         throw new TokenException(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
-//        return new TokenError(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
     }
 
     private Token lexInteger() {
