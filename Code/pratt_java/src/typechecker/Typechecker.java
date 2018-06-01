@@ -21,6 +21,7 @@ public class Typechecker implements Visitor {
 	private final Type emptyListType = Types.emptyListType;
 
 	private Environment env;
+	private Environment envGlobal;
 	private HashMap<String, List<Type>> functionSignatures;
 
 	private List<TypeError> errors;
@@ -101,7 +102,11 @@ public class Typechecker implements Visitor {
 				}
 			}
 		}
-		e.setType(env.get(e.function_name.name));
+		if(env.get(e.function_name.name) == null)
+			error(String.format("The function %s was not defined",
+					e.function_name.name), e);
+		else
+			e.setType(env.get(e.function_name.name).type);
 	}
 
 	@Override
@@ -111,11 +116,11 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(IdentifierExpression e) {
-		Type idType = env.get(e.name);
+		EnvironmentType idType = env.get(e.name);
 		if(idType == null)
 			error(String.format("Variable %s out of scope or undefined.", e.name), e);
 		else
-			e.setType(env.get(e.name));
+			e.setType(env.get(e.name).type);
 	}
 
 	@Override
@@ -372,7 +377,7 @@ public class Typechecker implements Visitor {
 		if(s.name instanceof IdentifierExpression){
 			IdentifierExpression id = (IdentifierExpression) s.name;
 
-			Type variableType = env.get(id.name);
+			Type variableType = env.get(id.name).type;
 
 			if(variableType == null){
 				error(String.format("Variable %s is not defined", id.name), s);
@@ -425,7 +430,7 @@ public class Typechecker implements Visitor {
 
 			}
 		}
-		s.setType(env.get(s.function_name.name));
+		s.setType(env.get(s.function_name.name).type);
 	}
 
 	@Override
@@ -509,8 +514,15 @@ public class Typechecker implements Visitor {
 
 		//set functiontype
 		d.setType(d.funType.returnType);
-		env.put(d.funName.name, d.funType.returnType);
-		functionSignatures.put(d.funName.name, d.funType.argsTypes);
+		//Functions are always global
+		if(env.get(d.funName.name) != null){
+			error(String.format("The function %s is already defined", d.funName.name), d);
+		}
+		else{
+			env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true));
+			functionSignatures.put(d.funName.name, d.funType.argsTypes);
+		}
+
 
 		//check if arguments and argument types match
 		if(d.args.size() != d.funType.argsTypes.size()){
@@ -523,8 +535,13 @@ public class Typechecker implements Visitor {
 		//set argument types if there are any
 		if(!d.args.isEmpty()){
 			for(IdentifierExpression id: d.args){
-				if(argsCount < d.funType.argsTypes.size())
-					env.put(id.name, d.funType.argsTypes.get(argsCount++));
+				if(env.get(id.name) != null){
+					if(!env.get(id.name).isGlobal)
+						error(String.format("The identifier %s is already in the list of parameters of this function", id.name), d);
+				}
+				else if(argsCount < d.funType.argsTypes.size())
+					//Arguments are treated as local variable, therefore not global
+					env.put(id.name, new EnvironmentType(d.funType.argsTypes.get(argsCount++), false));
 				else
 					env.put(id.name, null);
 			}
@@ -548,7 +565,7 @@ public class Typechecker implements Visitor {
 
 		env = backup;
 		//add function signature to environment, so other functions below it can still use it.
-		env.put(d.funName.name, d.funType.returnType);
+		env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true));
 
 	}
 
@@ -580,9 +597,13 @@ public class Typechecker implements Visitor {
 		}
 		if(d.varType.equals(d.right.getType()) || d.varType instanceof VarType) {
             if(env.get(d.left.name) != null){
-                error(String.format("Variable %s is already defined!", d.left.name), d);
+            	if((env.get(d.left.name).isGlobal && d.isGlobal) || ((!env.get(d.left.name).isGlobal && !d.isGlobal)))
+                	error(String.format("Variable %s is already defined!", d.left.name), d);
+            	else if(env.get(d.left.name).isGlobal && !d.isGlobal){
+					env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal));
+				}
             } else {
-                env.put(d.left.name, d.right.getType());
+                env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal));
             }
 		} else
             error(String.format("Variable %s, of type %s cannot have an assignment of type %s.",
@@ -858,7 +879,7 @@ public class Typechecker implements Visitor {
 	}
 
 	public Type getVariableType(String name){
-        return env.get(name);
+        return env.get(name).type;
     }
 
 
