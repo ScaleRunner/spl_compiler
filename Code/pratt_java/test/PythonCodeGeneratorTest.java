@@ -203,14 +203,17 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testReadInteger(){
-        List<String> result = runStatement("read(0)");
-        assertEquals("Please enter an integer: ", result.toString());
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/read.spl");
+
+//        List<String> result = runCode(program);
+//        assertEquals("120", result.get(0));
     }
 
     @Test
-    public void testReadChar(){
-        List<String> result = runStatement("read(1)");
-        assertEquals("Please enter a character: ", result.toString());
+    public void testReadCharacter(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/read_hello.spl");
+//        List<String> result = runCode(program);
+//        assertEquals("120", result.get(0));
     }
 
     @Test
