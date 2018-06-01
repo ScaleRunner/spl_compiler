@@ -278,8 +278,11 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ReadExpression e) {
-        String type = e.arg.name == 1 ? "a character" : "an integer";
-        programWriter.addToOutput(String.format("read('Please enter %s:')", type), false, true);
+        if(e.arg.name == 1){
+            programWriter.addToOutput("input('Please enter a character: ')", false, true);
+        } else {
+            programWriter.addToOutput("int(input('Please enter an integer: '))", false, true);
+        }
     }
 
     @Override

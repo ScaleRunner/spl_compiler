@@ -1,0 +1,30 @@
+greet (name) :: [Char] -> Void
+{
+    [Char] hello = 'h' : 'e' : 'l' : 'l' : 'o' : [];
+    print(hello);
+    print(name);
+}
+
+reverse_list (list) :: [Char] -> [Char] {
+    [Char] reverse = [];
+    while(!isEmpty(list)){
+        reverse = list.hd : reverse;
+        list = list.tl;
+    }
+    return reverse;
+
+}
+
+main() :: -> Void {
+    Char a = 'd';
+    [Char] name = [];
+
+    while (a != '0'){
+        a = read(1);
+        if(a != '0'){
+            name = a : name;
+        }
+    }
+    name = reverse_list(name);
+    greet(name);
+}

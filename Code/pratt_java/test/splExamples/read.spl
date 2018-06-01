@@ -1,0 +1,9 @@
+mult_by_two (int) :: Int -> Int
+{
+    return int * 2;
+}
+
+main() :: -> Void {
+    Int i = read(0);
+    print(mult_by_two(i));
+}
