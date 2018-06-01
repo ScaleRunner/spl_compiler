@@ -250,7 +250,7 @@ public class PythonCodeGeneratorTest {
 
                         //"return;" + Fix later
                         "}");
-        assertEquals("32", result.get(0));
+        assertEquals("8", result.get(0));
     }
 
     @Test
@@ -522,15 +522,17 @@ public class PythonCodeGeneratorTest {
     @Test
     public void testListTLandHD(){
         List<String> result = runCode("[Int] a = 1:2:3:[];\n" +
-                "[Int] b = 3:4:5:[];\n" +
+                "[Int] b = 3:4:5:6:[];\n" +
                 "[[Int]] c = a:b;\n" +
                 //"[Char] l = 'd':'e':'f':[];\n" +
                 "main()::->Void{\n" +
                 //"[Char] d = 'a':'b':'c':[];\n"+
-                "b.tl.tl = a.tl;\n"+
-                "print(2);\n" +
+                "b.hd = b;\n"+
+                "b.tl.tl = b;\n"+
+                "b.tl.tl.hd.tl.tl.hd = a.tl;\n"+
+                "print(b);\n" +
                 "}");
-        assertEquals("2", result.get(0));
+        assertEquals("[[[2, 3], 4, [...], 6]]", result.toString());
     }
 
     @Test

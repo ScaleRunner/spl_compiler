@@ -11,25 +11,35 @@ import java.util.List;
 
 public class CheckPythonVersion {
     public static String getPythonVersion(){
+        if(pythonVersionExists("python3")){
+            return "python3";
+        } else if(pythonVersionExists("python")){
+            return "python";
+        } else {
+            throw new CompileException("'python' or 'python3' is not found in your path");
+        }
+    }
+
+    private static boolean pythonVersionExists(String python){
         try {
             List<String> command = new ArrayList<>();
-            command.add("python3");
+            command.add(python);
             command.add("--version");
             ProcessBuilder builder = new ProcessBuilder(command);
+
             final Process process = builder.start();
-            InputStream is = process.getErrorStream();
+
+            InputStream is = process.getInputStream();
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
-
             process.waitFor();
-
             String line = br.readLine();
-            return line == null ? "python3" : "python";
-
-        } catch (IOException e) {
-            throw new CompileException("Stream could not be opened/closedn\n" + e.getMessage());
-        } catch (InterruptedException e) {
-            throw new CompileException("Python stopped abruptly\n" + e.getMessage());
+            if(line.contains("Python 2")){
+                System.err.println("Python 2.x was chosen as interpreter for running this compiler, which is not supported.");
+            }
+            return true;
+        } catch (IOException | InterruptedException e) {
+            return false;
         }
     }
 }

@@ -12,21 +12,38 @@ import util.Node;
 import util.Visitor;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CodeGenerator implements Visitor {
 
+    private boolean lhsAssignment = false;
     private final ProgramWriter programWriter;
+
+    int countNestedTail = 0;
+    int countNestedHead = 0;
+    int totalNestedHDTL = 0;
+    private boolean nestedTL = false;
+    private boolean nestedHD = false;
+    int postCall = 0;
+    private String variablePost = null;
+    private boolean useNested = false;
+
+    private List<String> variablesDeclaredInFunction;
+    private List<String> variablesUsedAsGlobal;
+    private boolean notUsedAsGlobal;
 
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath, "\t");
+        this.variablesDeclaredInFunction = new ArrayList<>();
+        this.variablesUsedAsGlobal = new ArrayList<>();
     }
 
     public void generateCode(List<Declaration> nodes) throws FileNotFoundException {
         for(Node n : nodes){
             n.accept(this);
         }
-
         programWriter.writeToFile();
     }
 
@@ -49,7 +66,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
+        this.notUsedAsGlobal = true;
         this.visit(e.function_name);
+        this.notUsedAsGlobal = false;
+
         programWriter.addToOutput("(", false);
         for(int i = 0; i < e.args.size(); i ++){
             this.visit(e.args.get(i));
@@ -66,6 +86,13 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IdentifierExpression e) {
+        if(lhsAssignment && postCall >1){
+            variablePost = e.name;
+        }
+        if(!this.notUsedAsGlobal && !this.variablesDeclaredInFunction.contains(e.name)
+                && !this.variablesUsedAsGlobal.contains(e.name)){
+            this.variablesUsedAsGlobal.add(e.name);
+        }
         programWriter.addToOutput(e.name, false);
     }
 
@@ -162,7 +189,19 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(PostfixExpression e) {
+
+        /*
+        * This version uses the number of nested tails as index of array;
+        * Therefore, nested tails + head, only works if the element of the list in the given index (number of nested tl's) is a list
+        * */
+        if(postCall == 0){
+            countNestedTail =0;
+            countNestedHead=0;
+        }
+        postCall++;
+
         this.visit(e.left);
+
         switch (e.operator) {
             case TOK_FST:
                 programWriter.addToOutput("[0]", false, false);
@@ -173,11 +212,52 @@ public class CodeGenerator implements Visitor {
                 break;
 
             case TOK_HD:
-                programWriter.addToOutput("[0]", false, false);
+                if(!lhsAssignment)
+                    programWriter.addToOutput("[0]", false, false);
+                else {
+
+                    countNestedHead++;
+                    totalNestedHDTL++;
+                    if(nestedTL){
+                        nestedTL = false;
+                        programWriter.addToOutput("["+countNestedTail+"]", false, false);
+                        useNested = true;
+                        countNestedTail = 0;
+                    }
+                    if(totalNestedHDTL < postCall){
+                        nestedHD = true;
+                    }
+                    else if (totalNestedHDTL == postCall){
+                        programWriter.addToOutput("[0]", false, false);
+                        nestedHD = false;
+                    }
+
+                }
                 break;
 
             case TOK_TL:
-                programWriter.addToOutput("[1:]", false, false);
+                if(!lhsAssignment)
+                    programWriter.addToOutput("[1:]", false, false);
+                else{
+                    countNestedTail++;
+                    totalNestedHDTL++;
+                    if(nestedHD){
+                        nestedHD = false;
+                        for(int i =0; i< countNestedHead; i++){
+                            programWriter.addToOutput("[0]", false, false);
+                        }
+
+                        useNested = true;
+                        countNestedHead = 0;
+                    }
+                    if(totalNestedHDTL < postCall){
+                        nestedTL = true;
+                    }
+                    else if (totalNestedHDTL == postCall){
+                        programWriter.addToOutput(" ["+countNestedTail+"]", false, false);
+                        nestedTL = false;
+                    }
+                }
                 break;
         }
     }
@@ -221,7 +301,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(AssignStatement s) {
+        lhsAssignment = true;
         this.visit(s.name);
+        lhsAssignment = false;
         programWriter.addToOutput( " =", true, false);
         this.visit(s.right);
         programWriter.addToOutput( "", false, true);
@@ -229,7 +311,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallStatement s) {
+        this.notUsedAsGlobal = true;
         this.visit(s.function_name);
+        this.notUsedAsGlobal = false;
+
         programWriter.addToOutput("(", false);
         for(int i = 0; i < s.args.size(); i ++){
             this.visit(s.args.get(i));
@@ -292,6 +377,10 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunctionDeclaration d) {
+        this.variablesUsedAsGlobal.clear();
+        this.variablesDeclaredInFunction.clear();
+        this.notUsedAsGlobal = true;
+
         programWriter.addToOutput( "def", true, false);
         this.visit(d.funName);
         int n_args = d.args.size();
@@ -307,11 +396,24 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(":",false, true);
         programWriter.addIndent();
         for(VariableDeclaration vd: d.decls){
+            variablesDeclaredInFunction.add(vd.left.name);
             this.visit(vd);
         }
+
+        this.notUsedAsGlobal = false;
         for(Statement s:d.stats){
+            countNestedTail = 0;
+            countNestedHead = 0;
+            totalNestedHDTL = 0;
+            postCall = 0;
             this.visit(s);
         }
+
+        Collections.reverse(this.variablesUsedAsGlobal); // Add them in order used
+        for(String globalVar : this.variablesUsedAsGlobal){
+            programWriter.addGlobal(globalVar);
+        }
+
         programWriter.removeIndent();
 
     }
@@ -323,5 +425,4 @@ public class CodeGenerator implements Visitor {
         this.visit(d.right);
         programWriter.addToOutput( "", false, true);
     }
-
 }
