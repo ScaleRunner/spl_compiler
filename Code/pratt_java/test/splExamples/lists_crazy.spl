@@ -1,28 +1,55 @@
 main()::->Void
 {
 
+
+    [([Int], [(Int, Int)])]  kzxc = ([],[]):((1:[]),((2,3):[])):[];
+    [[[([Int], [Int])]]]  y = (((([],[]):((1:[]),(2:[])):[]):[]):[]);
+    //Should not work and does not
+    //[[[[([Int], [Int])]]]] zxczxc= []:y;
     [Int] a = [];
     [Int] b = 7:[];
     [Int] c = 2:b;
+
+    ([[Int]], [[Int]]) abcde= ([],[]);
+    //[[(Int, [Int])]] rr = (1,b) : (2,c) : (3,[]): (4,[]):[];
+    //[[[Int]]] cccc = [];
+
+
+    [[[Int]]] cccc2 = []:[];
+
+
+    //Should not work and does not
+    //[[[([Int], [Int])]]] nn = (([],[]):(([]),([])):[]) : y;
+
     var zz = []:[];
     [[Int]] xx = (2:[]):zz;
+    [[Char]] yy = ('a':[]):zz;
+
+    var cc = []:[]:[]:[];
+
+
+    //Shouldn't work and does not
+    //[(Int, [Int])] rr = (1,b) : (2,c) : (3,[]:[]): (4,[]):[];
+    //[Int] xcv = []:[];
+
+
+
+
 
     //([Int], [Bool]) myTuple = ([],[]);
     [[Int]] d = (2:[]):[];
 
-    [[(Int, [Char])]] e = ((1, []):[]) : ((2, ('a':[])):[]);
+    [[(Int, [Char])]] e = ((1, []):[]) : ((2, ('a':[])):[]):[];
     [[Int]] f = (2:[]):[]:[]:[];
 
-    [[[([Int], [Int])]]]  y = (((([],[]):((1:[]),(2:[])):[]):[]):[]);
 
-    //Should not work and does not
-    //[[[([Int], [Int])]]] nn = (([],[]):(([]),([])):[]) : y;
+    //here
+
     //Should not work and does not;
     //[[Int]] h = 2:[]:[]:[]:[];
     //Should not work and does not;
     //[[[Int]]] ll =  (4:5:6:[]) : (((1:2:3:[]):[]):[]);
-    //Attempts to create list with []:y, which fails, but generates nullpointerexception
-    //somewhere else after error is found
+    //Attempts to create list with []:y, which fails
     //[[[([Int], [Int])]]] nn = ([],[]):(([]),([])):[] : y;
     //Unbalanced parenthesis give strange error
     //Missing ';' at the end of the line.
@@ -35,13 +62,15 @@ main()::->Void
     //[[(Int, Char)]] gg = ((1, []):[]) : (((2, 'a'):[]):[]);
     //Should not work and does not;
     //[Int] l = []:1:[];
-    //Should not work and does not;
-    //[([Int], [Int])]  k = ([],[]):((1:[]),((2,3):[])):[];
+
     //works and should work
-    //[([Int], [Int])]  k = ([],[]):((1:[]),(2:[])):[];
+    [([Int], [Int])]  lk = ([],[]):((1:[]),(2:[])):[];
 
     //This actually works as it should :O
-    [[[[([Int], [Int])]]]]  h = (((([],[]):(([]),([])):[]):[]):[]):(((([],[]):((1:[]),(2:[])):[]):[]):[]);
+    [[[[([Int], [Int])]]]]  h = (((([],[]):(([]),([])):[]):[]):[]):(((([],[]):((1:[]),(2:[])):[]):[]):[]):[];
+    //This actually works as it should :OOOOOOOOOOOOO
+    [[[[ (([[[[([Int], [Int])]]]], [[[[([Int], [Int])]]]]), ([[[[([Int], [Int])]]]], [[[[([Int], [Int])]]]]))  ]]]] yyy = ((( ((h, h), (h, h)):[]):[]):[]):[];
+
 
     [([Int], [Int])]  i = ([],[]):((1:[]),(2:[])):[];
     [[[([Int], [Int])]]]  j = ((([],[]):((1:[]),(2:[])):[]):[]):[];
@@ -53,19 +82,19 @@ main()::->Void
     [[(Int, [([Char],Char)] )]] m =  ((1, (([],'a'):[]) ):[]) : (((2, ((  ('b':[]) ,'c'):[]) ):[]):[]);
 
 
-    [[[[(Char,[Int])]]]] n =    (((('a', a):[]):[]):[]) : (((('b', []):[]):[]):[]);
+    [[[[(Char,[Int])]]]] n =    (((('a', a):[]):[]):[]) : (((('b', []):[]):[]):[]):[];
     //Should work and it does work
-    [[(Int, [(Char,Char)] )]] o =  ((1, (('d','a'):[]) ):[]) : ((2, (('b','c'):[]) ):[]);
+    [[(Int, [(Char,Char)] )]] o =  ((1, (('d','a'):[]) ):[]) : ((2, (('b','c'):[]) ):[]) :[];
     //Shouldn't work and it does not
     //[[(Int, [([Char],Char)] )]] s =  ((1, (([],'a'):[]) ):[]) : ((2, (('b','c'):[]) ):[]);
     [ ([Int],Int) ] p = ([],1) : (c,2) : ([],3): ([],4):[];
 
     ([Int], Char) q = (a, 'c');
+
     //Should not work and does not
-    //But gets null pointer exception
-    //[ (Int, [Int]) ] r = (1,b) : (2,c) : (3,[]:[]): (4,[]):[];
+    //[ (Int, [[Int]]) ] rRSR = (1,(7:[]):[]) : (2,(7:[]):[]) : (3, ([]:[])): (4,[]):[];
+
     //This works as it should though
-    //[ (Int, [[Int]]) ] r = (1,(7:[]):[]) : (2,(7:[]):[]) : (3, ([]:[])): (4,[]):[];
     [ (Int, [Int]) ] r = (1,b) : (2,c) : (3,[]): (4,[]):[];
     [ ([Int],Int) ] s = (b,1) : (c,2) : ([],3): ([],4):[];
 

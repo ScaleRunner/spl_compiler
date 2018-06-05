@@ -15,7 +15,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+
+
 public class Typechecker implements Visitor {
+
+	boolean checkingLeftRightDeclarationType = false;
 
 	// These are for convenience.
 	private final Type emptyListType = Types.emptyListType;
@@ -571,8 +575,10 @@ public class Typechecker implements Visitor {
 
 	@Override
 	public void visit(VariableDeclaration d) {
+
 		this.visit(d.right);
-		if(d.right.getType() instanceof ListType){
+		checkingLeftRightDeclarationType=true;
+		/*if(d.right.getType() instanceof ListType){
 			if(((ListType) d.right.getType()).listType == emptyListType){// we're dealing with an empty list
 
 				if(d.varType instanceof VarType){
@@ -584,17 +590,32 @@ public class Typechecker implements Visitor {
 			    else{
 					d.right.setType(d.varType);
 				}
-
-
-            }else if (d.varType instanceof  ListType){
-				if(isListOfCompatible(d.right.getType(), d.varType, d.right)){
+*/
+			if (d.varType instanceof  TupleType){
+				if(d.right.getType() instanceof TupleType){
+					if(isListOfCompatible(((TupleType) d.varType).left, ((TupleType) d.right.getType()).left, d.right) &&
+							isListOfCompatible(((TupleType) d.varType).right, ((TupleType) d.right.getType()).right, d.right)){
+						//it's fine
+						d.right.setType(d.varType);
+					}
+				}
+			}
+			else if (d.varType instanceof  ListType){
+				if(isListOfCompatible(d.varType, d.right.getType(), d.right)){
+					//it's fine
 					d.right.setType(d.varType);
 				}
+				//if rhs is only made of empty lists it might still be compatible.
+				/*else if(checkOnlyEmptyListType(d.right.getType())){
+						if(isListOfCompatible(((ListType) d.varType).listType, d.right.getType(), d.right))
+							d.right.setType(d.varType);
+				}*/
 			}
 			else if(d.varType instanceof VarType){
 				d.varType = Types.varType(d.right.getType());
 			}
-		}
+		//}
+		checkingLeftRightDeclarationType=false;
 		if(d.varType.equals(d.right.getType()) || d.varType instanceof VarType) {
             if(env.get(d.left.name) != null){
             	if((env.get(d.left.name).isGlobal && d.isGlobal) || ((!env.get(d.left.name).isGlobal && !d.isGlobal)))
@@ -631,7 +652,7 @@ public class Typechecker implements Visitor {
 		}
 
 		//If rhs has list type of left.type, it's fine
-		else if(isListOfCompatible( ((ListType) e.right.getType()).listType,(e.left.getType()), e)){
+		else if(isListOfCompatible((e.left.getType()), ((ListType) e.right.getType()).listType, e)){
 			e.setType(e.right.getType());
 			return;
 		}
@@ -692,11 +713,7 @@ public class Typechecker implements Visitor {
 		if(checkEmptyListTypeNull(left) ||checkEmptyListTypeNull(right)) {
 
 			if (left instanceof ListType && right instanceof ListType) {
-				if (((ListType) left).listType == emptyListType) {
-					//TODO: double check this later
-					return true;
-
-				} else if (((ListType) right).listType == emptyListType) {
+				if (((ListType) right).listType == emptyListType) {
 					//TODO: double check this later
 					return true;
 
@@ -766,19 +783,27 @@ public class Typechecker implements Visitor {
 						isListOfCompatible(((TupleType) left).right, ((TupleType) right).right, e);
 
 			}
-			else if (right == emptyListType && (!(left instanceof ListType)) && (!(left instanceof TupleType))) {
+			else if (checkingLeftRightDeclarationType && (right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
+				return true;
+			}
+			else if (checkingLeftRightDeclarationType && (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
+				return true;
+			}
+			else if (right == emptyListType && (!(left instanceof ListType))) {
 				return true;
 
 			}
-			else if (left == emptyListType&& (!(right instanceof ListType)) && (!(right instanceof TupleType))) {
+			else if (left == emptyListType && (!(right instanceof ListType)) ) {
 				return true;
 
 			}
 			else {
-				error("Typechecker: invalid list types",e );
+				//error("Typechecker: invalid list types",e );
 				return false;
 			}
 		}
+		else if( left == null || right == null)
+			return false;
 		else if(left.equals(right)){
 			return true;
 		}
