@@ -19,7 +19,7 @@ import java.util.List;
 
 public class Typechecker implements Visitor {
 
-	boolean checkingLeftRightDeclarationType = false;
+	private boolean checkingLeftRightDeclarationType = false;
 
 	// These are for convenience.
 	private final Type emptyListType = Types.emptyListType;
@@ -60,7 +60,7 @@ public class Typechecker implements Visitor {
 		errors.add(new TypeError(String.format("%s \n\tError occurred in:\n%s",errorMessage, n)));
 	}
 
-	public void printErrors() {
+	private void printErrors() {
 		for (TypeError e : errors) {
 			System.out.println(e.getErrorMessage());
 		}
@@ -621,13 +621,13 @@ public class Typechecker implements Visitor {
             	if((env.get(d.left.name).isGlobal && d.isGlobal) || ((!env.get(d.left.name).isGlobal && !d.isGlobal)))
                 	error(String.format("Variable %s is already defined!", d.left.name), d);
             	else if(env.get(d.left.name).isGlobal && !d.isGlobal){
-					env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal));
+					env.put(d.left.name, new EnvironmentType(d.right.getType(), false));
 				}
             } else {
                 env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal));
             }
 		} else
-            error(String.format("Variable %s, of type %s cannot have an assignment of type %s.",
+            error(String.format("Variable %s, of type \n%s cannot have an assignment \nof type %s.",
                     d.left, d.varType, d.right.getType()), d);
         d.setType(Types.voidType);
 	}
@@ -651,7 +651,7 @@ public class Typechecker implements Visitor {
 			return;
 		}
 
-		//If rhs has list type of left.type, it's fine
+		//If rhs has list type compatible left.type, it's fine
 		else if(isListOfCompatible((e.left.getType()), ((ListType) e.right.getType()).listType, e)){
 			e.setType(e.right.getType());
 			return;
@@ -659,11 +659,11 @@ public class Typechecker implements Visitor {
 
 		//If one  of the sides of the expression has an empty list, we need to check if types are
 		else if(checkEmptyListTypeNull(e.left.getType()) || checkEmptyListTypeNull(e.right.getType()) ){
-			if(isCompatible(e.left.getType(), ((ListType) e.right.getType()), e)){
-				if(checkEmptyListTypeNull(e.left.getType()))
-					e.setType(new ListType(e.right.getType()));
-				else
-					e.setType(new ListType(e.left.getType()));
+			if(isCompatible(e.left.getType(), ((ListType) e.right.getType()), e, false)){
+				//if(checkEmptyListTypeNull(e.left.getType()))
+					e.setType((e.right.getType()));
+				//else
+					//e.setType(Types.listType(e.left.getType()));
 			}
 			else
 				error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
@@ -707,26 +707,27 @@ public class Typechecker implements Visitor {
 
 	}
 
-    private boolean isCompatible(Type left, Type right, Expression e) {
+    private boolean isCompatible(Type left, Type right, Expression e, boolean nested) {
 		//tobeFixed = leftTYPE
 
 		if(checkEmptyListTypeNull(left) ||checkEmptyListTypeNull(right)) {
 
 			if (left instanceof ListType && right instanceof ListType) {
-				if (((ListType) right).listType == emptyListType) {
+				if (((ListType) right).listType == emptyListType && !nested) {
 					//TODO: double check this later
 					return true;
 
 				}else{
-					return isCompatible(((ListType) left).listType, ((ListType) right).listType, e);
+					return isCompatible(((ListType) left).listType, ((ListType) right).listType, e, false);
 				}
 
 			} else if (((left instanceof TupleType)) && ((right instanceof TupleType))) {
 					//if (toBeFixed.equals(emptyListType)) {
 					//	emptyListTypeExpr.setType(fixer);
 					//} else if (toBeFixed instanceof TupleType && fixer instanceof TupleType) {
-					return isCompatible(((TupleType) left).left, ((TupleType) right).left, e) &&
-					isCompatible(((TupleType) left).right, ((TupleType) right).right, e);
+                    return isCompatible(((TupleType) left).left, ((TupleType) right).left, e, true) &&
+					isCompatible(((TupleType) left).right, ((TupleType) right).right, e,true);
+
 
 			}
 			else if (left instanceof TupleType && ((right instanceof ListType))) {
@@ -739,8 +740,8 @@ public class Typechecker implements Visitor {
 				else{
 
 					TupleType listTuple = (TupleType) listType;
-					return isCompatible(((TupleType) left).left, listTuple.left, e) &&
-							isCompatible(((TupleType) left).right, listTuple.right, e);
+					return isCompatible(((TupleType) left).left, listTuple.left, e, true) &&
+							isCompatible(((TupleType) left).right, listTuple.right, e, true);
 				}
 
 			}
