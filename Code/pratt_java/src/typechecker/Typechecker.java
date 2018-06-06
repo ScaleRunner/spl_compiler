@@ -641,7 +641,50 @@ public class Typechecker implements Visitor {
 		ListType listTypeRight = (ListType) e.right.getType();
 
 		//Anything : emptyList has List[Anything] type
-		if(listTypeRight.listType == emptyListType){
+
+        if(listTypeRight instanceof ListType){
+            if(listTypeRight.listType instanceof ListType){
+                if(listTypeRight.listType instanceof ListType) {
+                    if(((ListType) listTypeRight.listType).listType == emptyListType) {
+                        if (e.left.getType() instanceof ListType) {
+                            if (((ListType) e.left.getType()).listType != emptyListType) {
+                                e.setType(e.left.getType());
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (e.left.getType() instanceof ListType){
+            if(((ListType) e.left.getType()).listType == emptyListType){
+                if(e.right.getType() instanceof ListType){
+                    if(((ListType) e.right.getType()).listType == emptyListType){
+                        e.setType(Types.listType(Types.listType(emptyListType)));
+                        return;
+                    }
+                    else if(((ListType) e.right.getType()).listType instanceof ListType){
+                        if(((ListType) ((ListType) e.right.getType()).listType).listType == emptyListType){
+                            e.setType(e.right.getType());
+                            return;
+                        }
+                        else{
+                            error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
+                        }
+                    }
+                    else{
+                        error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
+                    }
+                }
+                else{
+                    error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
+                }
+            }
+
+        }
+
+        if(listTypeRight.listType == emptyListType){
 			e.setType(new ListType(e.left.getType()));
 			return;
 		}
@@ -650,24 +693,27 @@ public class Typechecker implements Visitor {
 			e.setType(e.right.getType());
 			return;
 		}
-
 		//If rhs has list type compatible left.type, it's fine
 		else if(isListOfCompatible((e.left.getType()), ((ListType) e.right.getType()).listType, e)){
-			e.setType(e.right.getType());
-			return;
+		    Type infered = inferedTyped(e.left.getType(), ((ListType) e.right.getType()).listType, e);
+		    if(infered != null)
+			    e.setType(Types.listType(infered));
+		    else
+                error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
+			    return;
 		}
 
 		//If one  of the sides of the expression has an empty list, we need to check if types are
-		else if(checkEmptyListTypeNull(e.left.getType()) || checkEmptyListTypeNull(e.right.getType()) ){
-			if(isCompatible(e.left.getType(), ((ListType) e.right.getType()), e, false)){
-				//if(checkEmptyListTypeNull(e.left.getType()))
-					e.setType((e.right.getType()));
-				//else
-					//e.setType(Types.listType(e.left.getType()));
-			}
-			else
-				error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
-		}
+//		else if(checkEmptyListTypeNull(e.left.getType()) || checkEmptyListTypeNull(e.right.getType()) ){
+//			if(isCompatible(e.left.getType(), ((ListType) e.right.getType()), e, false)){
+//				//if(checkEmptyListTypeNull(e.left.getType()))
+//					e.setType((e.right.getType()));
+//				//else
+//					//e.setType(Types.listType(e.left.getType()));
+//			}
+//			else
+//				error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
+//		}
 		else
 			error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
 
@@ -773,8 +819,14 @@ public class Typechecker implements Visitor {
 		if(checkEmptyListTypeNull(left) ||checkEmptyListTypeNull(right)) {
 
 			if (left instanceof ListType && right instanceof ListType) {
-
-				return isListOfCompatible(((ListType) left).listType, ((ListType) right).listType, e);
+//                if (((ListType) left).listType == emptyListType){
+//                    return true;
+//                }
+//                else if (((ListType) right).listType == emptyListType){
+//                    return true;
+//                }
+//                else
+				    return isListOfCompatible(((ListType) left).listType, ((ListType) right).listType, e);
 
 			} else if (((left instanceof TupleType)) && ((right instanceof TupleType))) {
 				//if (toBeFixed.equals(emptyListType)) {
@@ -784,17 +836,19 @@ public class Typechecker implements Visitor {
 						isListOfCompatible(((TupleType) left).right, ((TupleType) right).right, e);
 
 			}
-			else if (checkingLeftRightDeclarationType && (right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
+			//else if (checkingLeftRightDeclarationType && (right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
+            /*else if ((right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
 				return true;
 			}
-			else if (checkingLeftRightDeclarationType && (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
+			//else if (checkingLeftRightDeclarationType && (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
+            else if ( (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
 				return true;
-			}
-			else if (right == emptyListType && (!(left instanceof ListType))) {
+			}*/
+			else if (right == emptyListType /*&& (!(left instanceof ListType))*/) {
 				return true;
 
 			}
-			else if (left == emptyListType && (!(right instanceof ListType)) ) {
+			else if (left == emptyListType /*&& (!(right instanceof ListType)) */) {
 				return true;
 
 			}
@@ -813,6 +867,56 @@ public class Typechecker implements Visitor {
 
 
 	}
+
+
+
+    private Type inferedTyped(Type left, Type right, Expression e) {
+        //tobeFixed = leftTYPE
+
+        if(checkEmptyListTypeNull(left) ||checkEmptyListTypeNull(right)) {
+
+            if (left instanceof ListType && right instanceof ListType) {
+                return Types.listType(inferedTyped(((ListType) left).listType, ((ListType) right).listType, e));
+
+            } else if (((left instanceof TupleType)) && ((right instanceof TupleType))) {
+                //if (toBeFixed.equals(emptyListType)) {
+                //	emptyListTypeExpr.setType(fixer);
+                //} else if (toBeFixed instanceof TupleType && fixer instanceof TupleType) {
+                return Types.tupleType(inferedTyped(((TupleType) left).left, ((TupleType) right).left, e),
+                        inferedTyped(((TupleType) left).right, ((TupleType) right).right, e));
+
+            }
+            //else if (checkingLeftRightDeclarationType && (right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
+            /*else if ((right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
+                return left;
+            }
+            //else if (checkingLeftRightDeclarationType && (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
+            else if ( (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
+                return right;
+            }*/
+            else if (right == emptyListType) {
+                return left;
+
+            }
+            else if (left == emptyListType ) {
+                return right;
+
+            }
+            else {
+                //error("Typechecker: invalid list types",e );
+                return null;
+            }
+        }
+        else if( left == null || right == null)
+            return null;
+        else if(left.equals(right)){
+            return left;
+        }
+        else
+            return null;
+
+
+    }
 
 //	//TODO: spend some more time to check this for more cases where things should not work.
 //	private Type inferEmptyListType(Type left, Type right, Expression e){
