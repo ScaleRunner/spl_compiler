@@ -12,7 +12,6 @@
 *.dmg
 *.gz
 *.iso
-*.jar
 *.rar
 *.tar
 *.zip
@@ -20,7 +19,7 @@
 *.ear
 *.sar
 *.class
-bin
+bin/*
 
 # Maven 
 target/
