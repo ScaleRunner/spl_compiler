@@ -2,6 +2,7 @@
 # Project specific excludes
 #
 *.ssm
+*.py
 
 #
 # Default excludes
@@ -67,7 +68,6 @@ pom.xml.tag
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 *.zip
