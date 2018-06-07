@@ -28,7 +28,7 @@ public class SSMCodeGeneratorTest {
             List<String> command = new ArrayList<>();
             command.add("java");
             command.add("-jar");
-            command.add("ssm.jar");
+            command.add("lib/ssm.jar");
             command.add("--cli");
             command.add("--file");
             command.add("test.ssm");
