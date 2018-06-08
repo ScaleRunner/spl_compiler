@@ -48,7 +48,7 @@ public class PythonCodeGeneratorTest {
 
             return result;
         } catch (IOException e) {
-            throw new CompileException("Stream could not be opened/closedn\n" + e.getMessage());
+            throw new CompileException("Stream could not be opened/closed\n" + e.getMessage());
         } catch (InterruptedException e) {
             throw new CompileException("Python stopped abruptly\n" + e.getMessage());
         }
@@ -537,7 +537,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testMarkus(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariablesSimple.spl");
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/recursiveFunction2.spl");
 
         List<String> result = runCode(program);
         assertEquals("[0, 42]", result.toString());
