@@ -1,20 +1,16 @@
 package typechecker;
 
-import parser.types.Type;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class Environment extends HashMap<String, EnvironmentType> {
-	// just shut up, okay?
-	private static final long serialVersionUID = 42L;
-	
-	// Applies a substitution to all types in the environment
-	public void applySubstitution(Substitution s) {
-		/*for (Entry<String, Type> pair : this.entrySet()) {
-			this.put(pair.getKey(), pair.getValue().applySubstitution(s));
-		}*/
-	}
+
+    public boolean isGlobalVariable(String varName){
+        EnvironmentType t = this.get(varName);
+        if(t == null)
+            return false;
+        return !t.isFunction && t.isGlobal;
+    }
 
     /**
      * Java Strings are immutable, Types are not they have to be copied
@@ -25,12 +21,7 @@ public class Environment extends HashMap<String, EnvironmentType> {
 	    Environment copy = new Environment();
 
         for (Map.Entry<String, EnvironmentType> entry : env.entrySet()) {
-            try {
-                copy.put(entry.getKey(), (EnvironmentType) entry.getValue().clone());
-            } catch (CloneNotSupportedException e) {
-                System.err.println("Type object is not cloneable.");
-                e.printStackTrace();
-            }
+            copy.put(entry.getKey(), (EnvironmentType) entry.getValue().clone());
         }
 
 	    return copy;

@@ -8,6 +8,7 @@ import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import parser.types.EmptyListType;
+import typechecker.Environment;
 import util.Node;
 import util.Visitor;
 
@@ -21,22 +22,21 @@ public class CodeGenerator implements Visitor {
     private boolean lhsAssignment = false;
     private final ProgramWriter programWriter;
 
-    int countNestedTail = 0;
-    int countNestedHead = 0;
-    int totalNestedHDTL = 0;
+    private int countNestedTail = 0;
+    private int countNestedHead = 0;
+    private int totalNestedHDTL = 0;
     private boolean nestedTL = false;
     private boolean nestedHD = false;
-    int postCall = 0;
+    private int postCall = 0;
     private String variablePost = null;
     private boolean useNested = false;
 
-    private List<String> variablesDeclaredInFunction;
-    private List<String> variablesUsedAsGlobal;
-    private boolean notUsedAsGlobal;
+    private final Environment env;
+    private ArrayList<String> variablesUsedAsGlobal;
 
-    public CodeGenerator(String filepath) {
+    public CodeGenerator(String filepath, Environment env) {
         this.programWriter = new ProgramWriter(filepath, "\t");
-        this.variablesDeclaredInFunction = new ArrayList<>();
+        this.env = env;
         this.variablesUsedAsGlobal = new ArrayList<>();
     }
 
@@ -66,9 +66,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
-        this.notUsedAsGlobal = true;
         this.visit(e.function_name);
-        this.notUsedAsGlobal = false;
 
         programWriter.addToOutput("(", false);
         for(int i = 0; i < e.args.size(); i ++){
@@ -89,8 +87,7 @@ public class CodeGenerator implements Visitor {
         if(lhsAssignment && postCall >1){
             variablePost = e.name;
         }
-        if(!this.notUsedAsGlobal && !this.variablesDeclaredInFunction.contains(e.name)
-                && !this.variablesUsedAsGlobal.contains(e.name)){
+        if(this.env.isGlobalVariable(e.name) && !this.variablesUsedAsGlobal.contains(e.name)){
             this.variablesUsedAsGlobal.add(e.name);
         }
         programWriter.addToOutput(e.name, false);
@@ -311,9 +308,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallStatement s) {
-        this.notUsedAsGlobal = true;
         this.visit(s.function_name);
-        this.notUsedAsGlobal = false;
 
         programWriter.addToOutput("(", false);
         for(int i = 0; i < s.args.size(); i ++){
@@ -377,9 +372,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunctionDeclaration d) {
-        this.variablesUsedAsGlobal.clear();
-        this.variablesDeclaredInFunction.clear();
-        this.notUsedAsGlobal = true;
+         this.variablesUsedAsGlobal.clear();
 
         programWriter.addToOutput( "def", true, false);
         this.visit(d.funName);
@@ -396,11 +389,9 @@ public class CodeGenerator implements Visitor {
         programWriter.addToOutput(":",false, true);
         programWriter.addIndent();
         for(VariableDeclaration vd: d.decls){
-            variablesDeclaredInFunction.add(vd.left.name);
             this.visit(vd);
         }
 
-        this.notUsedAsGlobal = false;
         for(Statement s:d.stats){
             countNestedTail = 0;
             countNestedHead = 0;

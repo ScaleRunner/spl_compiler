@@ -25,7 +25,6 @@ public class Typechecker implements Visitor {
 	private final Type emptyListType = Types.emptyListType;
 
 	private Environment env;
-	private Environment envGlobal;
 	private HashMap<String, List<Type>> functionSignatures;
 
 	private List<TypeError> errors;
@@ -62,7 +61,7 @@ public class Typechecker implements Visitor {
 
 	private void printErrors() {
 		for (TypeError e : errors) {
-			System.out.println(e.getErrorMessage());
+			System.err.println(e.getErrorMessage());
 		}
 	}
 
@@ -520,10 +519,6 @@ public class Typechecker implements Visitor {
 		//Backup original environment to fix let binding
 		Environment backup = Environment.deepCopy(env);
 
-		//counter to aux argtypes
-		int argsCount = 0;
-		//Not sure if I've tested return type void. Probably did.
-
 		//set functiontype
 		d.setType(d.funType.returnType);
 		//Functions are always global
@@ -546,19 +541,19 @@ public class Typechecker implements Visitor {
 
 		//set argument types if there are any
 		if(!d.args.isEmpty()){
-			for(IdentifierExpression id: d.args){
+			for(int argsCount = 0; argsCount < d.args.size(); argsCount++){
+			    IdentifierExpression id = d.args.get(argsCount);
 				if(env.get(id.name) != null){
 					if(!env.get(id.name).isGlobal)
 						error(String.format("The identifier %s is already in the list of parameters of this function", id.name), d);
 				}
 				else if(argsCount < d.funType.argsTypes.size())
 					//Arguments are treated as local variable, therefore not global
-					env.put(id.name, new EnvironmentType(d.funType.argsTypes.get(argsCount++), false));
+					env.put(id.name, new EnvironmentType(d.funType.argsTypes.get(argsCount), false, false));
 				else
 					env.put(id.name, null);
 			}
 		}
-
 
 		if(!d.decls.isEmpty()){
 			for(VariableDeclaration varDecl : d.decls){
@@ -577,7 +572,7 @@ public class Typechecker implements Visitor {
 
 		env = backup;
 		//add function signature to environment, so other functions below it can still use it.
-		env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true));
+		env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true, true));
 
 	}
 
@@ -629,10 +624,10 @@ public class Typechecker implements Visitor {
             	if((env.get(d.left.name).isGlobal && d.isGlobal) || ((!env.get(d.left.name).isGlobal && !d.isGlobal)))
                 	error(String.format("Variable %s is already defined!", d.left.name), d);
             	else if(env.get(d.left.name).isGlobal && !d.isGlobal){
-					env.put(d.left.name, new EnvironmentType(d.right.getType(), false));
+					env.put(d.left.name, new EnvironmentType(d.right.getType(), false, env.get(d.left.name).isFunction));
 				}
             } else {
-                env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal));
+                env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal, false));
             }
 		} else
             error(String.format("Variable %s, of type \n%s cannot have an assignment \nof type %s.",
@@ -711,22 +706,8 @@ public class Typechecker implements Visitor {
 			    return;
 		}
 
-		//If one  of the sides of the expression has an empty list, we need to check if types are
-//		else if(checkEmptyListTypeNull(e.left.getType()) || checkEmptyListTypeNull(e.right.getType()) ){
-//			if(isCompatible(e.left.getType(), ((ListType) e.right.getType()), e, false)){
-//				//if(checkEmptyListTypeNull(e.left.getType()))
-//					e.setType((e.right.getType()));
-//				//else
-//					//e.setType(Types.listType(e.left.getType()));
-//			}
-//			else
-//				error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
-//		}
 		else
 			error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
-
-		//e.setType(e.right.getType());
-
 	}
 
 	private boolean checkEmptyListTypeNull(Type e){
@@ -764,12 +745,6 @@ public class Typechecker implements Visitor {
 	}
 
 	private boolean checkOnlyEmptyListType(Type e){
-//		if(e instanceof TupleType) {
-//			Type left = ((TupleType) e).left;
-//			Type right = ((TupleType) e).right;
-//			return (checkOnlyEmptyListType(left) && checkOnlyEmptyListType(right));
-//		}
-//		else
 		if(e instanceof ListType) {
 			Type listType = ((ListType) e).listType;
 			return listType == emptyListType || checkOnlyEmptyListType(listType);
@@ -820,14 +795,6 @@ public class Typechecker implements Visitor {
 				error(String.format("=>Invalid types %s AND %s for inferencing.", left.toString(), right.toString()) ,e);
 				return false;
 			}
-//			else if (right == emptyListType && (!(left instanceof ListType)) && (!(left instanceof TupleType))) {
-//				return true;
-//
-//			}
-//			else if (left == emptyListType&& (!(right instanceof ListType)) && (!(right instanceof TupleType))) {
-//				return true;
-//
-//			}
 		}
 		else if(left.equals(right)){
 			return true;
@@ -1061,62 +1028,13 @@ public class Typechecker implements Visitor {
 
 	}
 
-//	//TODO: spend some more time to check this for more cases where things should not work.
-//	private Type inferEmptyListType(Type left, Type right, Expression e){
-//
-//
-//		if(left instanceof TupleType && right instanceof TupleType) {
-//			return new TupleType(
-//					(inferEmptyListType(((TupleType) left).left ,((TupleType) right).left, e)),
-//					inferEmptyListType(((TupleType) left).right, ((TupleType) right).right, e));
-//
-//		}
-//		else if(left instanceof TupleType && right instanceof ListType){
-//			//need some more thinking.
-//			if(((ListType) right).listType instanceof TupleType)
-//				return new ListType(inferEmptyListType(left, new TupleType(((TupleType) ((ListType) right).listType).left, ((TupleType) ((ListType) right).listType).right), e));
-//			else{
-//					//Error
-//				return null;
-//			}
-//
-//
-//		}
-//		else if(left instanceof ListType && right instanceof TupleType){
-//			//need some more thinking.
-//			Type leftListType = ((ListType) left).listType;
-//			if(leftListType instanceof TupleType)
-//				return new ListType(new TupleType(
-//						(inferEmptyListType(((TupleType) ((ListType) left).listType).left ,((TupleType) right).left,e)),
-//						inferEmptyListType(((TupleType) ((ListType) left).listType).right, ((TupleType) right).right,e)));
-//			else
-//				//don't know yet.
-//				return null;
-//
-//
-//		}
-//		else if(left instanceof ListType && right instanceof ListType){
-//			if(((ListType) right).listType == emptyListType)
-//				return left;
-//			else
-//				return new ListType(inferEmptyListType(((ListType) left).listType, ((ListType) right).listType, e));
-//		}
-//		else if(left == emptyListType)
-//			return right;
-//		else if (right == emptyListType)
-//			return left;
-//		else if (right.equals(left))
-//			return left;
-//		error("Type mismatch in empty list inference. Left: "+left + " Right: "+right, e);
-//		return null;
-//
-//	}
-
 	public Type getVariableType(String name){
         return env.get(name).type;
     }
 
-
+    public Environment getEnvironment(){
+	    return this.env;
+    }
 
 }
 

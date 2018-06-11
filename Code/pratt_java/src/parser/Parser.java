@@ -97,7 +97,6 @@ public class Parser {
 
         // Register Other
         registerPrefixExpression(TokenType.TOK_OPEN_PARENTHESIS, new ParenthesisParselet());
-        //registerPrefixExpression(TokenType.TOK_OPEN_CURLY, new BlockParselet());
         registerInfixExpression(TokenType.TOK_OPEN_PARENTHESIS, new CallParselet());
 
         // Register Fields
@@ -126,7 +125,7 @@ public class Parser {
             declarations.add(decl);
         }
         if(declarations.size()== 0){
-            throw new ParseException(this, "A SPL program needs at least one declaration.");
+            throw new ParseException(this, "An SPL program needs at least one declaration.");
         }
 
         return declarations;
@@ -152,7 +151,7 @@ public class Parser {
             return new FunctionDeclarationParselet(new IdentifierExpression(token.getStringValue())).parse(this, token);
         }
 
-        throw new ParseException(this, "No valid keyword is found!.");
+        throw new ParseException(this, "No valid declaration is found!.");
     }
 
     public ArrayList<Statement> parseBlock(){
@@ -176,9 +175,11 @@ public class Parser {
                 token.getType() == TokenType.TOK_KW_PRINT) {
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
 
-            if (prefix == null) throw new ParseException(this, token);
+            if (prefix == null)
+                throw new ParseException(this, token);
 
             return prefix.parse(this, token);
+
         } else if (token.getType() == TokenType.TOK_IDENTIFIER) {
             Expression id = mPrefixParseletsExpression.get(token.getType()).parse(this, token);
 
@@ -188,7 +189,8 @@ public class Parser {
 
                 if (match(TokenType.TOK_EOL))
                     return new CallStatement(funcall);
-                else throw new SemicolonError(this);
+                else
+                    throw new SemicolonError(this);
             }
 
             // ASSIGNMENT

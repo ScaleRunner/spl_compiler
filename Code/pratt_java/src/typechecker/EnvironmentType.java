@@ -3,29 +3,18 @@ package typechecker;
 import parser.types.Type;
 
 public class EnvironmentType {
-    public Type type;
-    public boolean isGlobal;
+    public final Type type;
+    public final boolean isGlobal;
+    public final boolean isFunction;
 
-    EnvironmentType(){
-        this.type = null;
-        this.isGlobal = false;
-    }
-
-    EnvironmentType(Type type, boolean isGlobal){
+    public EnvironmentType(Type type, boolean isGlobal, boolean isFunction){
         this.type = type;
         this.isGlobal = isGlobal;
+        this.isFunction = isFunction;
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        EnvironmentType copiedEnvironmentType = new EnvironmentType();
-        copiedEnvironmentType.type = this.type;
-        copiedEnvironmentType.isGlobal = this.isGlobal;
-        return copiedEnvironmentType;
+    public Object clone() {
+        return new EnvironmentType(this.type, this.isGlobal, this.isFunction);
     }
-
-//    public static EnvironmentType deepCopyEnvironmentType(EnvironmentType toBeCopied){
-//
-//    }
-
 }

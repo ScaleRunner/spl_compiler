@@ -2,6 +2,7 @@
 # Project specific excludes
 #
 *.ssm
+*.py
 
 #
 # Default excludes
@@ -12,7 +13,6 @@
 *.dmg
 *.gz
 *.iso
-*.jar
 *.rar
 *.tar
 *.zip
@@ -20,7 +20,7 @@
 *.ear
 *.sar
 *.class
-bin
+bin/*
 
 # Maven 
 target/
@@ -68,7 +68,6 @@ pom.xml.tag
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 *.zip
