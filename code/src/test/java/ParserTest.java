@@ -38,7 +38,7 @@ public class ParserTest {
     }
 
     @Test
-    public void node_check(){
+    public void node_check() {
         Lexer l = new Lexer("foo = bar;");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -51,7 +51,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testChar(){
+    public void testChar() {
         Lexer l = new Lexer("'a'");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -235,12 +235,12 @@ public class ParserTest {
         assertEquals(result, expected);
     }
 
-	@Test
-	public void testAssignmentMixedWithStatement() {
-	    Lexer l = new Lexer("a = b; c = a;if(a == c) { a = 2;}");
+    @Test
+    public void testAssignmentMixedWithStatement() {
+        Lexer l = new Lexer("a = b; c = a;if(a == c) { a = 2;}");
         List<Token> tokens = l.tokenize();
-		Parser p = new Parser(tokens);
-		ArrayList<Statement> result = p.parseBlock();
+        Parser p = new Parser(tokens);
+        ArrayList<Statement> result = p.parseBlock();
 
         Expression left = new IdentifierExpression("a");
         Expression right = new IdentifierExpression("b");
@@ -261,8 +261,8 @@ public class ParserTest {
                         new IdentifierExpression("c")),
                 if_branch,
                 new ArrayList<>()));
-        assertEquals(result,actual);
-	}
+        assertEquals(result, actual);
+    }
 
     @Test
     public void testEmptyStatement() {
@@ -399,8 +399,8 @@ public class ParserTest {
         p.parseBlock();
     }
 
-	@Test
-	public void testNegativeIdentifier() {
+    @Test
+    public void testNegativeIdentifier() {
         Lexer l = new Lexer("-a");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -409,7 +409,7 @@ public class ParserTest {
         Expression right = new IdentifierExpression("a");
         Expression expected = new PrefixExpression(TokenType.TOK_MINUS, right);
         assertEquals(result, expected);
-	}
+    }
 
     @Test
     public void testNestedNegativeIdentifier() {
@@ -422,16 +422,16 @@ public class ParserTest {
         Expression inner = new IdentifierExpression("a");
         Expression expected = new PrefixExpression(
                 TokenType.TOK_MINUS, new PrefixExpression(
-                        TokenType.TOK_MINUS, new PrefixExpression(
-                                TokenType.TOK_MINUS, inner
-                        )
-                )
+                TokenType.TOK_MINUS, new PrefixExpression(
+                TokenType.TOK_MINUS, inner
+        )
+        )
         );
         assertEquals(result, expected);
     }
 
-	@Test
-	public void testMultiplication() {
+    @Test
+    public void testMultiplication() {
         Lexer l = new Lexer("a * b");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -441,10 +441,10 @@ public class ParserTest {
         Expression right = new IdentifierExpression("b");
         Expression expected = new OperatorExpression(left, TokenType.TOK_MULT, right);
         assertEquals(result, expected);
-	}
+    }
 
-	@Test
-	public void testMultiplicationAssociativity() {
+    @Test
+    public void testMultiplicationAssociativity() {
         // Expected: (a + (((b * c) * d)) - e
         Lexer l = new Lexer("a + b * c * d - e");
         List<Token> tokens = l.tokenize();
@@ -469,10 +469,10 @@ public class ParserTest {
                 new IdentifierExpression("e")
         );
         assertEquals(result, expected);
-	}
+    }
 
     @Test
-	public void testAssignmentBoolean() {
+    public void testAssignmentBoolean() {
         Lexer l = new Lexer("value = True;");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -482,7 +482,7 @@ public class ParserTest {
         Expression right = new BooleanExpression(true);
         actual.add(new AssignStatement(left, right));
         assertEquals(result, actual);
-	}
+    }
 
     @Test
     public void testMultipleField() {
@@ -523,7 +523,7 @@ public class ParserTest {
         Parser p = new Parser(tokens);
         ArrayList<Statement> result = p.parseBlock();
         ArrayList<Statement> actual = new ArrayList<>();
-        Expression left = new IdentifierExpression("value") ;
+        Expression left = new IdentifierExpression("value");
         Expression right = new IntegerExpression(1);
         actual.add(new AssignStatement(left, right));
         assertEquals(result, actual);
@@ -565,7 +565,7 @@ public class ParserTest {
         assertEquals(result, actual);
     }
 
-	@Test
+    @Test
     public void testFunCall() {
         Lexer l = new Lexer("a()");
         List<Token> tokens = l.tokenize();
@@ -885,29 +885,28 @@ public class ParserTest {
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         List<Declaration> result = p.parseSPL();
-        List<Declaration> actual = new ArrayList<>();
-        actual.add(new VariableDeclaration(Types.varType(),
-                            new IdentifierExpression("alan"),
-                            new OperatorExpression(
-                                    new IntegerExpression(5),
-                                    TokenType.TOK_PLUS,
-                                    new OperatorExpression(
-                                            new IntegerExpression(3),
-                                            TokenType.TOK_MULT,
-                                            new IntegerExpression(2)
-                                    )
-                            ),true
-                        )
-                    );
-        assertEquals(result, actual);
+        Declaration actual =
+                new VariableDeclaration(Types.varType(),
+                        new IdentifierExpression("alan"),
+                        new OperatorExpression(
+                                new IntegerExpression(5),
+                                TokenType.TOK_PLUS,
+                                new OperatorExpression(
+                                        new IntegerExpression(3),
+                                        TokenType.TOK_MULT,
+                                        new IntegerExpression(2)
+                                )
+                        ), true
+                );
+        assertEquals(result.get(0), actual);
 
     }
 
     @Test
     public void testSPLSingleFunctionDeclaration() {
         Lexer l = new Lexer("sumOfTwoNumbers(a,b)::->Void{\n" +
-                                    "a = b;\n" +
-                                "}");
+                "a = b;\n" +
+                "}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         List<Declaration> result = p.parseSPL();
@@ -930,7 +929,7 @@ public class ParserTest {
         FunType funtype = new FunType(fargsType, returnType);
 
 
-        actual.add(new FunctionDeclaration(name,args, decls, stats, funtype));
+        actual.add(new FunctionDeclaration(name, args, decls, stats, funtype));
 
         assertEquals(result, actual);
 
@@ -1002,16 +1001,14 @@ public class ParserTest {
     }
 
 
-
-
     @Test
     public void testSPLSingleFunctionDeclarationWithReturnTypeManyDeclarations() {
         Lexer l = new Lexer("sumOfTwoNumbers(a,b):: Int Int -> Void{\n" +
-                                    "Int c = 0;\n " +
-                                    "var useless = 2;\n " +
-                                    "c = a + b;\n" +
-                                    "return c;\n" +
-                                "}");
+                "Int c = 0;\n " +
+                "var useless = 2;\n " +
+                "c = a + b;\n" +
+                "return c;\n" +
+                "}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         List<Declaration> result = p.parseSPL();
@@ -1034,8 +1031,8 @@ public class ParserTest {
         args.add(new IdentifierExpression("a"));
         args.add(new IdentifierExpression("b"));
 
-        decls.add(new VariableDeclaration(Types.intType, new IdentifierExpression("c"), new IntegerExpression(0), false ));
-        decls.add(new VariableDeclaration(Types.varType(),new IdentifierExpression("useless"), new IntegerExpression(2), false ));
+        decls.add(new VariableDeclaration(Types.intType, new IdentifierExpression("c"), new IntegerExpression(0), false));
+        decls.add(new VariableDeclaration(Types.varType(), new IdentifierExpression("useless"), new IntegerExpression(2), false));
 
 
         stats.add(new AssignStatement(
@@ -1045,7 +1042,7 @@ public class ParserTest {
                                 TokenType.TOK_PLUS,
                                 new IdentifierExpression("b")
                         )
-                    )
+                )
         );
 
 
@@ -1115,11 +1112,11 @@ public class ParserTest {
 //        int n_parantheses = 5000000; // 10mb file on disk
         int n_parantheses = 500;
         StringBuilder sbInput = new StringBuilder();
-        for(int i = 0; i < n_parantheses; i++){
+        for (int i = 0; i < n_parantheses; i++) {
             sbInput.append('(');
         }
         sbInput.append("cosy");
-        for(int i = 0; i < n_parantheses; i++){
+        for (int i = 0; i < n_parantheses; i++) {
             sbInput.append(')');
         }
 
@@ -1246,11 +1243,11 @@ public class ParserTest {
     public void testSPLExample1() {
         Lexer l = new Lexer("facR( n ) :: Int -> Int {\n" +
                 "if (n < 2 ) {\n " +
-                    "return 1;\n " +
+                "return 1;\n " +
                 "} else {\n" +
-                    "return n * facR ( n - 1 );\n" +
+                "return n * facR ( n - 1 );\n" +
                 "}\n" +
-            "}");
+                "}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         List<Declaration> result = p.parseSPL();
@@ -1279,13 +1276,13 @@ public class ParserTest {
 
         elseArm.add(new ReturnStatement(
                 new OperatorExpression(
-                    new IdentifierExpression("n"),
-                    TokenType.TOK_MULT,
-                    new CallExpression(
-                            new IdentifierExpression("facR"),
-                            funArgs
-                )
-        )));
+                        new IdentifierExpression("n"),
+                        TokenType.TOK_MULT,
+                        new CallExpression(
+                                new IdentifierExpression("facR"),
+                                funArgs
+                        )
+                )));
 
         stats.add(new ConditionalStatement(
                 new OperatorExpression(
@@ -1434,7 +1431,7 @@ public class ParserTest {
         List<Type> fargsType = new ArrayList<>();
         fargsType.add(Types.listType(Types.intType));
 
-        Type returnType =Types.tupleType(Types.charType, Types.intType);
+        Type returnType = Types.tupleType(Types.charType, Types.intType);
         FunType funType = new FunType(fargsType, returnType);
 
         actual.add(new FunctionDeclaration(name, args, decls, stats, funType));
@@ -1445,25 +1442,25 @@ public class ParserTest {
 
 
     /* ************************
-    *   START OF GIVEN TESTS  *
-    **************************/
+     *   START OF GIVEN TESTS  *
+     **************************/
 
     /**
      * This Test should fail because variables declarations are only allowed before any statements.
      */
     @Test(expected = ParseException.class)
     public void testIfThenElseWithVariables() {
-        Lexer l = new Lexer("main()::->Void\n"+
-                "{\n"+
-                "    if( True )\n"+
-                "    {\n"+
-                "        Int a = 10;\n"+
-                "        print(a);\n"+
-                "    }\n"+
-                "    else\n"+
-                "    {\n"+
-                "        print(100);\n"+
-                "    }\n"+
+        Lexer l = new Lexer("main()::->Void\n" +
+                "{\n" +
+                "    if( True )\n" +
+                "    {\n" +
+                "        Int a = 10;\n" +
+                "        print(a);\n" +
+                "    }\n" +
+                "    else\n" +
+                "    {\n" +
+                "        print(100);\n" +
+                "    }\n" +
                 "}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -1472,21 +1469,21 @@ public class ParserTest {
 
     @Test(expected = ParseException.class)
     public void testKeywords() {
-        Lexer l = new Lexer("main() :: -> Void\n"+
-                "{\n"+
-                "    // This might or might not work, depending on your implementation. Explain why or why not!\n"+
-                "    //Int while = 10;\n"+
-                "    \n"+
-                "    //Bool if = True;\n"+
-                "    //if(if) {} else { }\n"+
-                "    \n"+
-                "\n"+
-                "    // These should be parse errors\n"+
-                "    /*if if(True) {} else {}*/\n"+
-                "    /*if(True) {} else else {}*/\n"+
-                "    /*while;*/\n"+
-                "    /*10;*/\n"+
-                "    /*True;*/\n"+
+        Lexer l = new Lexer("main() :: -> Void\n" +
+                "{\n" +
+                "    // This might or might not work, depending on your implementation. Explain why or why not!\n" +
+                "    //Int while = 10;\n" +
+                "    \n" +
+                "    //Bool if = True;\n" +
+                "    //if(if) {} else { }\n" +
+                "    \n" +
+                "\n" +
+                "    // These should be parse errors\n" +
+                "    /*if if(True) {} else {}*/\n" +
+                "    /*if(True) {} else else {}*/\n" +
+                "    /*while;*/\n" +
+                "    /*10;*/\n" +
+                "    /*True;*/\n" +
                 "}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
@@ -1496,11 +1493,11 @@ public class ParserTest {
     @Test(expected = ParseException.class)
     public void testMissingCons() {
         Lexer l = new Lexer("main()::->Void\n" +
-                        "{\n" +
-                        "    // parse error\n" +
-                        "    [Int] a = 7:8:9[];\n" +
-                        "    print(a.hd);\n" +
-                        "}");
+                "{\n" +
+                "    // parse error\n" +
+                "    [Int] a = 7:8:9[];\n" +
+                "    print(a.hd);\n" +
+                "}");
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         p.parseSPL();
