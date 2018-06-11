@@ -526,7 +526,7 @@ public class Typechecker implements Visitor {
 			error(String.format("The function %s is already defined", d.funName.name), d);
 		}
 		else{
-			env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true));
+			env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true, true));
 			functionSignatures.put(d.funName.name, d.funType.argsTypes);
 		}
 
