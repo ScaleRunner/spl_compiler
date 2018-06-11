@@ -26,14 +26,14 @@ public class VariableDeclaration extends Declaration{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VariableDeclaration that = (VariableDeclaration) o;
-        return varType == that.varType &&
+        return Objects.equals(varType , that.varType) &&
                 Objects.equals(left, that.left) &&
-                Objects.equals(right, that.right);
+                Objects.equals(right, that.right) &&
+                Objects.equals(isGlobal, that.isGlobal);
     }
 
     @Override
     public int hashCode() {
-
         return Objects.hash(varType, left, right);
     }
 
