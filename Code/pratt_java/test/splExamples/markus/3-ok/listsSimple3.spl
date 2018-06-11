@@ -1,8 +1,0 @@
-main()::->Void
-{
-    [Int] a = 7:8:[];
-    [Int] b = a.tl;
-
-    // 8
-    print(b.hd);
-}

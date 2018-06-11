@@ -24,6 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 public class PythonCodeGeneratorTest {
 
+    private final String rootFolder = "./src/test/resources/splExamples/";
+
     private List<String> executePython() {
         String pythonVersion = CheckPythonVersion.getPythonVersion();
         try {
@@ -203,7 +205,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testReadInteger(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/read.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "read.spl");
 
 //        List<String> result = runCode(program);
 //        assertEquals("120", result.get(0));
@@ -211,7 +213,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testReadCharacter(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/read_hello.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "read_hello.spl");
 //        List<String> result = runCode(program);
 //        assertEquals("120", result.get(0));
     }
@@ -336,7 +338,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testSimpleWhile(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simpleWhile.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "simpleWhile.spl");
 
 
         List<String> result = runCode(program);
@@ -362,7 +364,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void FactorialImperative(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/factorial_imperative.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "factorial_imperative.spl");
 
         List<String> result = runCode(program);
         assertEquals("120", result.get(0));
@@ -370,7 +372,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void FactorialRecursive(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/factorial_recursive.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "factorial_recursive.spl");
 
         List<String> result = runCode(program);
         assertEquals("120", result.get(0));
@@ -378,7 +380,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testSimple(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simple.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "simple.spl");
 
         List<String> result = runCode(program);
         assertEquals("15", result.get(0));
@@ -386,7 +388,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testSimpleConditional(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simpleConditional.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "simpleConditional.spl");
 
         List<String> result = runCode(program);
         assertEquals("a", result.get(0));
@@ -399,7 +401,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void nested_while_if(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/print_numbers_up_to.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "print_numbers_up_to.spl");
 
         List<String> result = runCode(program);
         assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8]", result.toString());
@@ -407,7 +409,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void test_empty(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/is_empty.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "is_empty.spl");
 
         List<String> result = runCode(program);
         assertEquals("True", result.get(0));
@@ -432,7 +434,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void print(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
+        String program = ReadSPL.readLineByLineJava8( rootFolder + "print.spl");
 
         List<String> result = runCode(program);
         assertEquals("[('a', 'b'), " +
@@ -446,7 +448,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void infinite_lists(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/infinite_list.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "infinite_list.spl");
 
         List<String> result = runCode(program);
         assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3, 1]", result.toString());
@@ -454,7 +456,7 @@ public class PythonCodeGeneratorTest {
 
     @Test(expected = CompileException.class)
     public void testNoMain(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/no_main.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "no_main.spl");
 
         runCode(program);
     }
@@ -537,7 +539,7 @@ public class PythonCodeGeneratorTest {
 
     @Test
     public void testGlobalVariables(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariablesSimple.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/globalVariablesSimple.spl");
 
         List<String> result = runCode(program);
         assertEquals("[0, 42]", result.toString());
@@ -546,7 +548,7 @@ public class PythonCodeGeneratorTest {
     @Test
     public void testAllTestsByMarkus() {
         Long sleepTime = 50L;
-        try (Stream<Path> paths = Files.walk(Paths.get("./test/splExamples/markus/3-ok"))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(rootFolder + "markus/3-ok/"))) {
             paths.forEach(path ->{
                 if(Files.isRegularFile(path)){
                     try {
