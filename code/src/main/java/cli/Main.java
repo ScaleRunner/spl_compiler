@@ -1,3 +1,5 @@
+package cli;
+
 import cli.CLI;
 import cli.Runner;
 import org.apache.commons.cli.CommandLine;
