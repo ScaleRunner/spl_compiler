@@ -61,7 +61,7 @@ public class PythonCodeGeneratorTest {
         Typechecker tc = new Typechecker();
         tc.typecheck(nodes);
 
-        CodeGenerator gen = new CodeGenerator("test.py");
+        CodeGenerator gen = new CodeGenerator("test.py", tc.getEnvironment());
         try {
             gen.generateCode(nodes);
         } catch (FileNotFoundException e) {
@@ -77,7 +77,7 @@ public class PythonCodeGeneratorTest {
         Typechecker tc = new Typechecker();
         tc.typecheck(n);
 
-        CodeGenerator gen = new CodeGenerator("test.py");
+        CodeGenerator gen = new CodeGenerator("test.py", tc.getEnvironment());
         ProgramWriter.testProgram = true;
         try {
             gen.generateCode(n);
@@ -536,8 +536,8 @@ public class PythonCodeGeneratorTest {
     }
 
     @Test
-    public void testMarkus(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/recursiveFunction2.spl");
+    public void testGlobalVariables(){
+        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariablesSimple.spl");
 
         List<String> result = runCode(program);
         assertEquals("[0, 42]", result.toString());
