@@ -23,6 +23,8 @@ import static org.junit.Assert.assertEquals;
 
 public class SSMCodeGeneratorTest {
 
+    private final String rootFolder = "./src/test/resources/splExamples/";
+
     private String runSSM(boolean debug) {
         try {
             List<String> command = new ArrayList<>();
@@ -286,7 +288,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void testSimpleWhile(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simpleWhile.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "simpleWhile.spl");
 
 
         String result = runSPL(program, null,false);
@@ -312,7 +314,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void FactorialImperative(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/factorial_imperative.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "factorial_imperative.spl");
 
         String result = runSPL(program, null,false);
         assertEquals("120", result);
@@ -320,7 +322,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void FactorialRecursive(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/factorial_recursive.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "factorial_recursive.spl");
 
         String result = runSPL(program, null,false);
         assertEquals("120", result);
@@ -328,7 +330,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void testSimple(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simple.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "simple.spl");
 
         String result = runSPL(program, null,false);
         assertEquals("15", result);
@@ -336,7 +338,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void testSimpleConditional(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/simpleConditional.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "simpleConditional.spl");
 
         String result = runSPL(program, null,false);
         assertEquals("amachine halted", result);
@@ -349,7 +351,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void nested_while_if(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/print_numbers_up_to.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "print_numbers_up_to.spl");
 
         String result = runSPL(program, null,true);
         assertEquals("0 1 2 3 4 5 6 7 8 8 8 machine halted", result);
@@ -357,7 +359,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void test_empty(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/is_empty.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "is_empty.spl");
 
         String result = runSPL(program, null,false);
         assertEquals("-1", result);
@@ -383,7 +385,7 @@ public class SSMCodeGeneratorTest {
     @Test
     public void print(){
         // TODO: Not working for Lists
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/print.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "print.spl");
 
         String result = runSPL(program, null,true);
         assertEquals("('a', 'b')" +
@@ -398,7 +400,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void infinite_lists(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/infinite_list.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "infinite_list.spl");
 
         String result = runSPL(program, null,true);
         assertEquals("1 2 3 1 2 3 1 2 3 1 machine halted", result);
@@ -406,7 +408,7 @@ public class SSMCodeGeneratorTest {
 
     @Test(expected = CompileException.class)
     public void testNoMain(){
-        String program = ReadSPL.readLineByLineJava8("./test/splExamples/no_main.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "no_main.spl");
 
         runSPL(program, null,false);
     }
@@ -489,7 +491,7 @@ public class SSMCodeGeneratorTest {
     //Don't remember what this was
 //    @Test
 //    public void testSimpleFunctionList(){
-//        String program = ReadSPL.readLineByLineJava8("./test/splExamples/markus/3-ok/globalVariables.spl");
+//        String program = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/globalVariables.spl");
 //
 //        String result = runSPL(program, null,false);
 //        assertEquals("15", result);
@@ -498,7 +500,7 @@ public class SSMCodeGeneratorTest {
     @Test
     public void testAllTestsByMarkus() {
         Long sleepTime = 50L;
-        try (Stream<Path> paths = Files.walk(Paths.get("./test/splExamples/markus/3-ok"))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(rootFolder + "markus/3-ok"))) {
             paths.forEach(path ->{
                 if(Files.isRegularFile(path)){
                     try {
