@@ -832,6 +832,23 @@ public class ParserTest {
         assertEquals(result, actual);
     }
 
+
+    @Test(expected = ParseException.class)
+    public void testInvalidStatement() {
+        Lexer l = new Lexer("a = % 1;");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseStatement();
+    }
+
+    @Test(expected = SemicolonError.class)
+    public void testSemiColonError() {
+        Lexer l = new Lexer("foo()");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseStatement();
+    }
+
     @Test
     public void testComparisonPrecedence() {
         // Expected: ((True == (a > ((4 * b) + 5))) && (this == fun))
@@ -876,7 +893,14 @@ public class ParserTest {
         List<Token> tokens = l.tokenize();
         Parser p = new Parser(tokens);
         List<Declaration> result = p.parseSPL();
+    }
 
+    @Test(expected = ParseException.class)
+    public void testNoDecleration() {
+        Lexer l = new Lexer("print(1);");
+        List<Token> tokens = l.tokenize();
+        Parser p = new Parser(tokens);
+        p.parseSPL();
     }
 
     @Test
