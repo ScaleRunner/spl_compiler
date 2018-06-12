@@ -538,7 +538,7 @@ public class TypecheckerTest {
         assertTypecheckSuccess();
 
         Type empty = ((VariableDeclaration) nodes.get(0)).varType;
-        assertEquals(Types.varType(Types.listType(Types.intType)), empty);
+        assertEquals(Types.varType(Types.listType(Types.emptyListType)), empty);
     }
 
     @Test

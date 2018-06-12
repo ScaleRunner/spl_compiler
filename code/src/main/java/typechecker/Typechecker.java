@@ -122,8 +122,13 @@ public class Typechecker implements Visitor {
 		EnvironmentType idType = env.get(e.name);
 		if(idType == null)
 			error(String.format("Variable %s out of scope or undefined.", e.name), e);
-		else
-			e.setType(env.get(e.name).type);
+		else{
+			if(idType.isVarType){
+				e.setType( ((VarType)env.get(e.name).type).type);
+			}
+			else
+				e.setType(env.get(e.name).type);
+		}
 	}
 
 	@Override
@@ -392,12 +397,33 @@ public class Typechecker implements Visitor {
 
 			if(variableType == null){
 				error(String.format("Variable %s is not defined", id.name), s);
-			} else if(variableType instanceof ListType){
-				Type listType = ((ListType) variableType).listType;
-				if(listType == Types.emptyListType && s.right.getType() instanceof ListType){
-				    s.name.setType(s.right.getType());
-                }
-			} else if(!variableType.equals(s.right.getType()))
+			} if (variableType instanceof  TupleType){
+				if(s.right.getType() instanceof TupleType){
+					if(isCompatible(((TupleType) variableType).left, ((TupleType) s.right.getType()).left, s.right) &&
+							isCompatible(((TupleType) variableType).right, ((TupleType) s.right.getType()).right, s.right)){
+						//it's fine
+						s.setType(Types.voidType);
+						return;
+					}
+				}
+			}
+			else if (variableType instanceof  ListType){
+				if(isCompatible(variableType, s.right.getType(), s.right)){
+					//it's fine
+					s.setType(Types.voidType);
+					return;
+				}
+				//if rhs is only made of empty lists it might still be compatible.
+				/*else if(checkOnlyEmptyListType(d.right.getType())){
+						if(isCompatible(((ListType) d.varType).listType, d.right.getType(), d.right))
+							d.right.setType(d.varType);
+				}*/
+			}
+			else if(variableType instanceof VarType){
+				s.name.setType(Types.varType(s.right.getType()));
+				env.put(id.name, new EnvironmentType(s.name.getType(), env.get(id.name).isGlobal, env.get(id.name).isFunction, true));
+			}
+			else if(!variableType.equals(s.right.getType()))
 				error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
 						s.right.getType(), id.name, variableType, s.right.getType()),s);
 			s.setType(Types.voidType);
@@ -526,7 +552,7 @@ public class Typechecker implements Visitor {
 			error(String.format("The function %s is already defined", d.funName.name), d);
 		}
 		else{
-			env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true, true));
+			env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true, true, false));
 			functionSignatures.put(d.funName.name, d.funType.argsTypes);
 		}
 
@@ -549,8 +575,13 @@ public class Typechecker implements Visitor {
 				}
 				else if(argsCount < d.funType.argsTypes.size())
 					//Arguments are treated as local variable, therefore not global
-					env.put(id.name, new EnvironmentType(d.funType.argsTypes.get(argsCount), false, false));
+					if(d.funType.argsTypes.get(argsCount) instanceof VarType){
+						env.put(id.name, new EnvironmentType(d.funType.argsTypes.get(argsCount), false, false, true));
+					}
+					else
+					env.put(id.name, new EnvironmentType(d.funType.argsTypes.get(argsCount), false, false, false));
 				else
+					//TODO:check this
 					env.put(id.name, null);
 			}
 		}
@@ -572,7 +603,7 @@ public class Typechecker implements Visitor {
 
 		env = backup;
 		//add function signature to environment, so other functions below it can still use it.
-		env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true, true));
+		env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true, true, false));
 
 	}
 
@@ -584,16 +615,12 @@ public class Typechecker implements Visitor {
 		/*if(d.right.getType() instanceof ListType){
 			if(((ListType) d.right.getType()).listType == emptyListType){// we're dealing with an empty list
 
-				if(d.varType instanceof VarType){
-					//Only do this if type is var, otherwise a variable such as:
-					//[Int] a = [];
-					//Would have type Var(null);
-					d.varType = Types.varType(d.right.getType());
-			    }
+
 			    else{
 					d.right.setType(d.varType);
 				}
 */
+
 			if (d.varType instanceof  TupleType){
 				if(d.right.getType() instanceof TupleType){
 					if(isCompatible(((TupleType) d.varType).left, ((TupleType) d.right.getType()).left, d.right) &&
@@ -616,6 +643,7 @@ public class Typechecker implements Visitor {
 			}
 			else if(d.varType instanceof VarType){
 				d.varType = Types.varType(d.right.getType());
+
 			}
 		//}
 		checkingLeftRightDeclarationType=false;
@@ -624,10 +652,18 @@ public class Typechecker implements Visitor {
             	if((env.get(d.left.name).isGlobal && d.isGlobal) || ((!env.get(d.left.name).isGlobal && !d.isGlobal)))
                 	error(String.format("Variable %s is already defined!", d.left.name), d);
             	else if(env.get(d.left.name).isGlobal && !d.isGlobal){
-					env.put(d.left.name, new EnvironmentType(d.right.getType(), false, env.get(d.left.name).isFunction));
+					if(d.varType instanceof VarType){
+						env.put(d.left.name, new EnvironmentType(d.varType, false, false, true));
+					}
+					else
+						env.put(d.left.name, new EnvironmentType(d.right.getType(), false, false, false));
 				}
             } else {
-                env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal, false));
+				if(d.varType instanceof VarType){
+					env.put(d.left.name, new EnvironmentType(d.varType, false, false, true));
+				}
+				else
+                	env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal, false, false));
             }
 		} else
             error(String.format("Variable %s, of type \n%s cannot have an assignment \nof type %s.",
