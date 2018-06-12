@@ -708,6 +708,7 @@ public class Typechecker implements Visitor {
         } else return e instanceof EmptyListType;
     }
 
+
     private boolean isCompatible(Type left, Type right, Expression e) {
         if (checkEmptyListTypeNull(left) || checkEmptyListTypeNull(right)) {
 
