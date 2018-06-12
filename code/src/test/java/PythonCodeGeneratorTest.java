@@ -536,7 +536,7 @@ public class PythonCodeGeneratorTest {
                 "b.tl.tl.hd.tl.tl.hd = a.tl;\n"+
                 "print(b);\n" +
                 "}");
-        assertEquals("[[[2, 3, []], 4, [...], 6, []]]", result.toString());
+        assertEquals("[[[2, 3], 4, [...], 6]]", result.toString());
     }
 
     @Test
