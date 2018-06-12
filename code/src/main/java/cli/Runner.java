@@ -78,7 +78,7 @@ public class Runner {
         }
     }
 
-    private ProcessBuilder createPythonProcess(String filename) throws IOException, InterruptedException {
+    private ProcessBuilder createPythonProcess(String filename) {
         String pythonVersion = CheckPythonVersion.getPythonVersion();
         List<String> command = new ArrayList<>();
         command.add(pythonVersion);
@@ -88,7 +88,7 @@ public class Runner {
         return builder;
     }
 
-    private ProcessBuilder createSSMProcess(String filename) throws IOException {
+    private ProcessBuilder createSSMProcess(String filename) {
         List<String> command = new ArrayList<>();
         command.add("java");
         command.add("-jar");
