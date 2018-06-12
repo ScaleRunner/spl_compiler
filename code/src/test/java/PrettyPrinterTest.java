@@ -8,6 +8,7 @@ import parser.expressions.*;
 import parser.statements.Statement;
 import util.Node;
 import util.PrettyPrinter;
+import util.ReadSPL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -220,6 +221,15 @@ public class PrettyPrinterTest {
         assertEquals("foo + bar + 1 + True", pp.getResultString());
     }
 
+    @Test
+    public void testPrefix() {
+        Lexer l = new Lexer("-1 + !True");
+        Parser p = new Parser(l.tokenize());
+        Expression e = p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        e.accept(pp);
+        assertEquals(" -1 +  !True", pp.getResultString());
+    }
 
     @Test
     public void testPlusMult() {
@@ -250,6 +260,15 @@ public class PrettyPrinterTest {
         assertEquals("foo(bar) + 3 + true + field.hd", reprint);
     }
 
+    @Test
+    public void testLists() {
+        Lexer l = new Lexer("1 : 2 : 3 : []");
+        Parser p = new Parser(l.tokenize());
+        Expression result = p.parseExpression();
+        PrettyPrinter pp = new PrettyPrinter();
+        pp.visit(result);
+        assertEquals("1 : 2 : 3 : []", pp.getResultString());
+    }
 
     @Test
     public void testSPLExample1() {
@@ -331,4 +350,57 @@ public class PrettyPrinterTest {
         pp.visit(result);
         System.out.println(pp.getResultString());
     }
+
+    @Test
+    public void testHandmade() {
+        String s = ReadSPL.readLineByLineJava8("./src/test/resources/splExamples/markus/3-ok/lists.spl");
+        Lexer l = new Lexer(s);
+        Parser p = new Parser(l.tokenize());
+        List<Declaration> result = p.parseSPL();
+        PrettyPrinter pp = new PrettyPrinter();
+        pp.visit(result.get(0));
+        assertEquals("main() ::  -> Void {\n" +
+                "\t[Int] a = [];\n" +
+                "\t[Int] b = 7 : [];\n" +
+                "\t[Int] c = 2 : b;\n" +
+                "\t[(Int, Int)] d = (1, 1) : (2, 2) : (3, 3) : [];\n" +
+                "\t[(Int, [Int])] e = (1, b) : (2, c) : (3, []) : [];\n" +
+                "\tInt f = c.tl.hd;\n" +
+                "\t[[Int]] g = a : b : c : [];\n" +
+                "\tprint(isEmpty(a));\n" +
+                "\tprint(b.hd);\n" +
+                "\tprint(isEmpty(b));\n" +
+                "\tprint(isEmpty(b.tl));\n" +
+                "\tprint(c.hd);\n" +
+                "\tprint(c.tl.hd);\n" +
+                "\tprint(isEmpty(c.tl));\n" +
+                "\tprint(f);\n" +
+                "\tprint(g.tl.hd.hd);\n" +
+                "\tprint(g.tl.tl.hd.hd);\n" +
+                "\tprint(g.tl.tl.hd.tl.hd);\n" +
+                "}", pp.getResultString());
+    }
+
+    @Test
+    public void testRead() {
+        String s = ReadSPL.readLineByLineJava8("./src/test/resources/splExamples/read.spl");
+        Lexer l = new Lexer(s);
+        Parser p = new Parser(l.tokenize());
+        List<Declaration> result = p.parseSPL();
+        PrettyPrinter pp;
+
+        pp = new PrettyPrinter();
+        pp.visit(result.get(0));
+        assertEquals("mult_by(int, factor) :: Int -> Int {\n" +
+                "\treturn int * factor;\n" +
+                "}", pp.getResultString());
+
+        pp = new PrettyPrinter();
+        pp.visit(result.get(1));
+        assertEquals("main() ::  -> Void {\n" +
+                "\tInt i = read(0);\n" +
+                "\tprint(mult_by(i, 2));\n" +
+                "}", pp.getResultString());
+    }
+
 }

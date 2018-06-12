@@ -1,9 +1,9 @@
-mult_by_two (int) :: Int -> Int
+mult_by (int, factor) :: Int -> Int
 {
-    return int * 2;
+    return int * factor;
 }
 
 main() :: -> Void {
     Int i = read(0);
-    print(mult_by_two(i));
+    print(mult_by(i, 2));
 }
