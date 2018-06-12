@@ -764,31 +764,6 @@ public class Typechecker implements Visitor {
 
     }
 
-	private boolean checkNull(Type e){
-		if(e instanceof TupleType) {
-			Type left = ((TupleType) e).left;
-			Type right = ((TupleType) e).right;
-			return (checkNull(left) || checkNull(right));
-		}
-		else if(e instanceof ListType) {
-			Type listType = ((ListType) e).listType;
-			return listType == emptyListType || checkNull(listType);
-		}
-		else if (e == null)
-			return true;
-		else
-			return false;
-
-	}
-
-	private boolean checkOnlyEmptyListType(Type e){
-		if(e instanceof ListType) {
-			Type listType = ((ListType) e).listType;
-			return listType == emptyListType || checkOnlyEmptyListType(listType);
-		}
-		else return e instanceof EmptyListType;
-
-	}
 
 	private boolean isCompatible(Type left, Type right, Expression e) {
 		//tobeFixed = leftTYPE
