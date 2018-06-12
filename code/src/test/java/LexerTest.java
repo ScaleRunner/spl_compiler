@@ -30,6 +30,17 @@ public class LexerTest {
     }
 
     @Test
+    public void testNegativeInteger() {
+        Lexer l = new Lexer("-5");
+        Token t = l.nextToken();
+        assertEquals(TokenType.TOK_MINUS, t.getType());
+
+        t = l.nextToken();
+        assertEquals(TokenType.TOK_INT, t.getType());
+        assertEquals(5, t.getValue());
+    }
+
+    @Test
     public void testChar() {
         Lexer l = new Lexer("'a'");
         Token t = l.nextToken();
@@ -68,8 +79,6 @@ public class LexerTest {
         assertEquals(TokenType.TOK_MINUS, t.getType());
         t = l.nextToken();
         assertEquals(TokenType.TOK_INT, t.getType());
-
-
     }
 
     @Test
@@ -496,5 +505,34 @@ public class LexerTest {
 //        System.out.println(lexedTokenized);
     }
 
+    @Test
+    public void testSpecialCharacters() {
+        Lexer l = new Lexer("-> = { } [ ] ( ) , ;");
 
+        assertEquals(TokenType.TOK_KW_ARROW, l.nextToken().getType());
+        assertEquals(TokenType.TOK_ASSIGN, l.nextToken().getType());
+        assertEquals(TokenType.TOK_OPEN_CURLY, l.nextToken().getType());
+        assertEquals(TokenType.TOK_CLOSE_CURLY, l.nextToken().getType());
+        assertEquals(TokenType.TOK_OPEN_BRACKETS, l.nextToken().getType());
+        assertEquals(TokenType.TOK_CLOSE_BRACKETS, l.nextToken().getType());
+        assertEquals(TokenType.TOK_OPEN_PARENTHESIS, l.nextToken().getType());
+        assertEquals(TokenType.TOK_CLOSE_PARENTHESIS, l.nextToken().getType());
+        assertEquals(TokenType.TOK_COMMA, l.nextToken().getType());
+        assertEquals(TokenType.TOK_EOL, l.nextToken().getType());
+        assertEquals(TokenType.TOK_EOF, l.nextToken().getType());
+    }
+
+    @Test
+    public void testUnfinishedAndOr() {
+        Lexer l = new Lexer("& |");
+        l.tokenize();
+        assertEquals(l.getErrors().size(), 2);
+    }
+
+    @Test
+    public void testUnknownInput() {
+        Lexer l = new Lexer("? + 1");
+        l.tokenize();
+        assertEquals(l.getErrors().size(), 1);
+    }
 }

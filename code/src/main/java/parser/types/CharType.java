@@ -28,9 +28,7 @@ public class CharType extends Type {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return true;
+        return getClass() == obj.getClass();
     }
 
     @Override

@@ -11,24 +11,18 @@ import java.util.Objects;
  */
 public class ListExpression extends Expression {
 
-    public final List<Expression> items;
-
     public ListExpression() {
-        this.items = new ArrayList<>();
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ListExpression that = (ListExpression) o;
-        return Objects.equals(items, that.items);
     }
 
     @Override
     public int hashCode() {
+        return super.hashCode();
+    }
 
-        return Objects.hash(items);
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
     @Override

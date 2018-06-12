@@ -204,7 +204,7 @@ public class Lexer {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_AND);
             }
-            return new TokenOther(TokenType.TOK_ERR);
+            throw new TokenException("Expected to find two '&' characters, only one was found.");
         }
 
         if (match(':')) {
@@ -222,7 +222,7 @@ public class Lexer {
                 currentPosition++;
                 return new TokenOther(TokenType.TOK_OR);
             }
-            return new TokenOther(TokenType.TOK_ERR);
+            throw new TokenException("Expected to find two '|' characters, only one was found.");
         }
 
         if (match('{')) {
@@ -275,16 +275,12 @@ public class Lexer {
         if (Character.isAlphabetic(input.charAt(currentPosition)) || match('.')) {
             return lexIdentifier();
         }
+        currentPosition++;
         throw new TokenException(String.format("Found unknown character in input: '%s'", input.charAt(currentPosition)));
     }
 
     private Token lexInteger() {
-        boolean negative = false;
         int currentValue = 0;
-        if (match('-')) {
-            negative = true;
-            currentPosition++;
-        }
         while (currentPosition < input.length()
                 && Character.isDigit(input.charAt(currentPosition))) {
 
@@ -292,10 +288,6 @@ public class Lexer {
             currentValue += Character.getNumericValue(input
                     .charAt(currentPosition));
             currentPosition++;
-        }
-
-        if (negative) {
-            currentValue *= -1;
         }
 
         return new TokenInteger(currentValue);

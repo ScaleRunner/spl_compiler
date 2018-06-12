@@ -28,7 +28,7 @@ public class PrettyPrinter implements Visitor {
     private void printToken(TokenType t) {
         switch (t) {
             case TOK_NOT:
-                builder.append(" !");
+                builder.append(" ! ");
                 break;
             case TOK_MINUS:
                 builder.append(" - ");
@@ -79,9 +79,6 @@ public class PrettyPrinter implements Visitor {
                 builder.append(t.getValue());
                 break;
             case TOK_EOF:
-                break;
-            case TOK_EOL:
-                builder.append(";");
                 break;
             default:
                 throw new Error("PrettyPrinter: cannot print token " + t);
@@ -202,14 +199,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(ListExpression e) {
-        builder.append('[');
-        for (int i = 0; i < e.items.size(); i++) {
-            this.visit(e.items.get(i));
-            if (i < e.items.size() - 1) {
-                builder.append(", ");
-            }
-        }
-        builder.append("]");
+        builder.append("[]");
     }
 
     /**

@@ -175,9 +175,6 @@ public class Parser {
                 token.getType() == TokenType.TOK_KW_PRINT) {
             PrefixParseletStatement prefix = mPrefixParseletsStatement.get(token.getType());
 
-            if (prefix == null)
-                throw new ParseException(this, token);
-
             return prefix.parse(this, token);
 
         } else if (token.getType() == TokenType.TOK_IDENTIFIER) {

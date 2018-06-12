@@ -23,7 +23,6 @@ public class ListType extends Type{
 
     @Override
     public int hashCode() {
-
         return Objects.hash(listType);
     }
 
