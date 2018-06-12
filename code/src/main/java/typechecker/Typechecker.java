@@ -397,6 +397,7 @@ public class Typechecker implements Visitor {
 
 			if(variableType == null){
 				error(String.format("Variable %s is not defined", id.name), s);
+				return;
 			} if (variableType instanceof  TupleType){
 				if(s.right.getType() instanceof TupleType){
 					if(isCompatible(((TupleType) variableType).left, ((TupleType) s.right.getType()).left, s.right) &&
@@ -408,11 +409,11 @@ public class Typechecker implements Visitor {
 				}
 			}
 			else if (variableType instanceof  ListType){
-				if(isCompatible(variableType, s.right.getType(), s.right)){
-					//it's fine
-					s.setType(Types.voidType);
-					return;
-				}
+				if(isCompatible(variableType, s.right.getType(), s.right)) {
+                    //it's fine
+                    s.setType(Types.voidType);
+                    return;
+                }
 				//if rhs is only made of empty lists it might still be compatible.
 				/*else if(checkOnlyEmptyListType(d.right.getType())){
 						if(isCompatible(((ListType) d.varType).listType, d.right.getType(), d.right))
@@ -422,8 +423,10 @@ public class Typechecker implements Visitor {
 			else if(variableType instanceof VarType){
 				s.name.setType(Types.varType(s.right.getType()));
 				env.put(id.name, new EnvironmentType(s.name.getType(), env.get(id.name).isGlobal, env.get(id.name).isFunction, true));
+				s.setType(Types.voidType);
+				return;
 			}
-			else if(!variableType.equals(s.right.getType()))
+			if(!variableType.equals(s.right.getType()))
 				error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
 						s.right.getType(), id.name, variableType, s.right.getType()),s);
 			s.setType(Types.voidType);
@@ -666,7 +669,7 @@ public class Typechecker implements Visitor {
                 	env.put(d.left.name, new EnvironmentType(d.right.getType(), d.isGlobal, false, false));
             }
 		} else
-            error(String.format("Variable %s, of type \n%s cannot have an assignment \nof type %s.",
+            error(String.format("\nVariable %s, of type \n%s cannot have an assignment of type: \n%s.",
                     d.left, d.varType, d.right.getType()), d);
         d.setType(Types.voidType);
 	}
@@ -683,13 +686,11 @@ public class Typechecker implements Visitor {
 
         if(listTypeRight instanceof ListType){
             if(listTypeRight.listType instanceof ListType){
-                if(listTypeRight.listType instanceof ListType) {
-                    if(((ListType) listTypeRight.listType).listType == emptyListType) {
-                        if (e.left.getType() instanceof ListType) {
-                            if (((ListType) e.left.getType()).listType != emptyListType) {
-                                e.setType(e.left.getType());
-                                return;
-                            }
+                if(((ListType) listTypeRight.listType).listType == emptyListType) {
+                    if (e.left.getType() instanceof ListType) {
+                        if (((ListType) e.left.getType()).listType != emptyListType) {
+                            e.setType(e.left.getType());
+                            return;
                         }
                     }
                 }
@@ -789,94 +790,27 @@ public class Typechecker implements Visitor {
 
 	}
 
-    private boolean isCompatible(Type left, Type right, Expression e, boolean nested) {
-		//tobeFixed = leftTYPE
-
-		if(checkEmptyListTypeNull(left) ||checkEmptyListTypeNull(right)) {
-
-			if (left instanceof ListType && right instanceof ListType) {
-				if (((ListType) right).listType == emptyListType && !nested) {
-					//TODO: double check this later
-					return true;
-
-				}else{
-					return isCompatible(((ListType) left).listType, ((ListType) right).listType, e, false);
-				}
-
-			} else if (((left instanceof TupleType)) && ((right instanceof TupleType))) {
-					//if (toBeFixed.equals(emptyListType)) {
-					//	emptyListTypeExpr.setType(fixer);
-					//} else if (toBeFixed instanceof TupleType && fixer instanceof TupleType) {
-                    return isCompatible(((TupleType) left).left, ((TupleType) right).left, e, true) &&
-					isCompatible(((TupleType) left).right, ((TupleType) right).right, e,true);
-
-
-			}
-			else if (left instanceof TupleType && ((right instanceof ListType))) {
-				Type listType = ((ListType) right).listType;
-
-				if(! (listType instanceof TupleType)) {
-					error("EmptyTypeInference mismatch :Lhs has type Tuple and RHS does not. ("+listType+") " ,e);
-					return false;
-				}
-				else{
-
-					TupleType listTuple = (TupleType) listType;
-					return isCompatible(((TupleType) left).left, listTuple.left, e, true) &&
-							isCompatible(((TupleType) left).right, listTuple.right, e, true);
-				}
-
-			}
-			else{
-				error(String.format("=>Invalid types %s AND %s for inferencing.", left.toString(), right.toString()) ,e);
-				return false;
-			}
-		}
-		else if(left.equals(right)){
-			return true;
-		}
-		else
-			return false;
-
-
-    }
-
 	private boolean isCompatible(Type left, Type right, Expression e) {
 		//tobeFixed = leftTYPE
 
 		if(checkEmptyListTypeNull(left) ||checkEmptyListTypeNull(right)) {
 
 			if (left instanceof ListType && right instanceof ListType) {
-				if (((ListType) right).listType instanceof ListType){
-					if (((ListType) ((ListType) right).listType).listType == emptyListType){
-						return true;
-					}
-				}
-//                if (((ListType) left).listType == emptyListType){
-//                    return true;
-//                }
-//                else if (((ListType) right).listType == emptyListType){
-//                    return true;
-//                }
-//                else
+//				if (((ListType) right).listType instanceof ListType){
+//					if (((ListType) ((ListType) right).listType).listType == emptyListType){
+//						return true;
+//					}
+//				}
+
 				    return isCompatible(((ListType) left).listType, ((ListType) right).listType, e);
 
 			} else if (((left instanceof TupleType)) && ((right instanceof TupleType))) {
-				//if (toBeFixed.equals(emptyListType)) {
-				//	emptyListTypeExpr.setType(fixer);
-				//} else if (toBeFixed instanceof TupleType && fixer instanceof TupleType) {
+
 				return isNestedCompatible(((TupleType) left).left, ((TupleType) right).left, e) &&
 						isNestedCompatible(((TupleType) left).right, ((TupleType) right).right, e);
 
 			}
-			//else if (checkingLeftRightDeclarationType && (right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
-            /*else if ((right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
-				return true;
-			}
-			//else if (checkingLeftRightDeclarationType && (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
-            else if ( (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
-				return true;
-			}*/
+
 			else if (right == emptyListType /*&& (!(left instanceof ListType))*/) {
 				return true;
 
@@ -926,21 +860,12 @@ public class Typechecker implements Visitor {
                 return isNestedCompatible(((ListType) left).listType, ((ListType) right).listType, e);
 
 			} else if (((left instanceof TupleType)) && ((right instanceof TupleType))) {
-				//if (toBeFixed.equals(emptyListType)) {
-				//	emptyListTypeExpr.setType(fixer);
-				//} else if (toBeFixed instanceof TupleType && fixer instanceof TupleType) {
+
 				return isNestedCompatible(((TupleType) left).left, ((TupleType) right).left, e) &&
 						isNestedCompatible(((TupleType) left).right, ((TupleType) right).right, e);
 
 			}
-			//else if (checkingLeftRightDeclarationType && (right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
-            /*else if ((right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
-				return true;
-			}
-			//else if (checkingLeftRightDeclarationType && (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
-            else if ( (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
-				return true;
-			}*/
+
 			else if (right == emptyListType /*&& (!(left instanceof ListType))*/) {
 				return true;
 
@@ -977,22 +902,11 @@ public class Typechecker implements Visitor {
                 return Types.listType(inferedTyped(((ListType) left).listType, ((ListType) right).listType, e));
 
             } else if (((left instanceof TupleType)) && ((right instanceof TupleType))) {
-                //if (toBeFixed.equals(emptyListType)) {
-                //	emptyListTypeExpr.setType(fixer);
-                //} else if (toBeFixed instanceof TupleType && fixer instanceof TupleType) {
                 return Types.tupleType(inferedNestedTyped(((TupleType) left).left, ((TupleType) right).left, e),
 						inferedNestedTyped(((TupleType) left).right, ((TupleType) right).right, e));
 
             }
-            //else if (checkingLeftRightDeclarationType && (right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
-            /*else if ((right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
-                return left;
-            }
-            //else if (checkingLeftRightDeclarationType && (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
-            else if ( (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
-                return right;
-            }*/
-            //error("Typechecker: invalid list types",e );
+
             return null;
 
         }
@@ -1016,21 +930,12 @@ public class Typechecker implements Visitor {
 				return Types.listType(inferedNestedTyped(((ListType) left).listType, ((ListType) right).listType, e));
 
 			} else if (((left instanceof TupleType)) && ((right instanceof TupleType))) {
-				//if (toBeFixed.equals(emptyListType)) {
-				//	emptyListTypeExpr.setType(fixer);
-				//} else if (toBeFixed instanceof TupleType && fixer instanceof TupleType) {
+
 				return Types.tupleType(inferedNestedTyped(((TupleType) left).left, ((TupleType) right).left, e),
 						inferedNestedTyped(((TupleType) left).right, ((TupleType) right).right, e));
 
 			}
-			//else if (checkingLeftRightDeclarationType && (right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
-            /*else if ((right == emptyListType) && (left instanceof ListType) && (!( ((ListType) left).listType instanceof ListType))) {
-                return left;
-            }
-            //else if (checkingLeftRightDeclarationType && (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
-            else if ( (left == emptyListType) && (right instanceof ListType) && (!( ((ListType) right).listType instanceof ListType))) {
-                return right;
-            }*/
+
 			else if (right == emptyListType) {
 				return left;
 

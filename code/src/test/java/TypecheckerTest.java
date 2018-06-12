@@ -254,28 +254,28 @@ public class TypecheckerTest {
     public void testReadVar() {
         typecheckSPL("var a = read(0);\n");
         assertTypecheckSuccess();
-        assertEquals(Types.intType, tc.getVariableType("a"));
+        assertEquals(Types.varType(Types.intType), tc.getVariableType("a"));
     }
 
     @Test
     public void testVar() {
         typecheckSPL("var a = 3;\n");
         assertTypecheckSuccess();
-        assertEquals(Types.intType, tc.getVariableType("a"));
+        assertEquals(Types.varType(Types.intType), tc.getVariableType("a"));
     }
 
     @Test
     public void testVarInExpr() {
         typecheckSPL("var a = 3; Int b = a + 5; Bool c = a < b;");
         assertTypecheckSuccess();
-        assertEquals(Types.intType, tc.getVariableType("a"));
+        assertEquals(Types.varType(Types.intType), tc.getVariableType("a"));
     }
 
     @Test
     public void testVarInExprFaulty() {
         typecheckSPL("var a = False; Int b = a + 5; Char c = a == False;");
         assertTypecheckFailure();
-        assertEquals(Types.boolType, tc.getVariableType("a"));
+        assertEquals(Types.varType(Types.boolType), tc.getVariableType("a"));
     }
 
 	@Test
@@ -548,7 +548,7 @@ public class TypecheckerTest {
         List<Node> nodes = typecheckSPL(s);
         assertTypecheckSuccess();
         Type a = ((VariableDeclaration) nodes.get(0)).varType;
-        assertEquals(Types.varType(Types.listType(Types.intType)), a);
+        assertEquals(Types.varType(Types.listType(Types.emptyListType)), a);
     }
 
 

@@ -1,12 +1,17 @@
+[[Int]] mnbvvzx = []:[]:[];
+
 main()::->Void
 {
+    //Shouldn't work and does not
+
+    //[Int] xcv = []:[];
     [Int] abcd = (1:[]):([]:[]);
     [Int] f = (2:[]):[]:[]:[];
     [[[([Int], [Int])]]]  y = (((([],[]):((1:[]),(2:[])):[]):[]):[]);
     //Should not work and does not
     //[[[([Int], [Int])]]] zxczxc= ([]:[]):y;
-    //[[[[[Int]]]]] abcd = [];
-    //[[[[[Int]]]]] abcd = []:[];
+    [[[[[Int]]]]] abcdef = [];
+    [[[[[Int]]]]] abcdZXc = []:[];
     //[[Int]] abcnasb = 7:[];
     [Int] a = [];
     [Int] b = 7:[];
@@ -17,14 +22,14 @@ main()::->Void
     [(Int, ([Int], Int))] rrss =  (3,( ((1:[])), 2)): (4,([],1)):[];
 
     [([Int], [(Int, Int)])]  kzxc = ([],[]):((1:[]),((2,3):[])):[];
-    //[[[([Int], [Int])]]]  yyy = (((([],[]):((1:[]),(2:[])):[]):[]):[]);
+    [[[([Int], [Int])]]]  yyymnn = (((([],[]):((1:[]),(2:[])):[]):[]):[]);
     //Should not work and does not
     //[[[([Int], [Int])]]] zxczxc= []:y;
 
 
     ([[Int]], [[Int]]) abcde= ([],[]);
     //[[(Int, [Int])]] rr = (1,b) : (2,c) : (3,[]): (4,[]):[];
-    //[[[Int]]] cccc = [];
+    [[[Int]]] cccc = [];
 
 
     [[[Int]]] cccc2 = []:[];
@@ -40,9 +45,7 @@ main()::->Void
     var cc = []:[]:[]:[];
 
 
-    //Shouldn't work and does not
 
-    //[Int] xcv = []:[];
 
 
 
@@ -114,6 +117,8 @@ main()::->Void
 
     Int u = c.tl.hd;
     [[Int]] g = a : b : c : [];
+
+    mnbvvzx = (1:[]):[];
 
     // True
     print( isEmpty(a) );
