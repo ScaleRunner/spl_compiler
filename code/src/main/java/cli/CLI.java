@@ -6,7 +6,6 @@ public class CLI {
 
     private final String[] args;
     private final CommandLineParser parser;
-    private CommandLine cmd;
 
     public CLI(String[] args) {
         this.args = args;
@@ -19,6 +18,7 @@ public class CLI {
         options.addOption("c", "compile-only", false, "Only compile the code, do not run it");
         options.addOption("r", "reformat", false, "Reformat SPL code and exit (WARNING: Removes comments)");
         options.addOption("p", "python", false, "Compile to Python instead of SSM");
+        options.addOption("h", "help", false, "Show compiler usage");
 
         return options;
     }

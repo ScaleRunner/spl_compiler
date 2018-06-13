@@ -16,6 +16,10 @@ public class Main {
 
         try {
             CommandLine cmd = cli.parse();
+            if(cmd.hasOption("h")){
+                cli.help();
+                return;
+            }
             Runner runner = new Runner(cmd);
             runner.execute();
         } catch (ParseException e) {
