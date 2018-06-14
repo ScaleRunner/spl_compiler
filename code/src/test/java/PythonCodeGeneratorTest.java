@@ -437,6 +437,7 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8( rootFolder + "print.spl");
 
         List<String> result = runCode(program);
+        //TODO: This does not work due to indexing errors
         assertEquals("[('a', 'b'), " +
                         "(1, 2), " +
                         "(3, 'c'), " +
@@ -451,6 +452,7 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8(rootFolder + "infinite_list.spl");
 
         List<String> result = runCode(program);
+        //TODO: FIX THIS
         assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3, 1]", result.toString());
     }
 

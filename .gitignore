@@ -2,7 +2,6 @@
 # Project specific excludes
 #
 *.ssm
-*.py
 
 #
 # Default excludes

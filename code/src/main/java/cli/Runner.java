@@ -7,6 +7,7 @@ import parser.Parser;
 import parser.declarations.Declaration;
 import typechecker.Typechecker;
 import util.CheckPythonVersion;
+import util.PrettyPrinter;
 import util.ReadSPL;
 
 import java.io.BufferedReader;
@@ -19,16 +20,15 @@ import java.util.List;
 
 public class Runner {
 
-    private final CommandLine cmd;
     private final String path;
     private final boolean python;
     private final boolean compileOnly;
+    private final boolean reformat;
 
     public Runner(CommandLine cmd) {
-        this.cmd = cmd;
-
         this.python = cmd.hasOption("p");
         this.compileOnly = cmd.hasOption("c");
+        this.reformat = cmd.hasOption("r");
 
         String filepath = cmd.getOptionValue("i");
         if (filepath.endsWith(".spl")) {
@@ -47,6 +47,10 @@ public class Runner {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         List<Declaration> nodes = p.parseSPL();
+        if(reformat){
+            PrettyPrinter.writeToFile(inputfile, nodes);
+            return;
+        }
         Typechecker tc = new Typechecker();
         tc.typecheck(nodes);
 
@@ -78,7 +82,7 @@ public class Runner {
         }
     }
 
-    private ProcessBuilder createPythonProcess(String filename) throws IOException, InterruptedException {
+    private ProcessBuilder createPythonProcess(String filename) {
         String pythonVersion = CheckPythonVersion.getPythonVersion();
         List<String> command = new ArrayList<>();
         command.add(pythonVersion);
@@ -88,7 +92,7 @@ public class Runner {
         return builder;
     }
 
-    private ProcessBuilder createSSMProcess(String filename) throws IOException {
+    private ProcessBuilder createSSMProcess(String filename) {
         List<String> command = new ArrayList<>();
         command.add("java");
         command.add("-jar");

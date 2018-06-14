@@ -6,7 +6,6 @@ public class CLI {
 
     private final String[] args;
     private final CommandLineParser parser;
-    private CommandLine cmd;
 
     public CLI(String[] args) {
         this.args = args;
@@ -16,8 +15,10 @@ public class CLI {
     private Options getOptions() {
         Options options = new Options();
         options.addRequiredOption("i", "input-file", true, "The SPL filepath");
-        options.addOption("p", "python", false, "Compile to Python instead of SSM");
         options.addOption("c", "compile-only", false, "Only compile the code, do not run it");
+        options.addOption("r", "reformat", false, "Reformat SPL code and exit (WARNING: Removes comments)");
+        options.addOption("p", "python", false, "Compile to Python instead of SSM");
+        options.addOption("h", "help", false, "Show compiler usage");
 
         return options;
     }
@@ -27,7 +28,6 @@ public class CLI {
     }
 
     public void help() {
-        System.err.println("Arguments could not be parsed!");
         HelpFormatter help = new HelpFormatter();
         help.printHelp("Compiler", getOptions());
     }

@@ -9,6 +9,8 @@ import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -277,9 +279,10 @@ public class PrettyPrinter implements Visitor {
             builder.append(prefix);
             this.visit(varDecl);
         }
+        builder.append("\n");
         this.visit(d.stats);
         prefix = prefix.replaceFirst("\t", "");
-        builder.append("\n}");
+        builder.append("\n}\n\n");
     }
 
     /**
@@ -315,7 +318,7 @@ public class PrettyPrinter implements Visitor {
         for(int i = 0; i < fType.argsTypes.size(); i++){
             Type.visitType(this, fType.argsTypes.get(i));
             if (i < fType.argsTypes.size() - 1) {
-                builder.append(", ");
+                builder.append(" ");
             }
         }
 
@@ -398,4 +401,15 @@ public class PrettyPrinter implements Visitor {
         }
         return p.getResultString();
     }
+
+    public static void writeToFile(String outfile, List<? extends Node> nodes) throws IOException {
+        FileWriter fileWriter = new FileWriter(outfile, false);
+        PrettyPrinter pp = new PrettyPrinter();
+        for(Node n: nodes){
+            Node.visitNode(pp, n);
+        }
+        fileWriter.write(pp.getResultString());
+        fileWriter.close();
+    }
+
 }

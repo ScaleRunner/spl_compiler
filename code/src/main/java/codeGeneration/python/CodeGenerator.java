@@ -8,6 +8,8 @@ import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import parser.types.EmptyListType;
+import parser.types.ListType;
+import parser.types.Types;
 import typechecker.Environment;
 import util.Node;
 import util.Visitor;
@@ -167,11 +169,17 @@ public class CodeGenerator implements Visitor {
 
                 programWriter.addToOutput(" +", true);
 
+                // Below is for the list representation [1, 2, 3, []]
+//                if(e.right.getType() instanceof ListType && ((ListType) e.right.getType()).listType == Types.emptyListType){
+//                    programWriter.addToOutput("[[]]", true);
+//                }
+                //Below is for the list representation [1, 2, 3]
                 if(e.right.getType() instanceof EmptyListType){
                     programWriter.addToOutput("[", false);
                     this.visit(e.left);
                     programWriter.addToOutput("]", true);
-                } else {
+                }
+                else {
                     this.visit(e.right);
                 }
                 break;
