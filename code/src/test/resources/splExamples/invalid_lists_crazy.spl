@@ -1,0 +1,50 @@
+
+
+main()::->Void
+{
+    //Shouldn't work and does not
+    [Int] xcv = []:[];
+    Int laksdasf = [];
+    [[[([Int], [Int])]]]  y = (((([],[]):((1:[]),(2:[])):[]):[]):[]);
+    //Should not work and does not
+    [[[([Int], [Int])]]] zxczxc= ([]:[]):y;
+    [[Int]] abcnasb = 7:[];
+    [Int] a = [];
+    [Int] b = 7:[];
+    [Int] c = 2:b;
+
+    //Should not work and does not
+    [[[([Int], [Int])]]] zxczxc= []:y;
+
+
+    [[(Int, [Int])]] rr = (1,b) : (2,c) : (3,[]): (4,[]):[];
+    [[[([Int], [Int])]]] nn = (([],[]):(([]),([])):[]) : y;
+
+    //here
+
+    //Should not work and does not;
+    [[Int]] h = 2:[]:[]:[]:[];
+    //Should not work and does not;
+    [[[Int]]] ll =  (4:5:6:[]) : (((1:2:3:[]):[]):[]);
+    //Attempts to create list with []:y, which fails
+    [[[([Int], [Int])]]] nn2 = ([],[]):(([]),([])):[] : y;
+    //Unbalanced parenthesis give strange error
+    //Missing ';' at the end of the line.
+    [[[([Int], [Int])]]] n = ([],[]):(([]),([])):[] : y;
+
+    //Should not work and does not;
+    [[(Int, Char)]] gg = (1, []): (((2, 'a'):[]):[]);
+
+    //Should not work and does not;
+    [(Int, Char)] gg = ((1, []):[]) : (((2, 'a'):[]):[]);
+    //Should not work and does not;
+    [Int] l = []:(1:[]);
+
+
+
+    //Shouldn't work and it does not
+    [[(Int, [([Char],Char)] )]] s =  ((1, (([],'a'):[]) ):[]) : ((2, (('b','c'):[]) ):[]);
+
+    print(2);
+
+}

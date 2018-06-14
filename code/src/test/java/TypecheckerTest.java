@@ -368,6 +368,7 @@ public class TypecheckerTest {
     public void testEmptyListCompatibility() {
         typecheckSPL("[[Int]] a = []:[];\n"+
                 "main()::->Void{\n"+
+                "[[Int]] a = []:[];\n"+
                 "print(0);\n"+
                 "}");
         assertTypecheckSuccess();
@@ -393,6 +394,22 @@ public class TypecheckerTest {
 		for(Node n: nodes)
 			assertEquals(Types.intType, n.getType());
 	}
+
+    @Test
+    public void testOutOfScopeAssignment() {
+        List<Node> nodes = typecheckSPL("facR( n ) :: Int -> Int {\n" +
+                "[Int] a = 1:[];\n " +
+                "if (n < 2 ) {\n " +
+                "b = a;\n"+
+                "return 1;\n " +
+                "} else {\n" +
+                "return n * facR ( n - 1 );\n" +
+                "}\n" +
+                "}");
+        assertTypecheckFailure();
+//        for(Node n: nodes)
+//            assertEquals(Types.intType, n.getType());
+    }
 
     @Test
     public void testTwoFuncDecl() {
@@ -576,6 +593,7 @@ public class TypecheckerTest {
         assertTypecheckSuccess();
     }
 
+
     @Test
     public void testAssignmentsOkExampleMarkus() {
         String s = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/assignments.spl");
@@ -641,9 +659,28 @@ public class TypecheckerTest {
         assertTypecheckSuccess();
     }
 
+
+
+
     @Test
     public void testlistCrazy() {
         String s = ReadSPL.readLineByLineJava8(rootFolder + "lists_crazy.spl");
+
+        typecheckSPL(s);
+        assertTypecheckSuccess();
+    }
+
+    @Test
+    public void testinvalidListCrazy() {
+        String s = ReadSPL.readLineByLineJava8(rootFolder + "invalid_lists_crazy.spl");
+
+        typecheckSPL(s);
+        assertTypecheckFailure();
+    }
+
+    @Test
+    public void testtuplesCrazy() {
+        String s = ReadSPL.readLineByLineJava8(rootFolder + "tuples_crazy.spl");
 
         typecheckSPL(s);
         assertTypecheckSuccess();
@@ -708,6 +745,7 @@ public class TypecheckerTest {
         typecheckSPL(s);
         assertTypecheckFailure();
     }
+
 
     @Test
     public void testIfNotReturning() {

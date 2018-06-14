@@ -369,13 +369,30 @@ public class Typechecker implements Visitor {
     @Override
     public void visit(AssignStatement s) {
         this.visit(s.right);
-        if (s.name instanceof IdentifierExpression) {
-            IdentifierExpression id = (IdentifierExpression) s.name;
+        if (s.name instanceof IdentifierExpression || s.name instanceof PostfixExpression) {
+            Type variableType = null;
+            IdentifierExpression id = null;
+            if(s.name instanceof IdentifierExpression){
+                id = (IdentifierExpression) s.name;
+                EnvironmentType envT = env.get(id.name);
+                if(envT == null)
+                    variableType = null;
+                else
+                variableType = env.get(id.name).type;
+            }
+            if(s.name instanceof PostfixExpression){
+                this.visit(s.name);
+                variableType = s.name.getType();
+            }
 
-            Type variableType = env.get(id.name).type;
 
             if (variableType == null) {
-                error(String.format("Variable %s is not defined", id.name), s);
+                if(s.name instanceof IdentifierExpression){
+                    error(String.format("Variable %s is not defined", id.name), s);
+                }
+                else
+                    error(String.format("Invalid nested .tl and .hd, found null as type."), s);
+                s.setType(Types.voidType);
                 return;
             }
             if (variableType instanceof TupleType) {
@@ -404,23 +421,18 @@ public class Typechecker implements Visitor {
                 s.setType(Types.voidType);
                 return;
             }
+
             if (!variableType.equals(s.right.getType()))
-                error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
+                if(s.name instanceof IdentifierExpression)
+                    error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
                         s.right.getType(), id.name, variableType, s.right.getType()), s);
+                else
+                    error(String.format("Type %s cannot be assigned to %s.\n\tExpected: %s \n\tActual: %s",
+                            s.right.getType(), s.name.toString(), variableType, s.right.getType()), s);
             s.setType(Types.voidType);
         }
 
-        //need a different check, due to id.field.
-        else if (s.name.getClass() == PostfixExpression.class) {
-            this.visit((PostfixExpression) s.name);
-            if (s.name.getType() == null) {
-                error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
-                        s.right.getType(), s.name, s.name.getType(), s.right.getType()), s);
-            } else if (!s.name.getType().equals(s.right.getType()))
-                error(String.format("Type %s cannot be assigned to variable %s.\n\tExpected: %s \n\tActual: %s",
-                        s.right.getType(), s.name, s.name.getType(), s.right.getType()), s);
-            s.setType(Types.voidType);
-        }
+
     }
 
     @Override
