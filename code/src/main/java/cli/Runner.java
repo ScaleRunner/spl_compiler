@@ -6,7 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import parser.Parser;
 import parser.declarations.Declaration;
 import typechecker.Typechecker;
-import util.CheckPythonVersion;
+import util.CheckPython;
 import util.PrettyPrinter;
 import util.ReadSPL;
 
@@ -83,7 +83,7 @@ public class Runner {
     }
 
     private ProcessBuilder createPythonProcess(String filename) {
-        String pythonVersion = CheckPythonVersion.getPythonVersion();
+        String pythonVersion = CheckPython.getPythonVersion();
         List<String> command = new ArrayList<>();
         command.add(pythonVersion);
         command.add(filename);
