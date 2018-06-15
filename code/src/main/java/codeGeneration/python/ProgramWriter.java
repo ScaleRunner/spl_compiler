@@ -1,6 +1,8 @@
 package codeGeneration.python;
 
 import codeGeneration.CompileException;
+import util.CheckPython;
+import util.ReadSPL;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -21,12 +23,29 @@ public class ProgramWriter {
 
     public static boolean testProgram = false;
 
+    private final boolean splTypesInstalled;
+
+    private final List<String> toAdd;
+
     public ProgramWriter(String filepath, String indent){
         this.filepath = filepath;
         this.program = new ArrayList<>();
         this.indent = indent;
         this.currIndent = "";
         this.currLine = "";
+        this.splTypesInstalled = CheckPython.spl_types_installed();
+        this.toAdd = new ArrayList<>();
+    }
+
+    public void addImport(String class_name){
+        if(class_name.equals("Node")){
+            if(this.splTypesInstalled)
+                this.program.add(0, "from spl_types.lists import Node");
+            else
+                toAdd.add(ReadSPL.readLineByLineJava8("./src/main/python/spl_types/spl_types/lists.py"));
+        } else if(class_name.equals("Tuple")){
+            //TODO implement this
+        }
     }
 
     public void addToOutput(String line, boolean space, boolean EoL){
@@ -73,12 +92,24 @@ public class ProgramWriter {
         if(!main && !testProgram)
             throw new CompileException("Every SPL program needs a main function");
 
+        if(this.toAdd.size() > 0) {
+            out.println("");
+            out.println("######################");
+            out.println("# SPL Custom Classes #");
+            out.println("######################");
+            out.println("");
+
+            for(String classDef : this.toAdd){
+                out.println(classDef);
+            }
+        }
+
         if(!testProgram){
             out.println(""); // Insert blank line for visual pleasure
             out.println("if __name__ == '__main__':");
             out.println(indent + "main()");
-
         }
+
         out.close();
     }
 }
