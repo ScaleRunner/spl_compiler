@@ -51,4 +51,4 @@ def print_list(node: Node):
         str_values += ", " + str(tail)
         tail = tail.traverse()
 
-    return "[{}]".format(str_values)
+    print("[{}]".format(str_values))
