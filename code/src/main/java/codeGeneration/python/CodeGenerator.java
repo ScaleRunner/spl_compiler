@@ -36,8 +36,14 @@ public class CodeGenerator implements Visitor {
     private final Environment env;
     private ArrayList<String> variablesUsedAsGlobal;
 
+    private boolean listUsed = false;
+    private boolean tupleUsed = false;
+
     public CodeGenerator(String filepath, Environment env) {
-        this.programWriter = new ProgramWriter(filepath, "\t");
+        // For indentation, we can use spaces or tabs
+//        String indent = "\t";
+        String indent = "    ";
+        this.programWriter = new ProgramWriter(filepath, indent);
         this.env = env;
         this.variablesUsedAsGlobal = new ArrayList<>();
     }
@@ -45,6 +51,13 @@ public class CodeGenerator implements Visitor {
     public void generateCode(List<Declaration> nodes) throws FileNotFoundException {
         for(Node n : nodes){
             n.accept(this);
+        }
+
+        if(listUsed){
+            programWriter.addImport("Node");
+        }
+        if(tupleUsed){
+            programWriter.addImport("Tuple");
         }
         programWriter.writeToFile();
     }
@@ -108,7 +121,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ListExpression e) {
-        programWriter.addToOutput("[]", false);
+        this.listUsed = true;
+        programWriter.addToOutput("Node()", false);
     }
 
     @Override
@@ -163,25 +177,43 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput(" >=", true);
                 break;
             case TOK_CONS:
-                programWriter.addToOutput("[", false);
+                /*
+                  The following code block is new experimental
+                  First we want the LinkedList to be there and work from this:
+                  1 : 2 : []
+                    ->
+                  LinkedList().add_node(2).add_node(1)
+                 */
+                programWriter.addToOutput("Node(", false);
                 this.visit(e.left);
-                programWriter.addToOutput("]", true);
+                programWriter.addToOutput(")", true);
 
-                programWriter.addToOutput(" +", true);
+                programWriter.addToOutput("+", true);
+
+                this.visit(e.right);
+
+                /*
+                 * This one is the old implementation
+                 */
+//                programWriter.addToOutput("[", false);
+//                this.visit(e.left);
+//                programWriter.addToOutput("]", true);
+//
+//                programWriter.addToOutput(" +", true);
 
                 // Below is for the list representation [1, 2, 3, []]
 //                if(e.right.getType() instanceof ListType && ((ListType) e.right.getType()).listType == Types.emptyListType){
 //                    programWriter.addToOutput("[[]]", true);
 //                }
                 //Below is for the list representation [1, 2, 3]
-                if(e.right.getType() instanceof EmptyListType){
-                    programWriter.addToOutput("[", false);
-                    this.visit(e.left);
-                    programWriter.addToOutput("]", true);
-                }
-                else {
-                    this.visit(e.right);
-                }
+//                if(e.right.getType() instanceof EmptyListType){
+//                    programWriter.addToOutput("[", false);
+//                    this.visit(e.left);
+//                    programWriter.addToOutput("]", true);
+//                }
+//                else {
+//                    this.visit(e.right);
+//                }
                 break;
 
             default:
@@ -195,16 +227,6 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(PostfixExpression e) {
 
-        /*
-        * This version uses the number of nested tails as index of array;
-        * Therefore, nested tails + head, only works if the element of the list in the given index (number of nested tl's) is a list
-        * */
-        if(postCall == 0){
-            countNestedTail =0;
-            countNestedHead=0;
-        }
-        postCall++;
-
         this.visit(e.left);
 
         switch (e.operator) {
@@ -217,52 +239,11 @@ public class CodeGenerator implements Visitor {
                 break;
 
             case TOK_HD:
-                if(!lhsAssignment)
-                    programWriter.addToOutput("[0]", false, false);
-                else {
-
-                    countNestedHead++;
-                    totalNestedHDTL++;
-                    if(nestedTL){
-                        nestedTL = false;
-                        programWriter.addToOutput("["+countNestedTail+"]", false, false);
-                        useNested = true;
-                        countNestedTail = 0;
-                    }
-                    if(totalNestedHDTL < postCall){
-                        nestedHD = true;
-                    }
-                    else if (totalNestedHDTL == postCall){
-                        programWriter.addToOutput("[0]", false, false);
-                        nestedHD = false;
-                    }
-
-                }
+                programWriter.addToOutput("[0]", false, false);
                 break;
 
             case TOK_TL:
-                if(!lhsAssignment)
-                    programWriter.addToOutput("[1:]", false, false);
-                else{
-                    countNestedTail++;
-                    totalNestedHDTL++;
-                    if(nestedHD){
-                        nestedHD = false;
-                        for(int i =0; i< countNestedHead; i++){
-                            programWriter.addToOutput("[0]", false, false);
-                        }
-
-                        useNested = true;
-                        countNestedHead = 0;
-                    }
-                    if(totalNestedHDTL < postCall){
-                        nestedTL = true;
-                    }
-                    else if (totalNestedHDTL == postCall){
-                        programWriter.addToOutput(" ["+countNestedTail+"]", false, false);
-                        nestedTL = false;
-                    }
-                }
+                programWriter.addToOutput("[1]", false, false);
                 break;
         }
     }
@@ -292,6 +273,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(TupleExpression e) {
+        this.tupleUsed = true;
+
         programWriter.addToOutput("(", false);
         this.visit(e.left);
         programWriter.addToOutput(",", true);
