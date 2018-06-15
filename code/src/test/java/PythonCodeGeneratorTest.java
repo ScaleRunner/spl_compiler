@@ -561,6 +561,14 @@ public class PythonCodeGeneratorTest {
     }
 
     @Test
+    public void testTuples(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/tuples.spl");
+
+        List<String> result = runCode(program);
+        assertEquals("[5, 3, 15, False, 5, 3, 42, True, False, 5, 3, 1]", result.toString());
+    }
+
+    @Test
     public void testSPL_import(){
         List<String> result = executePython("./src/test/resources/pythonExamples/test_linkedList.py");
 

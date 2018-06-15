@@ -44,7 +44,10 @@ public class ProgramWriter {
             else
                 toAdd.add(ReadSPL.readLineByLineJava8("./src/main/python/spl_types/spl_types/lists.py"));
         } else if(class_name.equals("Tuple")){
-            //TODO implement this
+            if(this.splTypesInstalled)
+                this.program.add(0, "from spl_types.tuple import Tuple");
+            else
+                toAdd.add(ReadSPL.readLineByLineJava8("./src/main/python/spl_types/spl_types/tuple.py"));
         }
     }
 

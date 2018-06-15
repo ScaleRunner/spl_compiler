@@ -21,17 +21,7 @@ import java.util.List;
 
 public class CodeGenerator implements Visitor {
 
-    private boolean lhsAssignment = false;
     private final ProgramWriter programWriter;
-
-    private int countNestedTail = 0;
-    private int countNestedHead = 0;
-    private int totalNestedHDTL = 0;
-    private boolean nestedTL = false;
-    private boolean nestedHD = false;
-    private int postCall = 0;
-    private String variablePost = null;
-    private boolean useNested = false;
 
     private final Environment env;
     private ArrayList<String> variablesUsedAsGlobal;
@@ -99,9 +89,6 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IdentifierExpression e) {
-        if(lhsAssignment && postCall >1){
-            variablePost = e.name;
-        }
         if(this.env.isGlobalVariable(e.name) && !this.variablesUsedAsGlobal.contains(e.name)){
             this.variablesUsedAsGlobal.add(e.name);
         }
@@ -178,11 +165,10 @@ public class CodeGenerator implements Visitor {
                 break;
             case TOK_CONS:
                 /*
-                  The following code block is new experimental
-                  First we want the LinkedList to be there and work from this:
+                  The following code block is for creating lists
                   1 : 2 : []
                     ->
-                  LinkedList().add_node(2).add_node(1)
+                  Node(1) + (Node(2) + Node())
                  */
                 programWriter.addToOutput("Node(", false);
                 this.visit(e.left);
@@ -191,29 +177,6 @@ public class CodeGenerator implements Visitor {
                 programWriter.addToOutput("+", true);
 
                 this.visit(e.right);
-
-                /*
-                 * This one is the old implementation
-                 */
-//                programWriter.addToOutput("[", false);
-//                this.visit(e.left);
-//                programWriter.addToOutput("]", true);
-//
-//                programWriter.addToOutput(" +", true);
-
-                // Below is for the list representation [1, 2, 3, []]
-//                if(e.right.getType() instanceof ListType && ((ListType) e.right.getType()).listType == Types.emptyListType){
-//                    programWriter.addToOutput("[[]]", true);
-//                }
-                //Below is for the list representation [1, 2, 3]
-//                if(e.right.getType() instanceof EmptyListType){
-//                    programWriter.addToOutput("[", false);
-//                    this.visit(e.left);
-//                    programWriter.addToOutput("]", true);
-//                }
-//                else {
-//                    this.visit(e.right);
-//                }
                 break;
 
             default:
@@ -275,7 +238,7 @@ public class CodeGenerator implements Visitor {
     public void visit(TupleExpression e) {
         this.tupleUsed = true;
 
-        programWriter.addToOutput("(", false);
+        programWriter.addToOutput("Tuple(", false);
         this.visit(e.left);
         programWriter.addToOutput(",", true);
         this.visit(e.right);
@@ -289,9 +252,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(AssignStatement s) {
-        lhsAssignment = true;
         this.visit(s.name);
-        lhsAssignment = false;
         programWriter.addToOutput( " =", true, false);
         this.visit(s.right);
         programWriter.addToOutput( "", false, true);
@@ -384,10 +345,6 @@ public class CodeGenerator implements Visitor {
         }
 
         for(Statement s:d.stats){
-            countNestedTail = 0;
-            countNestedHead = 0;
-            totalNestedHDTL = 0;
-            postCall = 0;
             this.visit(s);
         }
 
