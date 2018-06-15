@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CheckPythonVersion {
+public class CheckPython {
     public static String getPythonVersion(){
         if(pythonVersionExists("python3")){
             return "python3";
@@ -39,6 +39,29 @@ public class CheckPythonVersion {
             }
             return true;
         } catch (IOException | InterruptedException e) {
+            return false;
+        }
+    }
+
+    public static boolean spl_types_installed(){
+        String python = getPythonVersion();
+        try {
+            List<String> command = new ArrayList<>();
+            command.add(python);
+            command.add("-c");
+            command.add("\"from spl_types.lists import Node; print(\'succes\')\"");
+            ProcessBuilder builder = new ProcessBuilder(command);
+
+            final Process process = builder.start();
+
+            InputStream is = process.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            process.waitFor();
+            String line = br.readLine();
+            return line.equals("succes");
+        } catch (IOException | InterruptedException | NullPointerException e) {
+            System.err.println("WARNING: the python module spl_types is not found. Appending class files in the python output...");
             return false;
         }
     }
