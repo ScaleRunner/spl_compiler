@@ -8,7 +8,7 @@ import org.junit.Test;
 import parser.Parser;
 import parser.declarations.Declaration;
 import typechecker.Typechecker;
-import util.CheckPythonVersion;
+import util.CheckPython;
 import util.Node;
 import util.ReadSPL;
 
@@ -21,17 +21,18 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class PythonCodeGeneratorTest {
 
     private final String rootFolder = "./src/test/resources/splExamples/";
 
-    private List<String> executePython() {
-        String pythonVersion = CheckPythonVersion.getPythonVersion();
+    private List<String> executePython(String filepath){
+        String pythonVersion = CheckPython.getPythonVersion();
         try {
             List<String> command = new ArrayList<>();
             command.add(pythonVersion);
-            command.add("test.py");
+            command.add(filepath);
             ProcessBuilder builder = new ProcessBuilder(command);
             builder = builder.redirectErrorStream(true);
             final Process process = builder.start();
@@ -54,6 +55,10 @@ public class PythonCodeGeneratorTest {
         } catch (InterruptedException e) {
             throw new CompileException("Python stopped abruptly\n" + e.getMessage());
         }
+    }
+
+    private List<String> executePython() {
+        return this.executePython("test.py");
     }
 
     private List<String> runCode(String program){
@@ -548,6 +553,24 @@ public class PythonCodeGeneratorTest {
     }
 
     @Test
+    public void testListsSimple(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/listsSimple.spl");
+
+        List<String> result = runCode(program);
+        assertEquals("[7, 10, 7, 8, 11, 8]", result.toString());
+    }
+
+    @Test
+    public void testSPL_import(){
+        List<String> result = executePython("./src/test/resources/pythonExamples/test_linkedList.py");
+
+        assertEquals("[Succes!]", result.toString());
+
+        assertTrue(CheckPython.spl_types_installed());
+    }
+
+
+    @Test
     public void testAllTestsByMarkus() {
         Long sleepTime = 50L;
         try (Stream<Path> paths = Files.walk(Paths.get(rootFolder + "markus/3-ok/"))) {
@@ -645,7 +668,6 @@ public class PythonCodeGeneratorTest {
                     } catch (ComparisonFailure f){
                         System.err.println(String.format("Test Failed! \n\tExpected:%s\n\tActual:\t %s", expected, result));
                     }
-
                 }
             });
         } catch (IOException e) {
