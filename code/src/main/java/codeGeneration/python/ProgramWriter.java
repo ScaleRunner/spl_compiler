@@ -87,15 +87,10 @@ public class ProgramWriter {
         boolean main = false;
 
         PrintWriter out = new PrintWriter(filepath);
-        for(String line : program) {
-            out.println(line);
-            if (line.contains("def main"))
-                main = true;
-        }
-        if(!main && !testProgram)
-            throw new CompileException("Every SPL program needs a main function");
 
         if(this.toAdd.size() > 0) {
+            System.err.println("WARNING: the python module spl_types is not found. Appending class files in the python output...");
+
             out.println("");
             out.println("######################");
             out.println("# SPL Custom Classes #");
@@ -105,7 +100,21 @@ public class ProgramWriter {
             for(String classDef : this.toAdd){
                 out.println(classDef);
             }
+
+            out.println("");
+            out.println("######################");
+            out.println("#      SPL Code      #");
+            out.println("######################");
+            out.println("");
         }
+
+        for(String line : program) {
+            out.println(line);
+            if (line.contains("def main"))
+                main = true;
+        }
+        if(!main && !testProgram)
+            throw new CompileException("Every SPL program needs a main function");
 
         if(!testProgram){
             out.println(""); // Insert blank line for visual pleasure

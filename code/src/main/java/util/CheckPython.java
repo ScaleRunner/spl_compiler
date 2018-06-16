@@ -61,7 +61,6 @@ public class CheckPython {
             String line = br.readLine();
             return line.equals("succes");
         } catch (IOException | InterruptedException | NullPointerException e) {
-            System.err.println("WARNING: the python module spl_types is not found. Appending class files in the python output...");
             return false;
         }
     }
