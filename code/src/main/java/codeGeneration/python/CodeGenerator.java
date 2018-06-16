@@ -55,6 +55,12 @@ public class CodeGenerator implements Visitor {
     public void generateCode(Node n) throws FileNotFoundException {
         n.accept(this);
 
+        if(listUsed){
+            programWriter.addImport("Node");
+        }
+        if(tupleUsed){
+            programWriter.addImport("Tuple");
+        }
         programWriter.writeToFile();
     }
 
@@ -102,8 +108,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(isEmptyExpression e) {
-        programWriter.addToOutput("not", true);
         this.visit(e.arg);
+        programWriter.addToOutput("[0]", true);
+        programWriter.addToOutput("== None", true);
     }
 
     @Override
