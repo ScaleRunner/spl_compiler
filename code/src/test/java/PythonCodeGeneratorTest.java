@@ -244,7 +244,7 @@ public class PythonCodeGeneratorTest {
     @Test
     public void testVariableDeclaration(){
         List<String> result = runCode(
-                "multBy2( n, m ) :: -> Void {\n" +
+                "multBy2( n, m ) :: Int Int -> Void {\n" +
                         "Int d = 9;\n" +
                         "d = 2;"+ //+ Try this later
                         "print(d);\n" +
@@ -442,13 +442,13 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8( rootFolder + "print.spl");
 
         List<String> result = runCode(program);
-        //TODO: This does not work due to indexing errors
-        assertEquals("[('a', 'b'), " +
+        assertEquals("[(a, b), " +
                         "(1, 2), " +
-                        "(3, 'c'), " +
-                        "((1, 2), ('a', 'b')), " +
-                        "(((1, 2), ('a', 'b')), ('a', 'b')), " +
-                        "((((1, 2), ('a', 'b')), ('a', 'b')), (((1, 2), ('a', 'b')), ('a', 'b')))]"
+                        "(3, c), " +
+                        "((1, 2), (a, b)), " +
+                        "(((1, 2), (a, b)), (a, b)), " +
+                        "((((1, 2), (a, b)), (a, b)), (((1, 2), (a, b)), (a, b))), " +
+                        "((((4, 2), (a, b)), (a, b)), (((4, 2), (a, b)), (a, b)))]"
                 , result.toString());
     }
 
@@ -457,7 +457,6 @@ public class PythonCodeGeneratorTest {
         String program = ReadSPL.readLineByLineJava8(rootFolder + "infinite_list.spl");
 
         List<String> result = runCode(program);
-        //TODO: FIX THIS
         assertEquals("[1, 2, 3, 1, 2, 3, 1, 2, 3, 1]", result.toString());
     }
 
@@ -529,22 +528,6 @@ public class PythonCodeGeneratorTest {
     }
 
     @Test
-    public void testListTLandHD(){
-        List<String> result = runCode("[Int] a = 1:2:3:[];\n" +
-                "[Int] b = 3:4:5:6:[];\n" +
-                "[[Int]] c = a:b:[];\n" +
-                //"[Char] l = 'd':'e':'f':[];\n" +
-                "main()::->Void{\n" +
-                //"[Char] d = 'a':'b':'c':[];\n"+
-                "b.hd = b;\n"+
-                "b.tl.tl = b;\n"+
-                "b.tl.tl.hd.tl.tl.hd = a.tl;\n"+
-                "print(b);\n" +
-                "}");
-        assertEquals("[[[2, 3], 4, [...], 6]]", result.toString());
-    }
-
-    @Test
     public void testGlobalVariables(){
         String program = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/globalVariablesSimple.spl");
 
@@ -567,16 +550,6 @@ public class PythonCodeGeneratorTest {
         List<String> result = runCode(program);
         assertEquals("[5, 3, 15, False, 5, 3, 42, True, False, 5, 3, 1]", result.toString());
     }
-
-    @Test
-    public void testSPL_import(){
-        List<String> result = executePython("./src/test/resources/pythonExamples/test_linkedList.py");
-
-        assertEquals("[Succes!]", result.toString());
-
-        assertTrue(CheckPython.spl_types_installed());
-    }
-
 
     @Test
     public void testAllTestsByMarkus() {
