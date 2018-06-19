@@ -2,10 +2,7 @@ package util;
 
 import codeGeneration.CompileException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,21 +43,13 @@ public class CheckPython {
     public static boolean spl_types_installed(){
         String python = getPythonVersion();
         try {
-            List<String> command = new ArrayList<>();
-            command.add(python);
-            command.add("-c");
-            command.add("\"from spl_types.lists import Node; print(\'succes\')\"");
-            ProcessBuilder builder = new ProcessBuilder(command);
+            String[] command = {python, "-c", "from spl_types.lists import Node"};//"\"; print('succes')\""};
+            final Process process = Runtime.getRuntime().exec(command);
 
-            final Process process = builder.start();
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            return stdError.readLine() == null;
 
-            InputStream is = process.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-            process.waitFor();
-            String line = br.readLine();
-            return line.equals("succes");
-        } catch (IOException | InterruptedException | NullPointerException e) {
+        } catch (IOException | NullPointerException e) {
             return false;
         }
     }
