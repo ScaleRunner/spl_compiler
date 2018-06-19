@@ -8,10 +8,13 @@ import parser.declarations.VariableDeclaration;
 import parser.expressions.*;
 import parser.statements.*;
 import parser.types.*;
+import util.Hashing;
 import util.Node;
 import util.Visitor;
 
 import java.io.FileNotFoundException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,11 +54,19 @@ public class CodeGenerator implements Visitor {
     private HashMap<String, HashMap<String, Integer>> functionsArgsEnvironment = new HashMap<>();
     private int numberOfGlobals = 0;
 
+    private MessageDigest md5Generator;
+
     private HashMap<String, Type> functionTypes = new HashMap<>();
 
 
     public CodeGenerator(String filepath) {
         this.programWriter = new ProgramWriter(filepath);
+
+        try {
+            this.md5Generator = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     public void generateCode(List<Declaration> nodes, Command postamble) throws FileNotFoundException {
@@ -444,7 +455,10 @@ public class CodeGenerator implements Visitor {
     public void visit(ConditionalStatement conditionalStatement) {
         //Bookkeeping: create branch names and adjust counters
         String branchThen = currentBranch + "_then" + thenBranches;
+        branchThen = Hashing.getMD5Hash(branchThen);
         String branchEnd = currentBranch + "_end" + endBranches;
+        branchEnd = Hashing.getMD5Hash(branchEnd);
+
         this.thenBranches++;
         this.endBranches++;
 
@@ -506,8 +520,11 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(LoopStatement loopStatement) {
         //Bookkeeping: create branch names and adjust counters
-        String branchLoop = currentBranch + "_loop" + loopBranches;
+        String branchLoop = currentBranch + "_loop" + thenBranches;
+        branchLoop = Hashing.getMD5Hash(branchLoop);
         String branchEnd = currentBranch + "_end" + endBranches;
+        branchEnd = Hashing.getMD5Hash(branchEnd);
+
         this.loopBranches++;
         this.endBranches++;
 
