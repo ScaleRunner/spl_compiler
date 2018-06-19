@@ -644,6 +644,7 @@ public class Typechecker implements Visitor {
     }
 
     private void consTypecheckAux(OperatorExpression e) {
+        //Ex: 1:1
         if (!(e.right.getType() instanceof ListType)) {
             error("Right hand side of cons expression must have listType list", e);
             return;
@@ -651,29 +652,33 @@ public class Typechecker implements Visitor {
 
         ListType listTypeRight = (ListType) e.right.getType();
 
-        //Anything : emptyList has List[Anything] type
-
+        // [Any]:[[Empty]] - > [[Any]]
         if (listTypeRight != null) {
             if (listTypeRight.listType instanceof ListType) {
                 if (((ListType) listTypeRight.listType).listType == emptyListType) {
                     if (e.left.getType() instanceof ListType) {
-                        if (((ListType) e.left.getType()).listType != emptyListType) {
-                            e.setType(e.left.getType());
+                        //Probably not necessary
+                        //if (((ListType) e.left.getType()).listType != emptyListType) {
+                            e.setType(Types.listType(e.left.getType()));
                             return;
-                        }
+                        //}
                     }
+                    error(String.format("LHS and RHS of cons expression are incompatible\n\tLHS: %s\n\tRHS: %s", e.left.getType(), e.right.getType()), e);
                 }
             }
         }
 
+        // [Empty]: Something
         if (e.left.getType() instanceof ListType) {
             if (((ListType) e.left.getType()).listType == emptyListType) {
                 if (e.right.getType() instanceof ListType) {
                     if (((ListType) e.right.getType()).listType == emptyListType) {
+                        // [Empty]: [Empty] -> [[Empty]]
                         e.setType(Types.listType(Types.listType(emptyListType)));
                         return;
                     } else if (((ListType) e.right.getType()).listType instanceof ListType) {
                         if (((ListType) ((ListType) e.right.getType()).listType).listType == emptyListType) {
+                            //[Empty]:[[Empty]] -> [[Empty]]
                             e.setType(e.right.getType());
                             return;
                         } else {
@@ -688,6 +693,7 @@ public class Typechecker implements Visitor {
             }
         }
 
+        // Any : [] -> [Any]
         if (listTypeRight.listType == emptyListType) {
             e.setType(new ListType(e.left.getType()));
             return;
@@ -697,6 +703,7 @@ public class Typechecker implements Visitor {
             e.setType(e.right.getType());
             return;
         }
+
         //If rhs has list type compatible left.type, it's fine
         else if (isCompatible((e.left.getType()), ((ListType) e.right.getType()).listType, e)) {
             Type infered = inferedTyped(e.left.getType(), ((ListType) e.right.getType()).listType, e);
