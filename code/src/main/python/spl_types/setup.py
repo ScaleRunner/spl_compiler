@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name='spl_types',
-    version='0.1.2',
+    version='1.0',
     url='https://github.com/ScaleRunner/compiler_construction',
     author='Dennis Verheijden',
     author_email='dennis-verheijden@live.nl',
