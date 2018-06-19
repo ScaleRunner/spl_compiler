@@ -287,6 +287,20 @@ public class SSMCodeGeneratorTest {
     }
 
     @Test
+    public void testEmptyListRHS(){
+        String result = runSPL("main()::->Void{\n" +
+                "Bool a = True; " +
+                "[Int] b = []; " +
+                "[Int] c = b.tl; " +
+                "while(!a){" +
+                "    a = False;" +
+                "}" +
+                "print(a);" +
+                "}", null,false);
+        assertEquals("-1", result);
+    }
+
+    @Test
     public void testSimpleWhile(){
         String program = ReadSPL.readLineByLineJava8(rootFolder + "simpleWhile.spl");
 
