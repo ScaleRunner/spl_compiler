@@ -501,7 +501,7 @@ public class PythonCodeGeneratorTest {
     public void testTupleWithLists(){
         List<String> result = runCode("[Int] a = 1:2:3:[];\n" +
                 "[Int] b = 3:4:5:[];\n" +
-                "[[Int]] c = a:b;\n" +
+                "[[Int]] c = a:b:[];\n" +
                 "main()::->Void{\n" +
                 "[Char] d = 'a':'b':'c':[];\n" +
                 "([[Int]],[Char]) e = (c, d);\n"+
