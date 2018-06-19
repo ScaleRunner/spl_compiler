@@ -279,10 +279,9 @@ public class PrettyPrinter implements Visitor {
             builder.append(prefix);
             this.visit(varDecl);
         }
-        builder.append("\n");
         this.visit(d.stats);
         prefix = prefix.replaceFirst("\t", "");
-        builder.append("\n}\n\n");
+        builder.append("\n}");
     }
 
     /**
