@@ -328,7 +328,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void FactorialImperative(){
-        String program = ReadSPL.readLineByLineJava8(rootFolder + "factorial_imperative.spl");
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/tuples.spl");
 
         String result = runSPL(program, null,false);
         assertEquals("120", result);
@@ -348,6 +348,14 @@ public class SSMCodeGeneratorTest {
 
         String result = runSPL(program, null,false);
         assertEquals("15", result);
+    }
+
+    @Test
+    public void testScope(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "scope_test.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("a", result);
     }
 
     @Test

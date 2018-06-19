@@ -98,11 +98,11 @@ public class Typechecker implements Visitor {
                 }
             }
         }
-        if (env.get(e.function_name.name) == null)
+        if (env.getFunction(e.function_name.name) == null)
             error(String.format("The function %s was not defined",
                     e.function_name.name), e);
         else
-            e.setType(env.get(e.function_name.name).type);
+            e.setType(env.getFunction(e.function_name.name).type);
     }
 
     @Override
@@ -457,7 +457,7 @@ public class Typechecker implements Visitor {
                 }
             }
         }
-        s.setType(env.get(s.function_name.name).type);
+        s.setType(env.getFunction(s.function_name.name).type);
     }
 
     @Override
@@ -539,10 +539,10 @@ public class Typechecker implements Visitor {
         //set functiontype
         d.setType(d.funType.returnType);
         //Functions are always global
-        if (env.get(d.funName.name) != null) {
+        if (env.getFunction(d.funName.name) != null) {
             error(String.format("The function %s is already defined", d.funName.name), d);
         } else {
-            env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true, true, false));
+            env.putFunction(d.funName.name, new EnvironmentType(d.funType.returnType, true, true, false));
             functionSignatures.put(d.funName.name, d.funType.argsTypes);
         }
 
@@ -590,7 +590,7 @@ public class Typechecker implements Visitor {
 
         env = backup;
         //add function signature to environment, so other functions below it can still use it.
-        env.put(d.funName.name, new EnvironmentType(d.funType.returnType, true, true, false));
+        env.putFunction(d.funName.name, new EnvironmentType(d.funType.returnType, true, true, false));
     }
 
     @Override

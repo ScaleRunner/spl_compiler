@@ -1,5 +1,8 @@
 package typechecker;
 
+import parser.declarations.FunctionDeclaration;
+import parser.types.Type;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,4 +29,16 @@ public class Environment extends HashMap<String, EnvironmentType> {
 
 	    return copy;
     }
+
+    public void putFunction(String key, EnvironmentType value){
+        this.put(key +"_func", value);
+    }
+
+    public EnvironmentType getFunction(String key){
+        return this.get(key +"_func");
+    }
+
+
+
 }
+

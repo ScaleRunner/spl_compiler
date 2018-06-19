@@ -140,6 +140,38 @@ public class TypecheckerTest {
     }
 
     @Test
+    public void testFunCallNoAssign(){
+        typecheckSPL("Int multBy3 = 0;" +
+                "Int myGlobal2 = 1;" +
+                "multBy3( n ) :: Int -> Int {\n" +
+                "Int f = 9;\n" +
+                "Int g = 3;" +
+                "g = 2;"+ //+ Try this later
+                "myGlobal2 = 10;"+
+                "return n * 3;\n" +
+                "}"+
+                "multBy2( n ) :: Int -> Int {\n" +
+                "Int d = 9;\n" +
+                "Int e = 3;" +
+                "myGlobal2 = d;" +
+                "myGlobal2 = e;"+
+                "d = 2;"+ //+ Try this later
+                "return multBy3(n * 2);\n" +
+                "}"+
+                "main()::->Void{\n" +
+                "Int a = 3+ 2;\n" +
+                "Int b = 5+ 3;\n" +
+                "Int c = b;\n" +
+                "c =multBy2(c);\n" +
+                //RESULT IS 48 because in multBy2
+                "print(c);\n" +
+                //"return;" + Fix later
+                "}");
+        assertTypecheckSuccess();
+
+    }
+
+    @Test
     public void testListTl() {
         Node e = typecheckExpr("((2, 'a') : []).tl");
         assertTypecheckSuccess();

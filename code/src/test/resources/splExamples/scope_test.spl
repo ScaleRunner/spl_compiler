@@ -1,0 +1,19 @@
+Int global = 1;
+
+//Variable already defined
+//Int global = 2;
+
+Int funName = 2;
+
+funName(a)::Int->Void{
+	//This is fine
+	Int global = 3;
+	//Also fine
+	Int funName = 4;
+	print(funName);
+}
+
+main()::->Void{
+    funName(3);
+    print('a');
+}
