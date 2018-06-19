@@ -13,7 +13,8 @@ import java.util.Map;
 public class ProgramWriter {
 
     // Number of characters that should be written in each column of the output
-    public final static int LENGTH = 10;
+    public final static int LENGTH_BRANCH = 35;
+    public final static int LENGTH_COMMAND = 10;
 
     private final String filepath;
 
@@ -53,7 +54,7 @@ public class ProgramWriter {
         if(!branchName.equals("")){
             branchName = branchName + ":";
         }
-        String format = "%-" + LENGTH + "s %s";
+        String format = "%-" + LENGTH_BRANCH + "s %s";
         return String.format(format, branchName, command);
     }
 

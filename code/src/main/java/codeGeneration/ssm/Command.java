@@ -26,7 +26,7 @@ public class Command {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        String format = "%-" + ProgramWriter.LENGTH + "s";
+        String format = "%-" + ProgramWriter.LENGTH_COMMAND + "s";
         sb.append(String.format(format, command));
         for(String arg : args){
             sb.append(" ");
