@@ -1,7 +1,7 @@
 class Node:
     def __init__(self, value=None, next_node=None):
         self.value = value
-        self.next_node: Node = next_node
+        self.next_node = next_node
 
     def traverse(self):
         return self.next_node
@@ -43,7 +43,7 @@ class Node:
         return "" if self.value is None else str(self.value)
 
 
-def print_list(node: Node):
+def print_list(node):
     str_values = str(node.value)
 
     tail = node.traverse()
