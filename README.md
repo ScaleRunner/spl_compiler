@@ -19,6 +19,13 @@ usage: Compiler
                          comments)
 ```
 
+### Steps for Executing SSM code
+SSM code can be compiled with the command:
+```
+java -jar compiler-X.X.jar -i test_file.spl -c
+```
+However, when it is desired to also run the code, the ``-c`` parameter should be omited. For running the code, you need to download the latest version of the Simple Stack Machine and put it in the same directory as the ``compiler-X.X.jar`` file. The SSM can be downloaded from [this page](http://www.staff.science.uu.nl/~dijks106/SSM/download.html) or by clicking [here](http://www.staff.science.uu.nl/~dijks106/SSM/Distr/ssm-20150616.tgz).
+
 ### Python Installation
 The python compilation uses custom data types for Lists, as it uses a LinkedList implementation, and tuples, as python tuples are immutable. If the python package is installed the will be imported, otherwise they will be appended to the generated output file when used.
 
