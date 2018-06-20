@@ -18,16 +18,18 @@ public class Main {
 
         try {
             CommandLine cmd = cli.parse();
+            if(cmd.hasOption("v")){
+                System.out.println(VERSION);
+                return;
+            }
             if(cmd.hasOption("h")){
                 cli.help();
-                return;
-            } else if(cmd.hasOption("v")){
-                System.out.println(VERSION);
                 return;
             }
             Runner runner = new Runner(cmd);
             runner.execute();
         } catch (ParseException e) {
+            System.err.println(e.getMessage());
             cli.help();
         } catch (FileNotFoundException e) {
             System.err.println("The inputfile could not be found!");

@@ -14,7 +14,7 @@ public class CLI {
 
     private Options getOptions() {
         Options options = new Options();
-        options.addRequiredOption("i", "input-file", true, "The SPL filepath");
+        options.addOption("i", "input-file", true, "The SPL filepath");
         options.addOption("c", "compile-only", false, "Only compile the code, do not run it");
         options.addOption("r", "reformat", false, "Reformat SPL code and exit (WARNING: Removes comments)");
         options.addOption("v", "version", false, "Print the version of the compiler");
