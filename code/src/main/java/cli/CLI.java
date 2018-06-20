@@ -17,6 +17,7 @@ public class CLI {
         options.addRequiredOption("i", "input-file", true, "The SPL filepath");
         options.addOption("c", "compile-only", false, "Only compile the code, do not run it");
         options.addOption("r", "reformat", false, "Reformat SPL code and exit (WARNING: Removes comments)");
+        options.addOption("v", "version", false, "Print the version of the compiler");
         options.addOption("p", "python", false, "Compile to Python instead of SSM");
         options.addOption("h", "help", false, "Show compiler usage");
 

@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class Main {
 
+    public static final String VERSION = "SPL Compiler v1.2";
+
     public static void main(String[] args) {
 
         CLI cli = new CLI(args);
@@ -18,6 +20,9 @@ public class Main {
             CommandLine cmd = cli.parse();
             if(cmd.hasOption("h")){
                 cli.help();
+                return;
+            } else if(cmd.hasOption("v")){
+                System.out.println(VERSION);
                 return;
             }
             Runner runner = new Runner(cmd);
