@@ -31,7 +31,7 @@ public class Runner {
         this.compileOnly = cmd.hasOption("c");
         this.reformat = cmd.hasOption("r");
 
-        if(!cmd.hasOption("i")){
+        if (!cmd.hasOption("i")) {
             throw new ParseException("An input file must be provided!");
         }
 
@@ -52,7 +52,7 @@ public class Runner {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         List<Declaration> nodes = p.parseSPL();
-        if(reformat){
+        if (reformat) {
             PrettyPrinter.writeToFile(inputfile, nodes);
             return;
         }

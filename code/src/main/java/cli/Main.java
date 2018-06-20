@@ -1,7 +1,5 @@
 package cli;
 
-import cli.CLI;
-import cli.Runner;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
@@ -18,11 +16,11 @@ public class Main {
 
         try {
             CommandLine cmd = cli.parse();
-            if(cmd.hasOption("v")){
+            if (cmd.hasOption("v")) {
                 System.out.println(VERSION);
                 return;
             }
-            if(cmd.hasOption("h")){
+            if (cmd.hasOption("h")) {
                 cli.help();
                 return;
             }
