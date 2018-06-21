@@ -1,0 +1,73 @@
+getLength(list):: [Int] -> Int{
+    Int length = 0;
+
+    while(!isEmpty(list)){
+        list = list.tl;
+        length = length + 1;
+    }
+    return length;
+}
+
+printList(list)::[Int]->Void{
+    while(!isEmpty(list)){
+            print(list.hd);
+            list = list.tl;
+    }
+
+}
+
+getNthElement(list, n)::[Int] Int-> Int{
+
+    Int element = 0;
+    while(n > 0){
+        list = list.tl;
+        n = n-1;
+    }
+    return list.hd;
+}
+
+setNthElement(list, n, value)::[Int] Int Int-> Void{
+
+    Int element = 0;
+    while(n > 0){
+        list = list.tl;
+        n = n-1;
+    }
+    list.hd = value;
+}
+
+insertionSort (list) :: [Int] -> [Int] {
+
+    Int length = getLength(list);
+    Int i = 1;
+    Int value = 0;
+    Int j = 0;
+    while(i < length){
+        value = getNthElement(list, i);
+        j = i-1;
+        while(j >= 0 && getNthElement(list, j) > value){
+            setNthElement(list, (j+1), getNthElement(list, j));
+            j = j - 1;
+        }
+        setNthElement(list, (j+1), value);
+        i = i+1;
+    }
+    return list;
+}
+
+
+
+main()::->Void
+{
+    [Int] a = 17:4:12:3:16:5:7:1:2:11:6:18:9:19:14:13:20:10:8:15:[];
+
+
+    a = insertionSort(a);
+    printList(a);
+
+
+
+
+}
+
+

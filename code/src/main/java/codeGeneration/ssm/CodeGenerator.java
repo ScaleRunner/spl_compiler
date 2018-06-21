@@ -122,7 +122,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(CallExpression e) {
-
+        HashMap<String, Integer> previous = currentArgumentsPlusOffsettmp;
         //SAVES previous MP
         //saves MP before putting arguments on stack
         programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
@@ -146,6 +146,8 @@ public class CodeGenerator implements Visitor {
         if(!(functionTypes.get(e.function_name.name) instanceof VoidType))
             programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
 
+        currentArgumentsPlusOffsettmp = previous;
+
     }
 
     @Override
@@ -161,6 +163,7 @@ public class CodeGenerator implements Visitor {
         if(currentlocalVariablesPlusOffset != null) {
             if (!leftsideVarDeclaration && (currentlocalVariablesPlusOffset.get(e.name) != null)) {
                 programWriter.addToOutput(currentBranch, new Command("ldl", Integer.toString(currentlocalVariablesPlusOffset.get(e.name)))); //Loads value from address
+
             }
             //we assume it's an argument
             else if (!leftsideVarDeclaration && currentArgumentsPlusOffsettmp.get(e.name) != null) {
@@ -265,10 +268,7 @@ public class CodeGenerator implements Visitor {
     public void visit(PostfixExpression e) {
 
         this.visit(e.left);
-//        if(leftsideVarDeclaration) {
-//            programWriter.addToOutput(currentBranch, new Command("lda", "0"));
-//        }
-//        if(!leftsideVarDeclaration ) {
+
 
             if (e.operator == TokenType.TOK_FST) {
                 programWriter.addToOutput(currentBranch, new Command("ldh", "0"));
@@ -352,21 +352,9 @@ public class CodeGenerator implements Visitor {
             leftsideVarDeclaration = false;
         if(s.name instanceof PostfixExpression)
             programWriter.removeLastCommand(currentBranch);
-//        if(s.name instanceof IdentifierExpression){
-//            if(GlobalVariablesPlusOffset.get(name)!= null){
-//                //Load address of first global variable
-//
-//            }
-//        }
 
-
-        //Value is put on the stack
-//        leftsideAssignment = false;
-        //leftsideVarDeclaration = false;
         this.visit(s.right);
-//        if(s.right instanceof CallExpression ){
-//            programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
-//        }
+
         if(s.name instanceof IdentifierExpression){
             String name = ((IdentifierExpression) s.name).name;
             if(GlobalVariablesPlusOffset.get(name)!= null){
@@ -402,6 +390,7 @@ public class CodeGenerator implements Visitor {
     public void visit(CallStatement s) {
         //SAVES previous MP
         //saves MP before putting arguments on stack
+        HashMap<String, Integer> previous = currentArgumentsPlusOffsettmp;
         programWriter.addToOutput(currentBranch, new Command("ldr", "MP"));
 
         for(Expression arg : s.args){
@@ -419,6 +408,8 @@ public class CodeGenerator implements Visitor {
         //programWriter.addToOutput(currentBranch, new Command("ajs", Integer.toString(-e.args.size())));
         if(!(functionTypes.get(s.function_name.name) instanceof VoidType))
             programWriter.addToOutput(currentBranch, new Command("ldr", "RR"));
+
+        currentArgumentsPlusOffsettmp = previous;
     }
 
     /**

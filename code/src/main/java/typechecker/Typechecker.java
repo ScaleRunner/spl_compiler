@@ -548,7 +548,7 @@ public class Typechecker implements Visitor {
 
         //check if arguments and argument types match
         if (d.args.size() != d.funType.argsTypes.size()) {
-            if (d.args.size() > d.funType.argsTypes.size())
+            if (d.args.size() < d.funType.argsTypes.size())
                 error("There are more argument types than function arguments", d);
             else
                 error("There are more function arguments than argument types", d);

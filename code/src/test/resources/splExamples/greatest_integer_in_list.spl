@@ -1,0 +1,19 @@
+
+greatestElement (list) :: [Int] -> Int {
+    Int greatest = 0;
+    while(!isEmpty(list)){
+            if(list.hd > greatest){
+                greatest = list.hd;
+            }
+            list = list.tl;
+    }
+    return greatest;
+}
+
+main()::->Void
+{
+    [Int] a = 4:3:5:1:[];
+
+    print(greatestElement(a));
+
+}

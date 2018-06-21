@@ -1,0 +1,93 @@
+getLength(list):: [Int] -> Int{
+    Int length = 0;
+
+    while(!isEmpty(list)){
+        list = list.tl;
+        length = length + 1;
+    }
+    return length;
+}
+
+printList(list)::[Int]->Void{
+    while(!isEmpty(list)){
+            print(list.hd);
+            list = list.tl;
+    }
+
+}
+
+getNthElement(list, n)::[Int] Int-> Int{
+
+    Int element = 0;
+    while(n > 0){
+        list = list.tl;
+        n = n-1;
+    }
+    return list.hd;
+}
+
+setNthElement(list, n, value)::[Int] Int Int-> Void{
+
+    Int element = 0;
+    while(n > 0){
+        list = list.tl;
+        n = n-1;
+    }
+    list.hd = value;
+}
+
+quickSort (list, begin, end) :: [Int] Int Int-> [Int] {
+
+    Int length = end-begin+1;
+    Int pivot = getNthElement(list, begin);
+    Int left = begin;
+    Int right = end;
+    Int aux = 0;
+
+    if(length > 1){
+
+
+
+        while(left <= right){
+            while(getNthElement(list, left) < pivot){
+                left = left +1;
+            }
+            while(getNthElement(list, right) > pivot){
+                right = right -1;
+            }
+            if(left <= right){
+                //Swaps
+                aux = getNthElement(list, left);
+                setNthElement(list, left, getNthElement(list, right));
+                setNthElement(list, right, aux);
+                left = left + 1;
+                right = right -1;
+
+            }
+
+
+
+        }
+        quickSort(list, begin, right);
+        quickSort(list, left, end);
+
+
+    }
+    return list;
+}
+
+
+
+main()::->Void
+{
+    [Int] a = 17:4:12:3:16:5:7:1:2:11:6:18:9:19:14:13:20:10:8:15:[];
+    Int length = getLength(a);
+
+    printList(quickSort(a, 0, length-1));
+
+
+
+
+}
+
+

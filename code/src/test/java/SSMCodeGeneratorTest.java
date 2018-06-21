@@ -326,13 +326,6 @@ public class SSMCodeGeneratorTest {
     }
 
 
-    @Test
-    public void FactorialImperative(){
-        String program = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/tuples.spl");
-
-        String result = runSPL(program, null,false);
-        assertEquals("120", result);
-    }
 
     @Test
     public void FactorialRecursive(){
@@ -350,13 +343,13 @@ public class SSMCodeGeneratorTest {
         assertEquals("15", result);
     }
 
-    @Test
-    public void testScope(){
-        String program = ReadSPL.readLineByLineJava8(rootFolder + "scope_test.spl");
-
-        String result = runSPL(program, null,false);
-        assertEquals("a", result);
-    }
+//    @Test
+//    public void testScope(){
+//        String program = ReadSPL.readLineByLineJava8(rootFolder + "scope_test.spl");
+//
+//        String result = runSPL(program, null,false);
+//        assertEquals("a", result);
+//    }
 
     @Test
     public void testSimpleConditional(){
@@ -428,6 +421,32 @@ public class SSMCodeGeneratorTest {
         assertEquals("1 2 3 1 2 3 1 2 3 1 machine halted", result);
     }
 
+    @Test
+    public void greatest_integer_int_list(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "greatest_integer_in_list.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("5", result);
+    }
+
+    @Test
+    public void insertionSort(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "insertion_sort.spl");
+
+        String result = runSPL(program, null,true);
+        assertEquals("1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 machine halted", result);
+    }
+
+    @Test
+    public void quickSort(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "quick_sort.spl");
+
+        String result = runSPL(program, null,true);
+        assertEquals("1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 machine halted", result);
+    }
+
+
+
     @Test(expected = CompileException.class)
     public void testNoMain(){
         String program = ReadSPL.readLineByLineJava8(rootFolder + "no_main.spl");
@@ -450,7 +469,7 @@ public class SSMCodeGeneratorTest {
         String result = runSPL("[Int] a = 1:2:3:[];\n" +
                 "main()::->Void{\n" +
                 "[Int] b = 3:4:5:[];\n" +
-                "[[Int]] c = a:b;\n" +
+                "[[Int]] c = a:b:[];\n" +
 
                 "print(a.hd);\n" +
                 "}", null,false);
@@ -470,7 +489,7 @@ public class SSMCodeGeneratorTest {
     public void testTupleWithLists(){
         String result = runSPL("[Int] a = 1:2:3:[];\n" +
                 "[Int] b = 3:4:5:[];\n" +
-                "[[Int]] c = a:b;\n" +
+                "[[Int]] c = a:b:[];\n" +
                 "main()::->Void{\n" +
                 "[Char] d = 'a':'b':'c':[];\n" +
                 "([[Int]],[Char]) e = (c, d);\n"+
@@ -483,7 +502,7 @@ public class SSMCodeGeneratorTest {
     public void testTupleFstSndTL(){
         String result = runSPL("[Int] a = 1:2:3:[];\n" +
                 "[Int] b = 3:4:5:[];\n" +
-                "[[Int]] c = a:b;\n" +
+                "[[Int]] c = a:b:[];\n" +
                 "[Char] l = 'd':'e':'f':[];\n" +
                 "main()::->Void{\n" +
                 "[Char] d = 'a':'b':'c':[];\n" +
@@ -500,7 +519,7 @@ public class SSMCodeGeneratorTest {
     public void testListTLandHD(){
         String result = runSPL("[Int] a = 1:2:3:[];\n" +
                 "[Int] b = 3:4:5:[];\n" +
-                "[[Int]] c = a:b;\n" +
+                "[[Int]] c = a:b:[];\n" +
                 //"[Char] l = 'd':'e':'f':[];\n" +
                 "main()::->Void{\n" +
                 //"[Char] d = 'a':'b':'c':[];\n"+
