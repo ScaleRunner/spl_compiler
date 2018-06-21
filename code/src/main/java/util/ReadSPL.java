@@ -17,6 +17,11 @@ public class ReadSPL {
         }
         catch (IOException e)
         {
+            if(filePath.contains("lists.py")){
+                return readLineByLineJava8("lists.py");
+            } else if(filePath.contains("tuples.py")){
+                return readLineByLineJava8("tuples.py");
+            }
             e.printStackTrace();
         }
         return contentBuilder.toString();
