@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class PythonCodeGeneratorTest {
 
@@ -557,6 +556,30 @@ public class PythonCodeGeneratorTest {
 
         List<String> result = runCode(program);
         assertEquals("[1]", result.toString());
+    }
+
+    @Test
+    public void greatest_integer_int_list(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "greatest_integer_in_list.spl");
+
+        List<String> result = runCode(program);
+        assertEquals("[5]", result.toString());
+    }
+
+    @Test
+    public void insertionSort(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "insertion_sort.spl");
+
+        List<String> result = runCode(program);
+        assertEquals("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]", result.toString());
+    }
+
+    @Test
+    public void quickSort(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "quick_sort.spl");
+
+        List<String> result = runCode(program);
+        assertEquals("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]", result.toString());
     }
 
     @Test

@@ -453,7 +453,6 @@ public class SSMCodeGeneratorTest {
     }
 
 
-
     @Test(expected = CompileException.class)
     public void testNoMain(){
         String program = ReadSPL.readLineByLineJava8(rootFolder + "no_main.spl");
@@ -538,6 +537,7 @@ public class SSMCodeGeneratorTest {
 
     @Test
     public void testParethesisBomb(){
+        // Depending on the Java version and OS this gives a StackOverflowError
         String program = ReadSPL.readLineByLineJava8(rootFolder + "parenthesis_bomb.spl");
 
         String result = runSPL(program, null, false);
