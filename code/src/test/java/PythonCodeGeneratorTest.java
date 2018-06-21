@@ -552,6 +552,14 @@ public class PythonCodeGeneratorTest {
     }
 
     @Test
+    public void testParethesisBomb(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "parenthesis_bomb.spl");
+
+        List<String> result = runCode(program);
+        assertEquals("[1]", result.toString());
+    }
+
+    @Test
     public void testAllTestsByMarkus() {
         Long sleepTime = 50L;
         try (Stream<Path> paths = Files.walk(Paths.get(rootFolder + "markus/3-ok/"))) {

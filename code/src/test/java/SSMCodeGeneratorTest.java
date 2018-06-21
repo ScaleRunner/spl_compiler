@@ -326,6 +326,13 @@ public class SSMCodeGeneratorTest {
     }
 
 
+    @Test
+    public void FactorialImperative(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "factorial_imperative.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("120", result);
+    }
 
     @Test
     public void FactorialRecursive(){
@@ -343,13 +350,13 @@ public class SSMCodeGeneratorTest {
         assertEquals("15", result);
     }
 
-//    @Test
-//    public void testScope(){
-//        String program = ReadSPL.readLineByLineJava8(rootFolder + "scope_test.spl");
-//
-//        String result = runSPL(program, null,false);
-//        assertEquals("a", result);
-//    }
+    @Test
+    public void testScope(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "scope_test.spl");
+
+        String result = runSPL(program, null,false);
+        assertEquals("4", result);
+    }
 
     @Test
     public void testSimpleConditional(){
@@ -529,14 +536,13 @@ public class SSMCodeGeneratorTest {
         assertEquals("2", result);
     }
 
-    //Don't remember what this was
-//    @Test
-//    public void testSimpleFunctionList(){
-//        String program = ReadSPL.readLineByLineJava8(rootFolder + "markus/3-ok/globalVariables.spl");
-//
-//        String result = runSPL(program, null,false);
-//        assertEquals("15", result);
-//    }
+    @Test
+    public void testParethesisBomb(){
+        String program = ReadSPL.readLineByLineJava8(rootFolder + "parenthesis_bomb.spl");
+
+        String result = runSPL(program, null, false);
+        assertEquals("1", result);
+    }
 
     @Test
     public void testAllTestsByMarkus() {

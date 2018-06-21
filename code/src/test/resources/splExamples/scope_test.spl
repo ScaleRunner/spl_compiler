@@ -15,5 +15,4 @@ funName(a)::Int->Void{
 
 main()::->Void{
     funName(3);
-    print('a');
 }

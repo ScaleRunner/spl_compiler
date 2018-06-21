@@ -3,6 +3,7 @@ package cli;
 import codeGeneration.python.CodeGenerator;
 import lexer.Lexer;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.ParseException;
 import parser.Parser;
 import parser.declarations.Declaration;
 import typechecker.Typechecker;
@@ -25,10 +26,14 @@ public class Runner {
     private final boolean compileOnly;
     private final boolean reformat;
 
-    public Runner(CommandLine cmd) {
+    public Runner(CommandLine cmd) throws ParseException {
         this.python = cmd.hasOption("p");
         this.compileOnly = cmd.hasOption("c");
         this.reformat = cmd.hasOption("r");
+
+        if (!cmd.hasOption("i")) {
+            throw new ParseException("An input file must be provided!");
+        }
 
         String filepath = cmd.getOptionValue("i");
         if (filepath.endsWith(".spl")) {
@@ -47,7 +52,7 @@ public class Runner {
         Lexer l = new Lexer(program);
         Parser p = new Parser(l.tokenize());
         List<Declaration> nodes = p.parseSPL();
-        if(reformat){
+        if (reformat) {
             PrettyPrinter.writeToFile(inputfile, nodes);
             return;
         }
